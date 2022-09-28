@@ -1,7 +1,7 @@
 
-## *[title]* 
-#### *[name]* 
-#### *[student id]* 
+## *MACHINE LEARNING FOR ACCELERATED CELLULAR AUTOMATA PATTERN SEARCH* 
+#### *Paul Bekaert* 
+#### *2517073B* 
 
 ## Proposal
 ### Motivation
