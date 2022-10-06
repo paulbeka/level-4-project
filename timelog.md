@@ -43,3 +43,7 @@
 ## Week 2
 
 ### 5 Oct 2022
+* *3 hours* Literature search, started writing a recap
+
+### 6 Oct 2022
+* *1 hour* worked on upcoming meeting + literature search
