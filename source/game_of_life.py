@@ -66,8 +66,12 @@ class Game:
 			if event.type == pygame.QUIT:
 				self.running = False
 
+
+		# update board state
+		self.cells = self.getNextState()
+
+
 		if self.fps // self.generations_per_second < self.tick_update:
-			self.update_cells()
 			self.tick_update = 0
 
 
@@ -94,7 +98,7 @@ class Game:
 			pygame.draw.rect(self.display, Game.BLACK, ((index[0]*self.cell_size, index[1]*self.cell_size), (self.cell_size, self.cell_size)), False)
 
 
-	def update_cells(self):
+	def getNextState(self):
 		active_cells = np.argwhere(self.cells == 1)
 		update = active_cells
 
@@ -110,16 +114,7 @@ class Game:
 			if cell[0] < 0 or cell[0] > self.x_size-1 or cell[1] < 0 or cell[1] > self.y_size-1:
 				continue
 
-			neighbors = self.neighbour_template + cell
-			
-			# Check that neighbours are within the board
-			valid_neighbours = neighbors[neighbors[:,0] > -1]
-			valid_neighbours = valid_neighbours[valid_neighbours[:,0] < self.x_size]
-			valid_neighbours = valid_neighbours[valid_neighbours[:,1] > -1]
-			valid_neighbours = valid_neighbours[valid_neighbours[:,1] < self.y_size]
-
-			n_live_neighbours = np.count_nonzero(self.cells[valid_neighbours[:,0],valid_neighbours[:,1]] == 1)
-			#print(n_live_neighbours)
+			n_live_neighbours = self.checkNumberOfNeighbours(cell)
 
 			# Rules of the game
 			if self.cells[cell[0], cell[1]]:
@@ -130,7 +125,19 @@ class Game:
 				if n_live_neighbours in self.rule2:
 					newState[cell[0], cell[1]] = True
 
-		self.cells = newState
+		return newState		
+
+
+	def checkNumberOfNeighbours(self, cell):
+		neighbors = self.neighbour_template + cell
+			
+		# Check that neighbours are within the board
+		valid_neighbours = neighbors[neighbors[:,0] > -1]
+		valid_neighbours = valid_neighbours[valid_neighbours[:,0] < self.x_size]
+		valid_neighbours = valid_neighbours[valid_neighbours[:,1] > -1]
+		valid_neighbours = valid_neighbours[valid_neighbours[:,1] < self.y_size]
+
+		return np.count_nonzero(self.cells[valid_neighbours[:,0],valid_neighbours[:,1]] == 1)
 
 
 	def getState(self):

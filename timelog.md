@@ -46,4 +46,21 @@
 * *3 hours* Literature search, started writing a recap
 
 ### 6 Oct 2022
-* *1 hour* worked on upcoming meeting + literature search
+* *2 hours* worked on upcoming meeting + literature search
+
+### 7 Oct 2022
+* *1 hour* met with supervisor and did reviewed it
+
+### 8 Oct 2022
+* *0 hours* No progress
+
+### 9 Oct 2022
+* *1 hour* Started working on the paper
+* *1 hour* trying to understand previous life search algorithms, and literature search
+
+### 10 Oct 2022
+* *1 hour* did some research about existing algorithms and wrote some background stuff
+* *3 hours* tried to make a brute force algorithm, but was significantly slower than expected. No progress.
+
+### 11 Oct 2022
+* *4 hours* know I want to search for spaceships, researched wikis and such, found useful modules to use later
