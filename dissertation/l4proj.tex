@@ -11,8 +11,8 @@
 
 %==============================================================================
 %% METADATA
-\title{Level 4 Project Report Template}
-\author{John H. Williamson}
+\title{This will be the title one day}
+\author{Paul E. B. Bekaert}
 \date{September 14, 2018}
 
 \maketitle
@@ -39,8 +39,8 @@
 % Please note that you are under no obligation to sign 
 % this declaration, but doing so would help future students.
 %
-%\def\consentname {My Name} % your full name
-%\def\consentdate {20 March 2018} % the date you agree
+\def\consentname {Paul E. B. Bekaert} % your full name
+\def\consentdate {7 October 2022} % the date you agree
 %
 \educationalconsent
 
@@ -80,93 +80,60 @@
 % reset page numbering. Don't remove this!
 \pagenumbering{arabic} 
 
-
 Why should the reader care about what are you doing and what are you actually doing?
-\section{Guidance}
 
-\textbf{Motivate} first, then state the general problem clearly. 
+\section{Motivation}
 
-\section{Writing guidance}
-\subsection{Who is the reader?}
+Deep learning has had a major impact in the computer science world. Problems deemed unsolvable years ago have now been reduced to efficient neural networks. 
 
-This is the key question for any writing. Your reader:
+The game of life has often been seen as a toy project. It is idealistic in its way to represent the world, as it is fully observable, episodic and deterministic. However, cellular automata are not all toy problems, as there exists applications in other fields, like Physics and Biology. For example,  \cite{physics_CA_use_example} models stress in dynamic re-crystallization using a CA .
 
-\begin{itemize}
-    \item
-    is a trained computer scientist: \emph{don't explain basics}.
-    \item
-    has limited time: \emph{keep on topic}.
-    \item
-    has no idea why anyone would want to do this: \emph{motivate clearly}
-    \item
-    might not know \emph{anything} about your project in particular:
-    \emph{explain your project}.
-    \item
-    but might know precise details and check them: \emph{be precise and
-    strive for accuracy.}
-    \item
-    doesn't know or care about you: \emph{personal discussions are
-    irrelevant}.
-\end{itemize}
+As of yet, no general way of finding patterns in the game of life using deep learning have been explored, and most of the deep learning used have been attempts at predicting the game of life after $n$ generations, or reversing the game. A neural network that could find structures in GoL could be generalised and used in other applications for pattern search where an algorithmic search may not be possible. 
+% General ideas here: either find a paper that uses CA to model a solution and needs a way of finding a pattern inside the CA, or demonstrate that a lot of problems that use CA also use neural networks for progression, and therefore maybe this algorithm could improve upon existing solutions and such.
 
-Remember, you will be marked by your supervisor and one or more members
-of staff. You might also have your project read by a prize-awarding
-committee or possibly a future employer. Bear that in mind.
+\section{Aims}
 
-\subsection{References and style guides}
-There are many style guides on good English writing. You don't need to
-read these, but they will improve how you write.
+This paper goes into detail about how to find 'spaceships' in the game of life using deep learning as a search method. Spaceships are structures inside the game that move across the board and keep the same configuration after having moved a set amount. The neural network will then be evaluated based on:
 
 \begin{itemize}
-    \item
-    \emph{How to write a great research paper} \cite{Pey17} (\textbf{recommended}, even though you aren't writing a research paper)
-    \item
-    \emph{How to Write with Style} \cite{Von80}. Short and easy to read. Available online.
-    \item
-    \emph{Style: The Basics of Clarity and Grace} \cite{Wil09} A very popular modern English style guide.
-    \item
-    \emph{Politics and the English Language} \cite{Orw68}  A famous essay on effective, clear writing in English.
-    \item
-    \emph{The Elements of Style} \cite{StrWhi07} Outdated, and American, but a classic.
-    \item
-    \emph{The Sense of Style} \cite{Pin15} Excellent, though quite in-depth.
+    \item The amount of well-known spaceships it finds
+    \item Restoring damage to an existing spaceship
+    \item Finding all known spaceships within a known $n \times n$ space
+    \item Finding new spaceships that haven't been catalogued.
 \end{itemize}
-
-\subsubsection{Citation styles}
-
-\begin{itemize}
-\item If you are referring to a reference as a noun, then cite it as: ``\citet{Orw68} discusses the role of language in political thought.''
-\item If you are referring implicitly to references, use: ``There are many good books on writing \citep{Orw68, Wil09, Pin15}.''
-\end{itemize}
-
-There is a complete guide on good citation practice by Peter Coxhead available here: \url{http://www.cs.bham.ac.uk/~pxc/refs/index.html}. 
-If you are unsure about how to cite online sources, please see this guide: \url{https://student.unsw.edu.au/how-do-i-cite-electronic-sources}.
-
-\subsection{Plagiarism warning}
-
-\begin{highlight_title}{WARNING}
-    
-    If you include material from other sources without full and correct attribution, you are commiting plagiarism. The penalties for plagiarism are severe.
-    Quote any included text and cite it correctly. Cite all images, figures, etc. clearly in the caption of the figure.
-\end{highlight_title}
 
 
 %==================================================================================================================================
 \chapter{Background}
 What did other people do, and how is it relevant to what you want to do?
-\section{Guidance}
-\begin{itemize}    
-    \item
-      Don't give a laundry list of references.
-    \item
-      Tie everything you say to your problem.
-    \item
-      Present an argument.
-    \item Think critically; weigh up the contribution of the background and put it in context.    
-    \item
-      \textbf{Don't write a tutorial}; provide background and cite
-      references for further information.
+\section{The game of life}
+% ========
+"The Game of Life" is a zero-player game invented by John Conway in 1969? which describes a cellular automata (CA) with a set of rules. The board is made out of a grid $n\times m$ is created, with each square being a cell. A cell is either dead or alive, represented as a $1$ or a $0$ respectively. The rules of the game can be defined in different ways, but the one John Conway proposed is the most well known. The neighbourhood of the cell is defined as Moore's neighbourhood, which is the 8 cells adjacent to the cell, diagonally and orthogonally. It can also be thought of as a $3\times 3$ matrix where the subject cell is placed in the middle. The number of neighbours the cell has is the number of cells alive that are present in the cell's Moore neighbourhood, $n$. We can then define the rules of the CA described in Life:
+
+\begin{itemize}
+    \item A dead cell turns into a living cell if $n \geq 3$
+    \item A living cell stays alive if $n = 2$ or $n = 3$
+    \item A living cell dies if $n < 2$ or $n > 3$
 \end{itemize}
+
+The last of these rules is to clarify, as really life can be described with only the two first rules. In this paper, we will only be focusing on the rules defined as above.
+
+% ========
+\section{Existing Search Methods}
+
+\subsection{Brute Force Search of Spaceships}
+
+https://www.ics.uci.edu/~eppstein/ca/search.html
+Tweak, gsearch, lifelab are the main ones it seems
+
+\subsection{Graph Search}
+
+One notable paper is "Searching for Spaceships" \cite{searching_for_spaceships}, which uses an algorithm "gfind", using a mix of breadth first search and depth first iterative deepening. The search takes place row-by-row, and uses a pre-calculated hash table of cell configurations to remove impossible rows from the search, narrowing down the search graph. This method only works for small periods, as larger ones run out of memory quite quickly.
+
+Another well known algorithm to find spaceships or oscillators is "lifesrc" created by David Bell, uses a depth first backtracking search. The grid is first set up with a few 'known' cells, set by the user. The rest of the cells are classed as 'unknown'. When the algorithm starts running, a decision is made on whether a cell should be alive or not, and the program will check forward and backward if there are any oscillating patterns of period $p$ set by the user. If nothing is found, the search continues, using the decided cell. If it is found later on that a cell placement in a particular cell is impossible, or that there are no oscillators in a particular configuration, then the algorithm will backtrack to the latest cell it decided on randomly. This is essentially a depth first search, however it discards certain sub-trees by eliminating ones that do not follow the Life rules (for example, checking if every cell is alive would be redundant, since there would be no oscillators in that configuration).
+
+\section{Deep Learning with the GoL in General}
+
 
 %==================================================================================================================================
 \chapter{Analysis/Requirements}
