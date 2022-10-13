@@ -49,7 +49,7 @@
 * *2 hours* worked on upcoming meeting + literature search
 
 ### 7 Oct 2022
-* *1 hour* met with supervisor and did reviewed it
+* *1 hour* met with supervisor and reviewed the meeting
 
 ### 8 Oct 2022
 * *0 hours* No progress
@@ -59,8 +59,18 @@
 * *1 hour* trying to understand previous life search algorithms, and literature search
 
 ### 10 Oct 2022
-* *1 hour* did some research about existing algorithms and wrote some background stuff
+* *1 hour* did some research about existing algorithms and wrote some of the background section
 * *3 hours* tried to make a brute force algorithm, but was significantly slower than expected. No progress.
 
 ### 11 Oct 2022
-* *4 hours* know I want to search for spaceships, researched wikis and such, found useful modules to use later
+* *4 hours* decided I want to search for spaceships, researched wikis, found useful modules to use later
+
+
+## Week 3
+
+### 12 Oct 2022
+* *2 hours*  Researched deep learning in GoL. Worked on the aims part of the paper, as well as found new way to do brute force
+
+### 13 Oct 2022
+* *1 hour* worked on a GoL structure detection algorithm
+* *1 hour* Figured out a way to detect structures & now working on calculating utility

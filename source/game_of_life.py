@@ -6,6 +6,7 @@ class Game:
 
 	WHITE = (255, 255, 255)
 	BLACK = (0, 0, 0)
+	NEIGHBOUR_TEMPLATE = np.array([[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]])
 
 	def __init__(self, width, height, rule1=[2, 3], rule2=[3], randomStart=False, show_display=True):
 
@@ -19,13 +20,12 @@ class Game:
 		self.show_display = show_display
 		self.fps = 60
 		self.tick_update = 0
-		self.generations_per_second = 60
+		self.generations_per_second = 10
 
 		self.clock = pygame.time.Clock()
 		self.running = True
 		if self.show_display:
 			self.display = pygame.display.set_mode((self.width, self.height))
-
 
 		self.x_size = self.width // self.cell_size
 		self.y_size = self.height // self.cell_size
@@ -35,11 +35,8 @@ class Game:
 			self.cells = np.random.choice(a=[False, True], size=self.x_size * self.y_size)
 		else:
 			self.cells = np.zeros(self.x_size * self.y_size, dtype=np.bool_)
-		
+
 		self.cells = self.cells.reshape(self.x_size, self.y_size)
-	
-		self.neighbour_template = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
-		self.neighbour_template = np.array(self.neighbour_template)
 
 		# preset cells - glider
 		self.cells[4, 4] = True
@@ -49,8 +46,8 @@ class Game:
 		self.cells[6, 3] = True
 
 		# additional presets
-		self.cells[6, 6] = True
-		self.cells[7, 7] = True
+		# self.cells[6, 6] = True
+		# self.cells[7, 7] = True
 
 	def run(self):
 		while self.running:
@@ -71,7 +68,7 @@ class Game:
 		self.cells = self.getNextState()
 
 
-		if self.fps // self.generations_per_second < self.tick_update:
+		if (self.fps // self.generations_per_second) < self.tick_update:
 			self.tick_update = 0
 
 
@@ -105,7 +102,7 @@ class Game:
 		newState = np.array(self.cells, copy=True)
 
 		for cell in active_cells:
-			neighbors = self.neighbour_template + cell
+			neighbors = Game.NEIGHBOUR_TEMPLATE + cell
 			update = np.append(update, neighbors, axis=0)
 
 		for cell in update:
@@ -129,7 +126,12 @@ class Game:
 
 
 	def checkNumberOfNeighbours(self, cell):
-		neighbors = self.neighbour_template + cell
+		neighbors = self.getValidNeighbours(cell)
+		return np.count_nonzero(self.cells[neighbors[:,0],neighbors[:,1]] == 1)
+
+
+	def getValidNeighbours(self, cell):
+		neighbors = Game.NEIGHBOUR_TEMPLATE + cell
 			
 		# Check that neighbours are within the board
 		valid_neighbours = neighbors[neighbors[:,0] > -1]
@@ -137,7 +139,7 @@ class Game:
 		valid_neighbours = valid_neighbours[valid_neighbours[:,1] > -1]
 		valid_neighbours = valid_neighbours[valid_neighbours[:,1] < self.y_size]
 
-		return np.count_nonzero(self.cells[valid_neighbours[:,0],valid_neighbours[:,1]] == 1)
+		return valid_neighbours
 
 
 	def getState(self):
@@ -145,7 +147,7 @@ class Game:
 
 
 def main():
-	game = Game(40, 40, randomStart=False)
+	game = Game(20, 20, randomStart=False)
 	game.run()
 	pygame.quit()
 

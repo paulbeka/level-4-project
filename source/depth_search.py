@@ -15,9 +15,10 @@ class DepthSearch:
 
 	def search(self):
 		x, y = 0, self.height//2
-		recur(x, y+1)
+		self.recur(x, y)
 
-	def recur(self):
+
+	def recur(selfs, x, y):
 		if y >= self.height-1:
 			if x >= self.width-1:
 				return
