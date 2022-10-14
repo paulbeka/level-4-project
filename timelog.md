@@ -74,3 +74,7 @@
 ### 13 Oct 2022
 * *1 hour* worked on a GoL structure detection algorithm
 * *1 hour* Figured out a way to detect structures & now working on calculating utility
+
+### 14 Oct 2022
+* *1 hour* Worked on the brute force program. Little progress.
+* *1 hour* met with supervisor and looked over what was said

@@ -38,12 +38,12 @@ class Game:
 
 		self.cells = self.cells.reshape(self.x_size, self.y_size)
 
-		# preset cells - glider
-		self.cells[4, 4] = True
-		self.cells[5, 5] = True
-		self.cells[6, 5] = True
-		self.cells[6, 4] = True
-		self.cells[6, 3] = True
+		# # preset cells - glider
+		# self.cells[4, 4] = True
+		# self.cells[5, 5] = True
+		# self.cells[6, 5] = True
+		# self.cells[6, 4] = True
+		# self.cells[6, 3] = True
 
 		# additional presets
 		# self.cells[6, 6] = True
@@ -63,10 +63,8 @@ class Game:
 			if event.type == pygame.QUIT:
 				self.running = False
 
-
 		# update board state
 		self.cells = self.getNextState()
-
 
 		if (self.fps // self.generations_per_second) < self.tick_update:
 			self.tick_update = 0
@@ -140,6 +138,13 @@ class Game:
 		valid_neighbours = valid_neighbours[valid_neighbours[:,1] < self.y_size]
 
 		return valid_neighbours
+
+
+	def evolve(self, configuration):
+		board = np.zeros((self.x_size, self.y_size))
+		board[configuration[:, 0], configuration[:, 1]] = True
+		self.cells = board
+		return self.getNextState()
 
 
 	def getState(self):
