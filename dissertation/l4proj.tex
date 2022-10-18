@@ -98,6 +98,9 @@ In this paper, we will be trying to find interesting structures in the game of l
 What did other people do, and how is it relevant to what you want to do?
 \section{The game of life}
 % ========
+
+\subsection{Rules}
+
 "The Game of Life" is a zero-player game invented by John Conway in 1969? which describes a cellular automata (CA) with a set of rules. The board is made out of a grid $n\times m$ is created, with each square being a cell. A cell is either dead or alive, represented as a $1$ or a $0$ respectively. The rules of the game can be defined in different ways, but the one John Conway proposed is the most well known. The neighbourhood of the cell is defined as Moore's neighbourhood, which is the 8 cells adjacent to the cell, diagonally and orthogonally. It can also be thought of as a $3\times 3$ matrix where the subject cell is placed in the middle. The number of neighbours the cell has is the number of cells alive that are present in the cell's Moore neighbourhood, $n$. We can then define the rules of the CA described in Life:
 
 \begin{itemize}
@@ -108,11 +111,44 @@ What did other people do, and how is it relevant to what you want to do?
     \item A living cell dies if $n > 3$, due to overcrowding
 \end{itemize}
 
-These rules are the rules of 'Life', and we will be using them throughout the rest of this paper.
+A state at $t+1$ is entirely dependant on the current state at $t$ and is calculated using the rules above.
 
 \begin{figure}[h]
-\includegraphics[width=8cm]{dissertation/images/moores_law.png}
+
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=0.9\linewidth, height=6cm]{dissertation/images/moores_law.png} 
+\caption{Moore's Neighbourhood}
+\label{fig:subim1}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=0.9\linewidth, height=6cm]{dissertation/images/boxplot_finger_distance.pdf}
+\caption{Another one}
+\label{fig:subim2}
+\end{subfigure}
+
+\caption{Examples of Moore's neighbourhood}
+\label{fig:image2}
 \end{figure}
+
+\subsection{Still lifes}
+
+A still life is a structure that does not move or change shape from generation to generation. They remain static, unless outside cells interact with it. Still lifes are by far the most known structures in the GoL, and they are easy to find, as they have the same shape for $t$ and $t+1$. Here are some examples of still lifes:
+
+\subsection{Oscillators}
+
+These are structures that change shape, but return to the same state every $p$ generations. They are a little harder to detect, as it is impossible to know how many generations it will take for the structure to repeat. An oscillator will stay in the same position after it has oscillated, and will keep oscillating as long as it is undisturbed by other cells and the program keeps running. Here are some examples of oscillators:
+
+\subsection{Spaceships}
+
+Spaceships are the main focus of this paper, and are the hardest structures to detect. They are similar to oscillators in that they repeat their state every $p$ generations. However, they also move a certain distance since their last oscillation. If the state space they are in is unbounded, then they will move forever without changing direction.
+
+The speed of a spaceship is determined in terms of the speed of light of GoL, $c$. This $c$ is defined as 1 cell per second, as it is theoretically the quickest information could hope to propagate given the rules of Life. The ship can move diagonally, orthogonally, or knightwise, which is when a ship moves in an oblique direction. A spaceship with a period $p$, which is moving $n$ cells in a particular direction is said to have a speed $nc/p$. A ship moving $n = 2$ cells left and with a period $p = 5$ will have a speed of $2c/5$. For a ship moving knightwise $n$ cells either left or right, and $m$ cells either up or down, will have a speed denoted as $(m, n)c/p$. These speeds can be simplified, for example a spaceship moving at speed $2c/4$ can be written as $c/2$.
+
+A further way to classify spaceships is by their type. 
+% should you explain this?
+
+Examples of spaceships:
+
 
 % ========
 \section{Existing Search Methods}
@@ -133,6 +169,7 @@ Another well known algorithm to find spaceships or oscillators is "lifesrc" crea
 There hasn't been much research done on neural networks and the game of life, however there are many hobbyists working on it. One of them is James McGuigan, who trained a neural network to learn the game of life after one iteration. He also worked on reversing the game of life, trying to find a previous configuration using a current board state.
 
 %==================================================================================================================================
+
 \chapter{Analysis/Requirements}
 What is the problem that you want to solve, and how did you arrive at it?
 \section{Guidance}
