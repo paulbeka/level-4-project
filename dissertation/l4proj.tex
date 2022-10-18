@@ -84,23 +84,13 @@ Why should the reader care about what are you doing and what are you actually do
 
 \section{Motivation}
 
-Deep learning has had a major impact in the computer science world. Problems deemed unsolvable years ago have now been reduced to efficient neural networks. 
+The game of life has often been seen as a toy project. It is idealistic in its representation, as it is fully observable, episodic and deterministic. However, its simple rules give rise to complex structures that are not easy to find. Those structures can be large, and looking for them is unfeasible with the current methods. In general, conventional graph search methods adapted to the task are are used, but they are slow and require large amounts of memory \cite{list_of_search_algorithms}, and as mentioned, they cannot find objects that are too large. There is, as of yet, no efficient way to search for these structures, and the question remains if there is a way to do it.
 
-The game of life has often been seen as a toy project. It is idealistic in its way to represent the world, as it is fully observable, episodic and deterministic. However, cellular automata are not all toy problems, as there exists applications in other fields, like Physics and Biology. For example,  \cite{physics_CA_use_example} models stress in dynamic re-crystallization using a CA .
-
-As of yet, no general way of finding patterns in the game of life using deep learning have been explored, and most of the deep learning used have been attempts at predicting the game of life after $n$ generations, or reversing the game. A neural network that could find structures in GoL could be generalised and used in other applications for pattern search where an algorithmic search may not be possible. 
-% General ideas here: either find a paper that uses CA to model a solution and needs a way of finding a pattern inside the CA, or demonstrate that a lot of problems that use CA also use neural networks for progression, and therefore maybe this algorithm could improve upon existing solutions and such.
+The concept of using deep learning to find structures in cellular automata has not yet been explored. With the advent and rise of neural networks, previously thought to be impossible problems have been unlocked, either by solving them directly or speeding up existing search algorithms. Since this is a difficult search problem, it stands to reason that solving it will potentially give new insights into how to solve similar problems.
 
 \section{Aims}
 
-This paper goes into detail about how to find 'spaceships' in the game of life using deep learning as a search method. Spaceships are structures inside the game that move across the board and keep the same configuration after having moved a set amount. The neural network will then be evaluated based on:
-
-\begin{itemize}
-    \item The amount of well-known spaceships it finds
-    \item Restoring damage to an existing spaceship
-    \item Finding all known spaceships within a known $n \times n$ space
-    \item Finding new spaceships that haven't been catalogued.
-\end{itemize}
+In this paper, we will be trying to find interesting structures in the game of life. Our particular interest will be in oscillating objects that move a set amount of space, so-called 'Spaceships'. The main goal will be to test and see if neural networks can speed up the search, and how different deep learning techniques fare against each other and other conventional search methods. The expectation is that the network will greatly decrease the time it takes to find novel structures, or recognise structures that are classified as spaceships.
 
 
 %==================================================================================================================================
@@ -112,11 +102,17 @@ What did other people do, and how is it relevant to what you want to do?
 
 \begin{itemize}
     \item A dead cell turns into a living cell if $n \geq 3$
+    \item A dead cell stays dead if $n < 3$
     \item A living cell stays alive if $n = 2$ or $n = 3$
-    \item A living cell dies if $n < 2$ or $n > 3$
+    \item A living cell dies if $n < 2$, due to under-population
+    \item A living cell dies if $n > 3$, due to overcrowding
 \end{itemize}
 
-The last of these rules is to clarify, as really life can be described with only the two first rules. In this paper, we will only be focusing on the rules defined as above.
+These rules are the rules of 'Life', and we will be using them throughout the rest of this paper.
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{dissertation/images/moores_law.png}
+\end{figure}
 
 % ========
 \section{Existing Search Methods}
@@ -128,12 +124,13 @@ Tweak, gsearch, lifelab are the main ones it seems
 
 \subsection{Graph Search}
 
-One notable paper is "Searching for Spaceships" \cite{searching_for_spaceships}, which uses an algorithm "gfind", using a mix of breadth first search and depth first iterative deepening. The search takes place row-by-row, and uses a pre-calculated hash table of cell configurations to remove impossible rows from the search, narrowing down the search graph. This method only works for small periods, as larger ones run out of memory quite quickly.
+One notable paper is "Searching for Spaceships" \cite{searching_for_spaceships}, which uses an algorithm "gfind", using a mix of breadth first search and depth first iterative deepening. The search takes place row-by-row, and uses a pre-calculated hash table of cell configurations to remove impossible rows from the search, narrowing down the graph. This method only works for small periods, as larger ones run out of memory quite quickly. 
 
 Another well known algorithm to find spaceships or oscillators is "lifesrc" created by David Bell, uses a depth first backtracking search. The grid is first set up with a few 'known' cells, set by the user. The rest of the cells are classed as 'unknown'. When the algorithm starts running, a decision is made on whether a cell should be alive or not, and the program will check forward and backward if there are any oscillating patterns of period $p$ set by the user. If nothing is found, the search continues, using the decided cell. If it is found later on that a cell placement in a particular cell is impossible, or that there are no oscillators in a particular configuration, then the algorithm will backtrack to the latest cell it decided on randomly. This is essentially a depth first search, however it discards certain sub-trees by eliminating ones that do not follow the Life rules (for example, checking if every cell is alive would be redundant, since there would be no oscillators in that configuration).
 
 \section{Deep Learning with the GoL in General}
 
+There hasn't been much research done on neural networks and the game of life, however there are many hobbyists working on it. One of them is James McGuigan, who trained a neural network to learn the game of life after one iteration. He also worked on reversing the game of life, trying to find a previous configuration using a current board state.
 
 %==================================================================================================================================
 \chapter{Analysis/Requirements}
