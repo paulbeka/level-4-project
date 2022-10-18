@@ -78,3 +78,13 @@
 ### 14 Oct 2022
 * *1 hour* Worked on the brute force program. Little progress.
 * *1 hour* met with supervisor and looked over what was said
+
+### 15 Oct 2022
+* *0 hours* No progress :/
+
+### 16 Oct 2022
+* *1 hour* worked on object identification in GoL
+* *3 hours* brute force algorithm now works, and did some research to find GoL databases
+
+### 17 Oct 2022
+* *2 hours* Research on how to do the deep learning, worked on a database interpreter, wrote part of the aims
