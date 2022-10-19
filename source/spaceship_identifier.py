@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 from game_of_life import Game
+from tools.rle_reader import RleReader
 
 
 # hyperparameters
@@ -16,16 +17,14 @@ learning_rate = 0.001
 
 codeReader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\30_30_all_spaceships.txt", box=30)
 
-train_dataset = RleReader.getFileArray()
+dataset = codeReader.getFileArray()
+ratio = 5
+
+train_dataset = dataset[0:len(dataset) - (len(dataset)//5)]
 test_dataset = []
 
-# train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
 # test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
-
-
-# test displaying the RLEs
-game = Game(30, 30)
-game.cells =
 
 
 class LifeNet(nn.Module):
@@ -45,4 +44,4 @@ def objectiveFunction(object):
 
 
 if __name__ == '__main__':
-	main()
+	pass

@@ -5,7 +5,7 @@ bo2bo$o$o3bo$4o!
 x=9,y=10
 bo4b3o$3o2bo2bo$ob2o4bo$b4o3bo$b2o5bo$5bo2bo$6b2o$7bo$6bo$6bo!
 x=9,y=11
-2b2obo$bo5bo$2ob2o$b3ob4o$2bo2$2bo$b3ob4o$2ob2o$bo5bo$2b2obo!
+2b2obo$bo5bo$2ob2o$b3ob4o$2bo$2bo$b3ob4o$2ob2o$bo5bo$2b2obo!
 x=10,y=12
 2o6b2o$b8o2$bo6bo$bo6bo$3bo2bo$b2ob2ob2o$2b2o2b2o$obo4bobo$2o6b2o$2obo2bob2o$4b2o!
 x=9,y=15
