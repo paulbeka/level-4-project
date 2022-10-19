@@ -1,7 +1,5 @@
 import re
-import sys
-import os
-import time
+import sys, os
 import numpy as np
 
 current = os.path.dirname(os.path.realpath(__file__))
@@ -88,9 +86,5 @@ if __name__ == "__main__":
 	rleReader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\30_30_all_spaceships.txt", box=30)
 	items = rleReader.getFileArray()
 	game = Game(30, 30)
-	for item in items:
-		print(item)
-		game.cells = item
-		# game.update()
-		game.render()
-		time.sleep(1)
+	game.renderItemList(items)
+	game.run()

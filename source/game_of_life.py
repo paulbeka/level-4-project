@@ -8,24 +8,33 @@ class Game:
 	BLACK = (0, 0, 0)
 	NEIGHBOUR_TEMPLATE = np.array([[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]])
 
-	def __init__(self, width, height, rule1=[2, 3], rule2=[3], randomStart=False, show_display=True):
+	def __init__(self, 
+				width, 
+				height, 
+				rule1=[2, 3], 
+				rule2=[3], 
+				randomStart=False, 
+				show_display=True):
 
 		pygame.init()
 
 		self.cell_size = 20
 		self.width, self.height = width*self.cell_size, height*self.cell_size
 		self.rule1, self.rule2 = rule1, rule2
+		self.show_display = show_display
 
 		# parameters
-		self.show_display = show_display
 		self.fps = 60
 		self.tick_update = 0
 		self.generations_per_second = 1
+		self.updateCellsAutomatically = True
 
 		self.clock = pygame.time.Clock()
 		self.running = True
+
 		if self.show_display:
 			self.display = pygame.display.set_mode((self.width, self.height))
+			pygame.display.set_caption("Game of Life")
 
 		self.x_size = self.width // self.cell_size
 		self.y_size = self.height // self.cell_size
@@ -49,6 +58,10 @@ class Game:
 		# self.cells[6, 6] = True
 		# self.cells[7, 7] = True
 
+		self.itemListToBeRendered = None
+		self.itemListToBeRenderedIndex = 0
+
+
 	def run(self):
 		while self.running:
 			self.update()
@@ -63,8 +76,15 @@ class Game:
 			if event.type == pygame.QUIT:
 				self.running = False
 
+			if event.type == pygame.KEYDOWN and self.renderNextItemList != None:
+				if event.key == pygame.K_RIGHT:
+					self.renderNextItemList(1)
+				elif event.key == pygame.K_LEFT:
+					self.renderNextItemList(-1)
+
 		# update board state
-		self.cells = self.getNextState()
+		if self.updateCellsAutomatically:
+			self.cells = self.getNextState()
 
 		if (self.fps // self.generations_per_second) < self.tick_update:
 			self.tick_update = 0
@@ -123,6 +143,7 @@ class Game:
 		return newState		
 
 
+	# cell checking functions 
 	def checkNumberOfNeighbours(self, cell):
 		neighbors = self.getValidNeighbours(cell)
 		return np.count_nonzero(self.cells[neighbors[:,0],neighbors[:,1]] == 1)
@@ -140,11 +161,29 @@ class Game:
 		return valid_neighbours
 
 
+	# evolve a specific configuration
 	def evolve(self, configuration):
 		board = np.zeros((self.x_size, self.y_size))
 		board[configuration[:, 0], configuration[:, 1]] = True
 		self.cells = board
 		return self.getNextState()
+
+
+	def renderItemList(self, itemList):
+		self.itemListToBeRendered = itemList
+		self.updateCellsAutomatically = False
+		self.renderNextItemList(0)
+
+
+	def renderNextItemList(self, direction):
+		self.itemListToBeRenderedIndex += direction
+
+		if self.itemListToBeRenderedIndex > len(self.itemListToBeRendered) - 1:
+			self.itemListToBeRenderedIndex = 0
+		elif self.itemListToBeRenderedIndex < 0:
+			self.itemListToBeRenderedIndex = len(self.itemListToBeRendered) - 1
+
+		self.cells = self.itemListToBeRendered[self.itemListToBeRenderedIndex]
 
 
 	def getState(self):
