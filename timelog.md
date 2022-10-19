@@ -92,3 +92,7 @@
 ### 18 Oct 2022
 * *2 hours* worked on paper writing, specifically the introduction on the GoL
 * *1 hour* worked on an RLE interpreter to read the GoL object database
+
+### 19 Oct 2022
+* *2 hours* made an rle generator and rle viewer, as well as bug fixes
+* *1 hour* worked on rle generator bug fixes

@@ -41,6 +41,30 @@ class RleReader:
 		return configurations
 
 
+	def getRleCodes(self):
+		if self.filename == None:
+			return None
+
+		with open(self.filename) as f:
+			items = f.readlines()
+
+		if not items:
+			return None
+
+		codes = []
+		currCode = ""
+		for i, item in enumerate(items):
+			if i % 2:
+				currCode += item.rstrip()
+				codes.append(currCode)
+				currCode = ""
+
+			else:
+				currCode += item
+
+		return codes
+
+
 	def placeConfigInBox(self, config, width, height):
 		newBox = np.zeros((width, height))
 		if width < config.shape[0] or height < config.shape[1]:

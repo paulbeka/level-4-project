@@ -81,13 +81,15 @@ class Game:
 					self.renderNextItemList(1)
 				elif event.key == pygame.K_LEFT:
 					self.renderNextItemList(-1)
+				elif event.key == pygame.K_SPACE:
+					self.updateCellsAutomatically = not self.updateCellsAutomatically
 
-		# update board state
-		if self.updateCellsAutomatically:
-			self.cells = self.getNextState()
 
 		if (self.fps // self.generations_per_second) < self.tick_update:
 			self.tick_update = 0
+			# update board state
+			if self.updateCellsAutomatically:
+				self.cells = self.getNextState()
 
 
 	def render(self):

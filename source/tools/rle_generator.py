@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from rle_reader import RleReader
 
 
 class RleGenerator:
@@ -20,10 +21,12 @@ class RleGenerator:
 						rle += str(currCount)
 
 					if currValue:
-						rle += 'b'
-					else:
 						rle += 'o'
-					currCount = 0
+					else:
+						rle += 'b'
+
+					currValue = grid[row, col]
+					currCount = 1
 
 				else:
 					currCount += 1
@@ -45,6 +48,7 @@ class RleGenerator:
 
 			rle += "$"
 
+		rle = rle[:-1]
 		rle += "!"
 
 		return rle
@@ -52,3 +56,17 @@ class RleGenerator:
 
 	def generateRandomRle(self):
 		return np.random.randint(2, size=(self.box-random.randint(0, self.box-1), self.box-random.randint(0, self.box-1)))
+
+
+if __name__ == "__main__":
+	generator = RleGenerator()
+	reader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\30_30_all_spaceships.txt")
+
+	rleList = reader.getFileArray()
+	check = [generator.gridToRle(rle) for rle in rleList]
+	actual_codes = reader.getRleCodes()
+
+	for i, item in enumerate(actual_codes):
+		print(item)
+		print(check[i])
+		print(check[i] == item)
