@@ -20,7 +20,7 @@ class Game:
 		self.show_display = show_display
 		self.fps = 60
 		self.tick_update = 0
-		self.generations_per_second = 10
+		self.generations_per_second = 1
 
 		self.clock = pygame.time.Clock()
 		self.running = True

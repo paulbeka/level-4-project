@@ -9,17 +9,23 @@ num_epochs = 5
 batch_size = 5
 learning_rate = 0.001
 
-
 # Get all the gliders known and split the dataset
 # feed nn a mix of gliders and not gliders
 # make it detect when it is a glider or not
 # given an input make it output a glider? How?
 
-train_dataset = []
+codeReader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\30_30_all_spaceships.txt", box=30)
+
+train_dataset = RleReader.getFileArray()
 test_dataset = []
 
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
+# train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+# test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
+
+
+# test displaying the RLEs
+game = Game(30, 30)
+game.cells =
 
 
 class LifeNet(nn.Module):

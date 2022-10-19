@@ -87,4 +87,8 @@
 * *3 hours* brute force algorithm now works, and did some research to find GoL databases
 
 ### 17 Oct 2022
-* *2 hours* Research on how to do the deep learning, worked on a database interpreter, wrote part of the aims
+* *3 hours* Research on how to do the deep learning, worked on a database interpreter, wrote part of the aims
+
+### 18 Oct 2022
+* *2 hours* worked on paper writing, specifically the introduction on the GoL
+* *1 hour* worked on an RLE interpreter to read the GoL object database
