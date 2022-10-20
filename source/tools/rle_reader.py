@@ -78,9 +78,9 @@ class RleReader:
 
 
 	def getConfig(self, code, x, y):
-		grid = np.zeros((y, x))
+		grid = np.zeros((x, y))
 		rle_list = code.split("$")
-
+		rowIndex = 0
 		for row, item in enumerate(rle_list):
 			parseIndex = 0
 			codeList = list(item)
@@ -89,11 +89,11 @@ class RleReader:
 			for i, item in enumerate(codeList):
 				if item == 'o' or item == 'b':
 					if numStr == "":
-						grid[row, parseIndex] = int(item == 'o')
+						grid[parseIndex, rowIndex] = int(item == 'o')
 						parseIndex += 1
 
 					else:
-						grid[row, parseIndex:parseIndex+int(numStr)] = int(item =='o')
+						grid[parseIndex:parseIndex+int(numStr), rowIndex] = int(item =='o')
 						parseIndex += int(numStr)
 						numStr = ""
 
@@ -102,6 +102,11 @@ class RleReader:
 
 				else:
 					numStr += item
+
+			if item[-1] != 'o' and item[-1] != '!':
+				rowIndex += int(item[-1])
+			else:
+				rowIndex += 1
 
 		return grid
 

@@ -26,7 +26,7 @@ class Game:
 		# parameters
 		self.fps = 60
 		self.tick_update = 0
-		self.generations_per_second = 1
+		self.generations_per_second = 2
 		self.updateCellsAutomatically = True
 
 		self.clock = pygame.time.Clock()

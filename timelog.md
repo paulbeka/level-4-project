@@ -15,7 +15,6 @@
 ## Week 1
 
 ### 28 Sep 2022
-
 * *2 hours* read the paper(https://arxiv.org/pdf/cs/0004003.pdf), and researched the project
 
 ### 29 Sep 2022
@@ -93,6 +92,9 @@
 * *2 hours* worked on paper writing, specifically the introduction on the GoL
 * *1 hour* worked on an RLE interpreter to read the GoL object database
 
+
+## Week 4
+
 ### 19 Oct 2022
 * *2 hours* made an rle generator and rle viewer, as well as bug fixes
-* *1 hour* worked on rle generator bug fixes
+* *2 hours* worked on rle generator bug fixes

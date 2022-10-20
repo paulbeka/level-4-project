@@ -10,13 +10,22 @@ class RleGenerator:
 
 
 	def gridToRle(self, grid):
-		rle = ""
+		rle = f"x={grid.shape[0]},y={grid.shape[1]}\n"
 		rowCount = 1
-		for row in range(grid.shape[0]):
+		for row in range(grid.shape[1]):
+
 			currCount = 1
-			currValue = grid[row, 0]
-			for col in range(1, grid.shape[1]):
-				if grid[row, col] != currValue:
+			currValue = grid[0, row]
+
+			for col in range(1, grid.shape[0]):
+				if grid[col, row] != currValue:
+					# place the $ characters
+					if rowCount > 1:
+						rle = rle[:-1]
+						rle += str(rowCount) + "$"
+						rowCount = 1
+
+				
 					if currCount > 1:
 						rle += str(currCount)
 
@@ -25,7 +34,7 @@ class RleGenerator:
 					else:
 						rle += 'b'
 
-					currValue = grid[row, col]
+					currValue = grid[col, row]
 					currCount = 1
 
 				else:
@@ -37,18 +46,17 @@ class RleGenerator:
 				rle += 'o'
 
 			# check if it was an empty row
-			if currCount == grid.shape[1] and not currValue:
+			if currCount >= grid.shape[0] and currValue == 0:
 				rowCount += 1
 				continue
 
-			# add the $ count if the row size was above 1
-			if rowCount > 1:
-				rle += str(rowCount)
-				rowCount = 1
-
 			rle += "$"
 
-		rle = rle[:-1]
+
+		# remove unneccessary characters
+		while rle[-1] != 'o':
+			rle = rle[:-1]
+
 		rle += "!"
 
 		return rle
@@ -67,6 +75,6 @@ if __name__ == "__main__":
 	actual_codes = reader.getRleCodes()
 
 	for i, item in enumerate(actual_codes):
-		print(item)
-		print(check[i])
+		# print(item)
+		# print(check[i])
 		print(check[i] == item)
