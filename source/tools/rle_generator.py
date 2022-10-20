@@ -63,18 +63,36 @@ class RleGenerator:
 
 
 	def generateRandomRle(self):
-		return np.random.randint(2, size=(self.box-random.randint(0, self.box-1), self.box-random.randint(0, self.box-1)))
+		try:
+			grid = np.random.randint(2, size=(self.box-random.randint(0, self.box-1), self.box-random.randint(0, self.box-1)))
+			return self.gridToRle(grid)
+		except:
+			return self.generateRandomRle()
+
+
+	def generateRandomRleFile(self, count):
+		string = ""
+		for i in range(count):
+			string += self.generateRandomRle() + "\n"
+
+		with open("output.txt", "w") as f:
+			f.write(string)
+
+		print(f"{count} RLE objects created and written to output.txt")
 
 
 if __name__ == "__main__":
-	generator = RleGenerator()
-	reader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\30_30_all_spaceships.txt")
+	generator = RleGenerator(box=30)
+	# TEST CODE
+	# reader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\30_30_all_spaceships.txt")
 
-	rleList = reader.getFileArray()
-	check = [generator.gridToRle(rle) for rle in rleList]
-	actual_codes = reader.getRleCodes()
+	# rleList = reader.getFileArray()
+	# check = [generator.gridToRle(rle) for rle in rleList]
+	# actual_codes = reader.getRleCodes()
 
-	for i, item in enumerate(actual_codes):
-		# print(item)
-		# print(check[i])
-		print(check[i] == item)
+	# for i, item in enumerate(actual_codes):
+	# 	# print(item)
+	# 	# print(check[i])
+	# 	print(check[i] == item)
+
+	generator.generateRandomRleFile(20)

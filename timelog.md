@@ -98,3 +98,6 @@
 ### 19 Oct 2022
 * *2 hours* made an rle generator and rle viewer, as well as bug fixes
 * *2 hours* worked on rle generator bug fixes
+
+### 20 Oct 2022
+* ** Worked on RLE encoder, made presentation for advisor meeting, fixed bugs

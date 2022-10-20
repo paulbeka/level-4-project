@@ -1,3 +1,6 @@
+# TODO:
+# - Make the getfromfilearray method take in a file as a paremeter
+
 import re
 import sys, os
 import numpy as np
@@ -112,7 +115,7 @@ class RleReader:
 
 
 if __name__ == "__main__":
-	rleReader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\30_30_all_spaceships.txt", box=30)
+	rleReader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\random_rle.txt", box=30)
 	items = rleReader.getFileArray()
 	game = Game(30, 30)
 	game.renderItemList(items)
