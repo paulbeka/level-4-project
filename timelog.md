@@ -76,7 +76,8 @@
 
 ### 14 Oct 2022
 * *1 hour* Worked on the brute force program. Little progress.
-* *1 hour* met with supervisor and looked over what was said
+* *1 hour* met with supervisor and looked over what wa
+s said
 
 ### 15 Oct 2022
 * *0 hours* No progress :/
@@ -103,3 +104,4 @@
 * *3 hours* Worked on RLE encoder, made presentation for advisor meeting, fixed bugs, made small NN
 
 ### 21 Oct 2022
+* *2 hours* Worked on the CNN, created an object identifier, fixed brute force display, fixed bugs

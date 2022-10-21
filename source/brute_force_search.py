@@ -32,7 +32,14 @@ class BruteForceSearch:
 				if usefulObjects:
 					interestingObjects += usefulObjects
 
-		print(interestingObjects)
+		# turn the objects into a board configuration
+		interestingConfigs = [np.zeros((self.width, self.height)) for _ in range(len(interestingObjects))]
+		for i, item in enumerate(interestingObjects):
+			interestingConfigs[i][item[:, 0], item[:, 1]] = True
+
+		# display objects
+		self.game.renderItemList(interestingConfigs)
+		self.game.run()
 
 
 	def findObjects(self, config):

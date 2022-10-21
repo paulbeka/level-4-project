@@ -171,6 +171,14 @@ class Game:
 		return self.getNextState()
 
 
+	# find the pattern identity of an object
+	def patternIdentity(self, pattern):
+		reference = np.argmin(pattern)
+		pattern = pattern - reference
+		return pattern
+
+
+	### RENDERING MISC ITEMS ###
 	def renderItemList(self, itemList):
 		self.itemListToBeRendered = itemList
 		self.updateCellsAutomatically = False
