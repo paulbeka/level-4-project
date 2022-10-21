@@ -100,4 +100,6 @@
 * *2 hours* worked on rle generator bug fixes
 
 ### 20 Oct 2022
-* ** Worked on RLE encoder, made presentation for advisor meeting, fixed bugs
+* *3 hours* Worked on RLE encoder, made presentation for advisor meeting, fixed bugs, made small NN
+
+### 21 Oct 2022
