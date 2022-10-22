@@ -165,7 +165,8 @@ class Game:
 
 	# evolve a specific configuration
 	def evolve(self, configuration):
-		board = np.zeros((self.x_size, self.y_size))
+		maxWidth = np.max(configuration)+1
+		board = np.zeros((maxWidth, maxWidth))
 		board[configuration[:, 0], configuration[:, 1]] = True
 		self.cells = board
 		return self.getNextState()

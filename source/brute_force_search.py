@@ -1,5 +1,6 @@
 import numpy as np
 from game_of_life import Game
+from tools.object_identifier import ObjectIdentifier
 import math
 
 
@@ -8,6 +9,8 @@ class BruteForceSearch:
 	def __init__(self, width, height):
 		self.width, self.height = width, height
 		self.game = Game(width, height)
+		# make sure the width set is higher than actual width
+		self.objectIdentifier = ObjectIdentifier(width+2, self.game)
 
 		self.search_period = 4
 
@@ -26,9 +29,9 @@ class BruteForceSearch:
 		for i in range(configs.shape[2]):
 			if i % 5000 == 0:
 				print(f"{100*i/configs.shape[2]:.2f}% done")
-			objects = self.findObjects(configs[:, :, i])
+			objects = self.objectIdentifier.findObjects(configs[:, :, i])
 			if objects:
-				usefulObjects = self.findUsefulObjects(objects)
+				usefulObjects = self.objectIdentifier.findUsefulObjects(objects, 3)
 				if usefulObjects:
 					interestingObjects += usefulObjects
 
@@ -42,60 +45,8 @@ class BruteForceSearch:
 		self.game.run()
 
 
-	def findObjects(self, config):
-		alive = list(np.argwhere(config == 1))
-		objects = []
-		# go through all the alive cells
-		while alive:
-			cell = alive[0]
-			structure = [cell]
-			alive = alive[1:]
-			searched = []
-
-			neighbor_q = list(self.game.getValidNeighbours(cell).reshape(-1, 2))
-			
-			while neighbor_q:
-				currentSearch = neighbor_q.pop(0)
-				if not any((currentSearch == x).all() for x in structure):
-					if config[currentSearch[0], currentSearch[1]] == 1:
-						neighbor_q += list(self.game.getValidNeighbours(currentSearch).reshape(-1, 2))
-						structure.append(currentSearch)
-						alive = [x for x in alive if not (x==currentSearch).all()]
-					else:
-						for n in list(self.game.getValidNeighbours(currentSearch).reshape(-1, 2)):
-							if config[n[0], n[1]] == 1 and not any((n == x).all() for x in structure):
-								neighbor_q.append(n)
-				else:
-					continue
-
-			if len(structure) > 2:
-				objects.append(np.array(list(structure)))
-
-		return objects
-
-
-	def findUsefulObjects(self, objects):
-		usefulObjects = []
-
-		for obj in objects:
-			currentConfig = obj
-			for i in range(1, self.search_period):
-				evolved_board = self.game.evolve(currentConfig)
-				structures = self.findObjects(evolved_board)
-
-				if len(structures) == 0:
-					break
-				currentConfig = structures[0]
-
-				if np.array_equal(obj, currentConfig):
-					usefulObjects.append(obj)
-					break
-
-		return usefulObjects
-
-
 def main():
-	newSearch = BruteForceSearch(4, 4)
+	newSearch = BruteForceSearch(3, 3)
 	newSearch.search()
 
 
