@@ -105,3 +105,13 @@ s said
 
 ### 21 Oct 2022
 * *2 hours* Worked on the CNN, created an object identifier, fixed brute force display, fixed bugs
+* *1 hour* met with supervisor and reviewed the meeting
+
+### 22 Oct 2022
+* *1 hour* kept working on the object identifier class, and wrote a bit of the paper
+
+### 23 Oct 2022
+* *1 hour* wrote some of the literature search
+
+### 24 oct 2022
+* *2 hours* worked on fixing my spaghetti code

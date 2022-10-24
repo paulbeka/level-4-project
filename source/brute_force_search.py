@@ -2,6 +2,7 @@ import numpy as np
 from game_of_life import Game
 from tools.object_identifier import ObjectIdentifier
 import math
+from tools.rle_reader import RleReader
 
 
 class BruteForceSearch:
@@ -10,7 +11,8 @@ class BruteForceSearch:
 		self.width, self.height = width, height
 		self.game = Game(width, height)
 		# make sure the width set is higher than actual width
-		self.objectIdentifier = ObjectIdentifier(width+2, self.game)
+		self.objectIdentifier = ObjectIdentifier(width, self.game)
+		self.rleReader = RleReader()
 
 		self.search_period = 4
 
@@ -26,19 +28,22 @@ class BruteForceSearch:
 			val = "0" * ((self.width*self.height)-len(val)) + val
 			configs = np.append(configs, np.array([int(i) for i in list(val)]).reshape(self.width, self.height, 1), axis=2)
 
+ 		# now find the interesting objects in the configurations
 		for i in range(configs.shape[2]):
-			if i % 5000 == 0:
-				print(f"{100*i/configs.shape[2]:.2f}% done")
+			# if i % 5000 == 0:
+			# 	print(f"{100*i/configs.shape[2]:.2f}% done")
 			objects = self.objectIdentifier.findObjects(configs[:, :, i])
 			if objects:
-				usefulObjects = self.objectIdentifier.findUsefulObjects(objects, 3)
+				usefulObjects = self.objectIdentifier.findUsefulObjects(objects, self.search_period)
 				if usefulObjects:
-					interestingObjects += usefulObjects
+					for item in usefulObjects:
+						if not item in interestingObjects:
+							interestingObjects += usefulObjects
 
 		# turn the objects into a board configuration
 		interestingConfigs = [np.zeros((self.width, self.height)) for _ in range(len(interestingObjects))]
 		for i, item in enumerate(interestingObjects):
-			interestingConfigs[i][item[:, 0], item[:, 1]] = True
+			interestingConfigs[i] = self.rleReader.getConfig(item)
 
 		# display objects
 		self.game.renderItemList(interestingConfigs)

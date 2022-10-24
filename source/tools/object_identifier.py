@@ -1,6 +1,7 @@
 # TODO: fix this class to identify ships with more than 2 dead cells between them
 
 import numpy as np
+from .rle_generator import RleGenerator
 
 
 class ObjectIdentifier:
@@ -8,6 +9,7 @@ class ObjectIdentifier:
 	def __init__(self, maxSize, game):
 		self.maxSize = maxSize
 		self.game = game
+		self.rleGenerator = RleGenerator()
 
 
 	# needs to be updated to find objects with more than 2 dead cells between them
@@ -49,30 +51,34 @@ class ObjectIdentifier:
 		for item in objects:
 			properties = self.identifyObjectProperties(item, maxPeriod)
 			if properties != None:
-				usefulObjects.append(properties)
+				# this is temporary - needs to return full list of objects
+				usefulObjects.append(properties[0])
 
 		return usefulObjects
 
 
 	### IDENTIFYING OBJECT PROPERTIES ###
+	# expand this method later to include more data analysis (that's why it exists)
 	def identifyObjectProperties(self, config, maxPeriod):
-		assert config.shape[0] < self.maxSize and config.shape[1] < self.maxSize, f"Config must be smaller than max size of {self.maxSize}"
-		board = np.zeros((self.maxSize, self.maxSize))
-		board[config[:, 0]+(self.maxSize-config.shape[0])//2, config[:, 1]+(self.maxSize-config.shape[1])//2] = True
+		assert max(config[:,0]) < self.maxSize and max(config[:,1]) < self.maxSize, f"Config must be smaller than max size of {self.maxSize}"
 
-		pattern, period, speed = self.evolveUntilPattern(board, maxPeriod)
-		if pattern == None:
+		pattern, period, speed = self.evolveUntilPattern(config, maxPeriod)
+
+		# check item found has properties
+		if period == -1:
 			return None
 
 		else:
 			return (pattern, period, speed)
 
 
-	def evolveUntilPattern(self, board, maxPeriod):
-		currentConfig = np.argwhere(board == 1)
-		normalizedPattern = self.game.patternIdentity(currentConfig)
+	def evolveUntilPattern(self, config, maxPeriod):
+		normalizedPattern = self.game.patternIdentity(config)
+		currentConfig = config + self.maxSize//2
+		dimention = max(max(config[:,0]), max(config[:,1])) + self.maxSize
+
 		for i in range(1, maxPeriod):
-			evolved_board = self.game.evolve(currentConfig)
+			evolved_board = self.game.evolve(currentConfig, dimention)
 			structures = self.findObjects(evolved_board)
 
 			# check if pattern has died out
@@ -81,10 +87,10 @@ class ObjectIdentifier:
 
 			# this needs to be fixed to account for items that have a space of 2 or more between them
 			currentConfig = structures[0]
-
+			
 			if np.array_equal(self.game.patternIdentity(currentConfig), normalizedPattern):
 				distance = abs(np.argmin(currentConfig) - np.argmin(normalizedPattern))
-				return (normalizedPattern, i, distance)
+				return (self.rleGenerator.normalizedPatternToRle(normalizedPattern), i, distance)
 
 		return (None, -1, -1)
 

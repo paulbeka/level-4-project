@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from rle_reader import RleReader
+from .rle_reader import RleReader
 
 
 class RleGenerator:
@@ -60,6 +60,13 @@ class RleGenerator:
 		rle += "!"
 
 		return rle
+
+
+	def normalizedPatternToRle(self, pattern):
+		dims = [max(pattern[:, 0])+1, max(pattern[:, 1])+1]
+		grid = np.zeros((dims[0], dims[1]))
+		grid[pattern[:, 0], pattern[:, 1]] = True
+		return self.gridToRle(grid)
 
 
 	def generateRandomRle(self):

@@ -164,9 +164,8 @@ class Game:
 
 
 	# evolve a specific configuration
-	def evolve(self, configuration):
-		maxWidth = np.max(configuration)+1
-		board = np.zeros((maxWidth, maxWidth))
+	def evolve(self, configuration, dimention):
+		board = np.zeros((dimention, dimention))
 		board[configuration[:, 0], configuration[:, 1]] = True
 		self.cells = board
 		return self.getNextState()
@@ -174,13 +173,16 @@ class Game:
 
 	# find the pattern identity of an object
 	def patternIdentity(self, pattern):
-		reference = np.argmin(pattern)
-		pattern = pattern - reference
+		reference = (min(pattern[:,0]), min(pattern[:,1]))
+		pattern[:, 0] -= reference[0]
+		pattern[:, 1] -= reference[1]
 		return pattern
 
 
 	### RENDERING MISC ITEMS ###
 	def renderItemList(self, itemList):
+		if not itemList:
+			return False
 		self.itemListToBeRendered = itemList
 		self.updateCellsAutomatically = False
 		self.renderNextItemList(0)

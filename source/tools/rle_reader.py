@@ -80,8 +80,15 @@ class RleReader:
 		return newBox
 
 
-	def getConfig(self, code, x, y):
+	def getConfig(self, code):
+		dims, code = code.split("\n")
+		# get the grid dimentions from rle format: x=x,y=y
+		x, y = dims.split(",")
+		x = int(x.split("=")[1])
+		y = int(y.split("=")[1])
 		grid = np.zeros((x, y))
+
+		# get the rest of the code
 		rle_list = code.split("$")
 		rowIndex = 0
 		for row, item in enumerate(rle_list):
