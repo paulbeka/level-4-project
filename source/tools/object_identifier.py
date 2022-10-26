@@ -23,15 +23,19 @@ class ObjectIdentifier:
 			alive = alive[1:]
 			searched = []
 
+			# this is a queue of alive cells to which valid neighbours are added, to form a structure
+			# it terminates when a structure has 2 dead cells between its cells and other structures
 			neighbor_q = list(self.game.getValidNeighbours(cell).reshape(-1, 2))
-
 			while neighbor_q:
 				currentSearch = neighbor_q.pop(0)
 				if not any((currentSearch == x).all() for x in structure):
 					if config[currentSearch[0], currentSearch[1]] == 1:
+						# check that the cell is still in the alive list
+						if not any((currentSearch == x).all() for x in alive):
+							continue
 						neighbor_q += list(self.game.getValidNeighbours(currentSearch).reshape(-1, 2))
 						structure.append(currentSearch)
-						alive = [x for x in alive if not (x==currentSearch).all()]
+						alive = [x for x in alive if not np.array_equal(x, currentSearch)]
 					else:
 						for n in list(self.game.getValidNeighbours(currentSearch).reshape(-1, 2)):
 							if config[n[0], n[1]] == 1 and not any((n == x).all() for x in structure):
@@ -73,24 +77,33 @@ class ObjectIdentifier:
 
 
 	def evolveUntilPattern(self, config, maxPeriod):
-		normalizedPattern = self.game.patternIdentity(config)
-		currentConfig = config + self.maxSize//2
+		currentConfig = config + self.maxSize//2 # put structure in the board center
+		normalizedPattern = self.game.patternIdentity(currentConfig)
+
+		# make sure the pattern has a padding of maxSize to the highest width in the pattern
 		dimention = max(max(config[:,0]), max(config[:,1])) + self.maxSize
+		# make the new board to be evolved
+		board = np.zeros((dimention, dimention))
+		board[currentConfig[:, 0], currentConfig[:, 1]] = True
 
 		for i in range(1, maxPeriod):
-			evolved_board = self.game.evolve(currentConfig, dimention)
-			structures = self.findObjects(evolved_board)
 
-			# check if pattern has died out
+			board = self.game.evolve(board)
+			structures = self.findObjects(board)
+
+			# check if pattern has died out- stop execution
 			if len(structures) == 0:
 				return (None, -1, -1)
 
+			if len(structures) > 1:
+				print("HELLo")
+
 			# this needs to be fixed to account for items that have a space of 2 or more between them
-			currentConfig = structures[0]
-			
-			if np.array_equal(self.game.patternIdentity(currentConfig), normalizedPattern):
-				distance = abs(np.argmin(currentConfig) - np.argmin(normalizedPattern))
-				return (self.rleGenerator.normalizedPatternToRle(normalizedPattern), i, distance)
+			print("___________")
+			for structure in structures:
+				if np.array_equal(self.game.patternIdentity(structure), normalizedPattern):
+					distance = abs(np.argmin(structure) - np.argmin(currentConfig))
+					return (self.rleGenerator.normalizedPatternToRle(normalizedPattern), i, distance)
 
 		return (None, -1, -1)
 

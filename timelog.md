@@ -115,3 +115,12 @@ s said
 
 ### 24 oct 2022
 * *2 hours* worked on fixing my spaghetti code
+
+### 25 Oct 2022
+* *2 hours* bug fixing, not much work done
+
+
+## Week 5
+
+### 26 Oct 2022
+* *2 hours* more bug fixing, found errors in the pattern recognition software
