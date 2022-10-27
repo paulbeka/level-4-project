@@ -95,11 +95,7 @@ class ObjectIdentifier:
 			if len(structures) == 0:
 				return (None, -1, -1)
 
-			if len(structures) > 1:
-				print("HELLo")
-
 			# this needs to be fixed to account for items that have a space of 2 or more between them
-			print("___________")
 			for structure in structures:
 				if np.array_equal(self.game.patternIdentity(structure), normalizedPattern):
 					distance = abs(np.argmin(structure) - np.argmin(currentConfig))

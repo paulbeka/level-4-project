@@ -124,3 +124,6 @@ s said
 
 ### 26 Oct 2022
 * *2 hours* more bug fixing, found errors in the pattern recognition software
+
+### 27 Oct 2022
+* *1 hour* worked on slides and thought about golly impelementation
