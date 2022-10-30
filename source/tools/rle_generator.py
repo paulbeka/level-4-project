@@ -5,8 +5,8 @@ from rle_reader import RleReader
 
 class RleGenerator:
 
-	def __init__(self, box=10):
-		self.box = box
+	def __init__(self, width=10, height=10):
+		self.width, self.height = width, height
 
 
 	def gridToRle(self, grid):
@@ -75,11 +75,11 @@ class RleGenerator:
 		try:
 			num_decimals = str(density)[::-1].find('.')
 			if random_size_f:
-				grid = np.random.randint(10*num_decimals, size=(self.box-random.randint(0, self.box-1), self.box-random.randint(0, self.box-1)))
+				grid = np.random.randint(10*num_decimals, size=(self.width-random.randint(0, self.width-1), self.height-random.randint(0, self.height-1)))
 			else:
-				grid = np.random.randint(10*num_decimals, size=(self.box, self.box))
+				grid = np.random.randint(10*num_decimals, size=(self.width, self.height))
 
-			finalGrid = np.zeros((self.box, self.box))
+			finalGrid = np.zeros((self.width, self.height))
 			above_1_locations = np.argwhere(grid > density*(10**num_decimals))
 			finalGrid[above_1_locations[:,0], above_1_locations[:,1]] = 1
 			return self.gridToRle(finalGrid)
@@ -99,6 +99,7 @@ class RleGenerator:
 
 
 if __name__ == "__main__":
-	generator = RleGenerator(box=100)
-	print(generator.generateRandomRle(0.5, False))
-	generator.generateRandomRleFile(1000, density=0.5, random_size_f=False)
+	generator = RleGenerator(100, 100)
+
+	# generating a random test file:
+	# generator.generateRandomRleFile(1000, density=0.5, random_size_f=False)

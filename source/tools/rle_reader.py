@@ -13,13 +13,13 @@ from game_of_life import Game
 
 class RleReader:
 
-	def __init__(self, filename=None, box=None):
+	def __init__(self, box=None):
 		self.filename = filename
 		self.box = box
 
 
-	def getFileArray(self):
-		items = self.getRleCodes()
+	def getFileArray(self, filename):
+		items = self.getRleCodes(filename)
 		configurations = []
 
 		for item in items:
@@ -28,15 +28,14 @@ class RleReader:
 			else:
 				configurations.append(self.getConfig(item))
 
-
 		return configurations
 
 
-	def getRleCodes(self):
-		if self.filename == None:
-			assert False, "Filename to get RLE codes is not specified."
+	def getRleCodes(self, filename):
+		if os.path.exists(filename):
+			assert False, "File does not exist."
 
-		with open(self.filename) as f:
+		with open(filename) as f:
 			items = f.readlines()
 
 		codes = []

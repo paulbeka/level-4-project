@@ -133,3 +133,6 @@ s said
 
 ### 29 Oct 2022
 * *1 hour* created a data generator class
+
+### 30 Oct 2022
+* *2 hours* worked on data generation
