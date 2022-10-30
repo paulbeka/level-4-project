@@ -19,26 +19,14 @@ class RleReader:
 
 
 	def getFileArray(self):
-		if self.filename == None:
-			return None
-
-		with open(self.filename) as f:
-			items = f.readlines()
-
+		items = self.getRleCodes()
 		configurations = []
-		if not items:
-			return None
 
-		currXYconfig = ()
 		for item in items:
-			if item[0] == "x":
-				params = item.split(',')
-				currXYconfig = (params[0].split("=")[1], params[1].split("=")[1])
-				continue
 			if self.box != None:
-				configurations.append(self.placeConfigInBox(self.getConfig(item.rstrip(), int(currXYconfig[0]), int(currXYconfig[1])), self.box, self.box))
+				configurations.append(self.placeConfigInBox(self.getConfig(item), self.box, self.box))
 			else:
-				configurations.append(self.getConfig(item.rstrip(), int(currXYconfig[0]), int(currXYconfig[1])))
+				configurations.append(self.getConfig(item))
 
 
 		return configurations
@@ -46,13 +34,10 @@ class RleReader:
 
 	def getRleCodes(self):
 		if self.filename == None:
-			return None
+			assert False, "Filename to get RLE codes is not specified."
 
 		with open(self.filename) as f:
 			items = f.readlines()
-
-		if not items:
-			return None
 
 		codes = []
 		currCode = ""

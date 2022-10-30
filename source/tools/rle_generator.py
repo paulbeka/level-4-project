@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from .rle_reader import RleReader
+from rle_reader import RleReader
 
 
 class RleGenerator:
@@ -69,18 +69,28 @@ class RleGenerator:
 		return self.gridToRle(grid)
 
 
-	def generateRandomRle(self):
+	# density        : represents the density of the cell counts
+	# random_size_f  : flag to tell if the cells generated are put inside a random box
+	def generateRandomRle(self, density, random_size_f):
 		try:
-			grid = np.random.randint(2, size=(self.box-random.randint(0, self.box-1), self.box-random.randint(0, self.box-1)))
-			return self.gridToRle(grid)
+			num_decimals = str(density)[::-1].find('.')
+			if random_size_f:
+				grid = np.random.randint(10*num_decimals, size=(self.box-random.randint(0, self.box-1), self.box-random.randint(0, self.box-1)))
+			else:
+				grid = np.random.randint(10*num_decimals, size=(self.box, self.box))
+
+			finalGrid = np.zeros((self.box, self.box))
+			above_1_locations = np.argwhere(grid > density*(10**num_decimals))
+			finalGrid[above_1_locations[:,0], above_1_locations[:,1]] = 1
+			return self.gridToRle(finalGrid)
 		except:
-			return self.generateRandomRle()
+			return self.generateRandomRle(density, random_size_f)
 
 
-	def generateRandomRleFile(self, count):
+	def generateRandomRleFile(self, count, density=0.5, random_size_f=False):
 		string = ""
 		for i in range(count):
-			string += self.generateRandomRle() + "\n"
+			string += self.generateRandomRle(density, random_size_f) + "\n"
 
 		with open("output.txt", "w") as f:
 			f.write(string)
@@ -89,17 +99,6 @@ class RleGenerator:
 
 
 if __name__ == "__main__":
-	generator = RleGenerator(box=30)
-	# TEST CODE
-	# reader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\30_30_all_spaceships.txt")
-
-	# rleList = reader.getFileArray()
-	# check = [generator.gridToRle(rle) for rle in rleList]
-	# actual_codes = reader.getRleCodes()
-
-	# for i, item in enumerate(actual_codes):
-	# 	# print(item)
-	# 	# print(check[i])
-	# 	print(check[i] == item)
-
-	generator.generateRandomRleFile(20)
+	generator = RleGenerator(box=100)
+	print(generator.generateRandomRle(0.5, False))
+	generator.generateRandomRleFile(1000, density=0.5, random_size_f=False)

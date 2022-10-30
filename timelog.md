@@ -127,3 +127,9 @@ s said
 
 ### 27 Oct 2022
 * *1 hour* worked on slides and thought about golly impelementation
+
+### 28 Oct 2022
+* *1 hour* saw supervisor and worked on the data
+
+### 29 Oct 2022
+* *1 hour* created a data generator class
