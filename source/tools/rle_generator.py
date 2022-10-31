@@ -102,4 +102,4 @@ if __name__ == "__main__":
 	generator = RleGenerator(100, 100)
 
 	# generating a random test file:
-	# generator.generateRandomRleFile(1000, density=0.5, random_size_f=False)
+	generator.generateRandomRleFile(1000, density=0.5, random_size_f=False)

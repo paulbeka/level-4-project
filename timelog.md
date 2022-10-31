@@ -126,13 +126,15 @@ s said
 * *2 hours* more bug fixing, found errors in the pattern recognition software
 
 ### 27 Oct 2022
-* *1 hour* worked on slides and thought about golly impelementation
+* *2z hour* worked on slides and thought about golly impelementation
 
 ### 28 Oct 2022
 * *1 hour* saw supervisor and worked on the data
 
 ### 29 Oct 2022
-* *1 hour* created a data generator class
+* *2 hour* created a data generator class
 
 ### 30 Oct 2022
-* *2 hours* worked on data generation
+* *3 hours* worked on data generation
+
+### 31 Oct 2022

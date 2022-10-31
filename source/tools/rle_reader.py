@@ -2,19 +2,12 @@
 # - Make the getfromfilearray method take in a file as a paremeter
 
 import re
-import sys, os
+import os
 import numpy as np
-
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-
-from game_of_life import Game
 
 class RleReader:
 
 	def __init__(self, box=None):
-		self.filename = filename
 		self.box = box
 
 
@@ -32,8 +25,8 @@ class RleReader:
 
 
 	def getRleCodes(self, filename):
-		if os.path.exists(filename):
-			assert False, "File does not exist."
+		if not os.path.exists(filename):
+			assert False, f"File {filename} does not exist."
 
 		with open(filename) as f:
 			items = f.readlines()
@@ -106,8 +99,9 @@ class RleReader:
 
 
 if __name__ == "__main__":
-	rleReader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\random_rle.txt", box=30)
-	items = rleReader.getFileArray()
-	game = Game(30, 30)
-	game.renderItemList(items)
-	game.run()
+	pass
+	# rleReader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\random_rle.txt", box=30)
+	# items = rleReader.getFileArray()
+	# game = Game(30, 30)
+	# game.renderItemList(items)
+	# game.run()
