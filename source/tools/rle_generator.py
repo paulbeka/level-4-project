@@ -75,9 +75,9 @@ class RleGenerator:
 		try:
 			num_decimals = str(density)[::-1].find('.')
 			if random_size_f:
-				grid = np.random.randint(10*num_decimals, size=(self.width-random.randint(0, self.width-1), self.height-random.randint(0, self.height-1)))
+				grid = np.random.randint(10**num_decimals, size=(self.width-random.randint(0, self.width-1), self.height-random.randint(0, self.height-1)))
 			else:
-				grid = np.random.randint(10*num_decimals, size=(self.width, self.height))
+				grid = np.random.randint(10**num_decimals, size=(self.width, self.height))
 
 			finalGrid = np.zeros((self.width, self.height))
 			above_1_locations = np.argwhere(grid > density*(10**num_decimals))

@@ -12,20 +12,8 @@ batch_size = 5
 learning_rate = 0.01
 
 ### LOAD DATA ###
-ratio = 5 
-codeReader = RleReader("C:\\Workspace\\level-4-project\\source\\data\\30_30_all_spaceships.txt", box=30)
 
-glider_dataset = [(item, 1) for item in codeReader.getFileArray()]
-codeReader.fileName = "C:\\Workspace\\level-4-project\\source\\data\\random_rle.txt"
-fake_dataset = [(item, 0) for item in codeReader.getFileArray()]
-
-train_dataset = glider_dataset[0:len(glider_dataset) - (len(glider_dataset)//5)]
-train_dataset += fake_dataset[0:len(fake_dataset) - (len(fake_dataset)//5)]
-test_dataset = glider_dataset[len(glider_dataset) - (len(glider_dataset)//5): len(glider_dataset)]
-test_dataset += fake_dataset[len(fake_dataset) - (len(fake_dataset)//5): len(fake_dataset)]
-
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
+# use data generator class here
 
 ### NEURAL NET ###
 
