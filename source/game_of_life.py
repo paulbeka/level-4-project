@@ -18,7 +18,7 @@ class Game:
 
 		pygame.init()
 
-		self.cell_size = 20
+		self.cell_size = 5
 		self.width, self.height = width*self.cell_size, height*self.cell_size
 		self.rule1, self.rule2 = rule1, rule2
 		self.show_display = show_display
@@ -200,7 +200,13 @@ class Game:
 		elif self.itemListToBeRenderedIndex < 0:
 			self.itemListToBeRenderedIndex = len(self.itemListToBeRendered) - 1
 
-		self.cells = self.itemListToBeRendered[self.itemListToBeRenderedIndex]
+		# check to see if list has an information attribute to be printed
+		if len(self.itemListToBeRendered[self.itemListToBeRenderedIndex]) > 1:
+			self.cells = np.array(self.itemListToBeRendered[self.itemListToBeRenderedIndex][0])
+			print(self.itemListToBeRendered[self.itemListToBeRenderedIndex][1])
+		else:
+			self.cells = self.itemListToBeRendered[self.itemListToBeRenderedIndex][0]
+
 
 
 	def getState(self):

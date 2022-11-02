@@ -4,6 +4,7 @@
 from tools.rle_reader import RleReader
 import random
 import torch
+import numpy as np
 
 
 class SpaceshipIdentifierDataLoader:
@@ -31,11 +32,20 @@ class SpaceshipIdentifierDataLoader:
 		spaceships = self.reader.getFileArray(self.root_folder + "\\spaceships.txt")
 		randomly_placed_spaceships = []
 
-		for spaceship in spaceships:
-			if width-spaceship.shape[0]-1 > 0:
-				spaceship[:, 0] += random.randint(0, width-spaceship.shape[0]-1)
-			if height-spaceship.shape[1]-1 > 0:
-				spaceship[:, 1] += random.randint(0, height-spaceship.shape[1]-1)
+		for i in range(self.n_samples):
+			grid = np.zeros((width, height))
+			
+			# need to loop around the only spaceships that we have available
+			currSpaceship = spaceships[i % len(spaceships)]
+			aliveLoc = np.argwhere(currSpaceship == 1)
+
+			if width-currSpaceship.shape[0]-1 > 0:
+				aliveLoc[:, 0] += random.randint(0, width-currSpaceship.shape[0]-1)
+			if height-currSpaceship.shape[1]-1 > 0:
+				aliveLoc[:, 1] += random.randint(0, height-currSpaceship.shape[1]-1)
+
+			grid[aliveLoc[:,0], aliveLoc[:,1]] = 1
+			randomly_placed_spaceships.append(grid)
 
 		return [(item, 1) for item in randomly_placed_spaceships]
 
@@ -51,7 +61,6 @@ class SpaceshipIdentifierDataLoader:
 
 		train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=self.batch_size, shuffle=True)
 		test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=self.batch_size, shuffle=True)
-
 		return train_loader, test_loader
 
 

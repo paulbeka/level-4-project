@@ -126,7 +126,7 @@ s said
 * *2 hours* more bug fixing, found errors in the pattern recognition software
 
 ### 27 Oct 2022
-* *2z hour* worked on slides and thought about golly impelementation
+* *2 hour* worked on slides and thought about golly impelementation
 
 ### 28 Oct 2022
 * *1 hour* saw supervisor and worked on the data
@@ -138,3 +138,9 @@ s said
 * *3 hours* worked on data generation
 
 ### 31 Oct 2022
+* *3 hours* created working CNN to detect spaceships
+
+### 1 Nov 2022
+* *3 hours* worked on testing and ideas
+
+### 2 Nov 2022

@@ -8,7 +8,7 @@ from dataloaders.spaceshipid_dataloader import SpaceshipIdentifierDataLoader
 
 
 ### HYPERPARAMETERS ###
-num_epochs = 5
+num_epochs = 1
 batch_size = 5
 learning_rate = 0.001
 
@@ -29,7 +29,7 @@ class LifeNetCNN(nn.Module):
 		super(LifeNetCNN, self).__init__()
 		self.conv1	= nn.Conv2d(1, 3, batch_size)
 		self.pool = nn.MaxPool2d(2, 2)
-		self.conv2 = nn.Conv2d(3, 16, 5)
+		self.conv2 = nn.Conv2d(3, 16, batch_size)
 		# reaches 9x9
 		self.fc1 = nn.Linear(16*22*22, 100)
 		self.fc2 = nn.Linear(100, 84)
@@ -63,23 +63,30 @@ for epoch in range(num_epochs):
 		loss.backward()
 		optimizer.step()
 
-		print(f"Loss: {loss.item():.4f}")
+		if i % 10 == 0:
+			print(f"Loss: {loss.item():.9f}")
 
 
 ### TESTING ###
 
 with torch.no_grad():
 	correct, samples = 0, 0
+	displayList = []
 	for configs, labels in test_loader:
 		outputs = model(configs)
 
 		_, predictions = torch.max(outputs, 1)
+
+		displayList += [(configs[i], predictions[i]) for i in range(batch_size)]
 		samples += labels.shape[0]
 		correct += (predictions == labels).sum().item()
 
 	accuracy = 100 * (correct / samples)
 	print(f"Accuracy: {accuracy:.2f}%")
 
+	game = Game(width, height)
+	game.renderItemList(displayList)
+	game.run()
 
 # run
 if __name__ == '__main__':
