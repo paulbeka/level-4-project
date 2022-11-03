@@ -16,7 +16,7 @@ width, height = 100, 100
 
 ### LOAD DATA ###
 
-dataloader = SpaceshipIdentifierDataLoader(1000, 0.5, False, "C:\\Workspace\\level-4-project\\source\\data\\spaceship_identification", batch_size=batch_size)
+dataloader = SpaceshipIdentifierDataLoader(1000, 0.5, False, "C:\\Workspace\\level-4-project\\source\\data\\spaceship_identification", batch_size=batch_size, include_random_in_spaceship=True)
 train_loader, test_loader = dataloader.loadSpaceshipIdentifierDataset(width, height)
 
 ### NEURAL NET ###

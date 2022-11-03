@@ -2,6 +2,7 @@
 # Can be used to get random RLEs and random spaceship placements
 
 from tools.rle_reader import RleReader
+from tools.rle_generator import RleGenerator
 import random
 import torch
 import numpy as np
@@ -15,6 +16,7 @@ class SpaceshipIdentifierDataLoader:
 				fixed_box_size,
 				root_folder,
 				batch_size=5,
+				include_random_in_spaceship = False,
 				ratio = 0.8):
 
 		self.n_samples = n_samples
@@ -22,6 +24,7 @@ class SpaceshipIdentifierDataLoader:
 		self.fixed_box_size = fixed_box_size
 		self.root_folder = root_folder
 		self.batch_size = batch_size
+		self.include_random_in_spaceship = include_random_in_spaceship
 
 		self.n_train_samples = int(n_samples * ratio)
 
@@ -32,6 +35,8 @@ class SpaceshipIdentifierDataLoader:
 		spaceships = self.reader.getFileArray(self.root_folder + "\\spaceships.txt")
 		randomly_placed_spaceships = []
 
+		generator = RleGenerator(width, height)
+
 		for i in range(self.n_samples):
 			grid = np.zeros((width, height))
 			
@@ -39,13 +44,26 @@ class SpaceshipIdentifierDataLoader:
 			currSpaceship = spaceships[i % len(spaceships)]
 			aliveLoc = np.argwhere(currSpaceship == 1)
 
-			if width-currSpaceship.shape[0]-1 > 0:
-				aliveLoc[:, 0] += random.randint(0, width-currSpaceship.shape[0]-1)
-			if height-currSpaceship.shape[1]-1 > 0:
-				aliveLoc[:, 1] += random.randint(0, height-currSpaceship.shape[1]-1)
+			# using the max function to make sure it does not crash if shape[x]-1 = -1
+			addWidthIndex = random.randint(0, max(width-currSpaceship.shape[0]-1, 0))
+			addHeightIndex = random.randint(0, max(height-currSpaceship.shape[1]-1, 0))
+
+			aliveLoc[:, 0] += addWidthIndex
+			aliveLoc[:, 1] += addHeightIndex
 
 			grid[aliveLoc[:,0], aliveLoc[:,1]] = 1
-			randomly_placed_spaceships.append(grid)
+
+			if self.include_random_in_spaceship:
+				random_sample = generator.generateRandomGrid(self.random_density, False)
+				x_min, y_min = min(aliveLoc[:,0])-2, min(aliveLoc[:,1])-2
+				x_max, y_max = max(aliveLoc[:,0])+2, max(aliveLoc[:,1])+2
+				random_sample[x_min:x_max, y_min:y_max] = 0
+				random_sample[aliveLoc[:,0], aliveLoc[:,1]] = 1
+				randomly_placed_spaceships.append(random_sample)
+
+			else:
+				randomly_placed_spaceships.append(grid)
+
 
 		return [(item, 1) for item in randomly_placed_spaceships]
 
