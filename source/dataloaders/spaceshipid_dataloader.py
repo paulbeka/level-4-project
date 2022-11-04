@@ -4,6 +4,7 @@
 from tools.rle_reader import RleReader
 from tools.rle_generator import RleGenerator
 import random
+import os
 import torch
 import numpy as np
 
@@ -71,7 +72,7 @@ class SpaceshipIdentifierDataLoader:
 	# function used to generate an equal number of ships and random patterns in an n*m grid
 	# width, height : dimentions of the grid
 	def loadSpaceshipIdentifierDataset(self, width, height):
-		random_configs = [(item, 0) for item in self.reader.getFileArray(self.root_folder + "\\random_rles.txt")]
+		random_configs = [(item, 0) for item in self.reader.getFileArray(os.path.join(self.root_folder,"random_rles.txt"))]
 		spaceship_configs = self.loadSpaceships(width, height)
 
 		train_dataset = random_configs[0:self.n_train_samples] + spaceship_configs[0:self.n_train_samples]

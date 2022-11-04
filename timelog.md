@@ -144,3 +144,7 @@ s said
 * *3 hours* worked on testing and ideas
 
 ### 2 Nov 2022
+* *3 hours* testing classes 
+
+### 3 Nov 2022
+* *3 hours* made slides for meeting tomorrow, emailed supervisor, worked on more testing 

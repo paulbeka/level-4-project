@@ -5,18 +5,36 @@ import numpy as np
 from game_of_life import Game
 from tools.rle_reader import RleReader
 from dataloaders.spaceshipid_dataloader import SpaceshipIdentifierDataLoader
+import os
+
+
+### CONSTANTS ###
+DATA_PATH = os.path.join(os.getcwd(), "data")
 
 
 ### HYPERPARAMETERS ###
-num_epochs = 1
+num_epochs = 5
 batch_size = 5
 learning_rate = 0.001
+
+# save the model after it has been trained.
+save_model = False
+save_name = ""
+if save_model:
+	save_name = input("Input the name of your NN: ")
+SAVE_PATH = os.path.join(DATA_PATH, "models", save_name)
 
 width, height = 100, 100
 
 ### LOAD DATA ###
 
-dataloader = SpaceshipIdentifierDataLoader(1000, 0.5, False, "C:\\Workspace\\level-4-project\\source\\data\\spaceship_identification", batch_size=batch_size, include_random_in_spaceship=True)
+dataloader = SpaceshipIdentifierDataLoader(1000, 
+	0.5, 
+	False, 
+	os.path.join(DATA_PATH, "spaceship_identification"), 
+	batch_size=batch_size, 
+	include_random_in_spaceship=True)
+
 train_loader, test_loader = dataloader.loadSpaceshipIdentifierDataset(width, height)
 
 ### NEURAL NET ###
@@ -71,22 +89,26 @@ for epoch in range(num_epochs):
 
 with torch.no_grad():
 	correct, samples = 0, 0
-	displayList = []
+	# displayList = []
 	for configs, labels in test_loader:
 		outputs = model(configs)
 
 		_, predictions = torch.max(outputs, 1)
 
-		displayList += [(configs[i], predictions[i]) for i in range(batch_size)]
+		# displayList += [(configs[i], predictions[i]) for i in range(batch_size)]
 		samples += labels.shape[0]
 		correct += (predictions == labels).sum().item()
 
 	accuracy = 100 * (correct / samples)
 	print(f"Accuracy: {accuracy:.2f}%")
 
-	game = Game(width, height)
-	game.renderItemList(displayList)
-	game.run()
+	# some rudementry testing
+	# game = Game(width, height)
+	# game.renderItemList(displayList)
+	# game.run()
+
+	if save_model:
+		torch.save(model.state_dict(), SAVE_PATH)
 
 # run
 if __name__ == '__main__':
