@@ -2,10 +2,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+import os
+
 from game_of_life import Game
 from tools.rle_reader import RleReader
 from dataloaders.spaceshipid_dataloader import SpaceshipIdentifierDataLoader
-import os
+from nn_tester import NeuralNetworkTester
 
 
 ### CONSTANTS ###
@@ -15,10 +17,9 @@ DATA_PATH = os.path.join(os.getcwd(), "data")
 ### HYPERPARAMETERS ###
 num_epochs = 5
 batch_size = 5
-learning_rate = 0.001
+learning_rate = 0.0001
 
-# save the model after it has been trained.
-save_model = False
+save_model = True  # set to true if you wish model to be saved
 save_name = ""
 if save_model:
 	save_name = input("Input the name of your NN: ")
@@ -28,14 +29,18 @@ width, height = 100, 100
 
 ### LOAD DATA ###
 
-dataloader = SpaceshipIdentifierDataLoader(1000, 
+dataloader_params = [
+	1000, 
 	0.5, 
 	False, 
 	os.path.join(DATA_PATH, "spaceship_identification"), 
-	batch_size=batch_size, 
-	include_random_in_spaceship=True)
+	5, 
+	True
+]
 
-train_loader, test_loader = dataloader.loadSpaceshipIdentifierDataset(width, height)
+dataloader = SpaceshipIdentifierDataLoader(*dataloader_params)
+
+train_loader, test_loader = dataloader.loadData(width, height)
 
 ### NEURAL NET ###
 
@@ -88,27 +93,27 @@ for epoch in range(num_epochs):
 ### TESTING ###
 
 with torch.no_grad():
-	correct, samples = 0, 0
-	# displayList = []
-	for configs, labels in test_loader:
-		outputs = model(configs)
+	# correct, samples = 0, 0
+	# for configs, labels in test_loader:
+	# 	outputs = model(configs)
 
-		_, predictions = torch.max(outputs, 1)
+	# 	_, predictions = torch.max(outputs, 1)
 
-		# displayList += [(configs[i], predictions[i]) for i in range(batch_size)]
-		samples += labels.shape[0]
-		correct += (predictions == labels).sum().item()
+	# 	samples += labels.shape[0]
+	# 	correct += (predictions == labels).sum().item()
 
-	accuracy = 100 * (correct / samples)
-	print(f"Accuracy: {accuracy:.2f}%")
+	# accuracy = 100 * (correct / samples)
+	# print(f"Accuracy: {accuracy:.2f}%")
 
-	# some rudementry testing
-	# game = Game(width, height)
-	# game.renderItemList(displayList)
-	# game.run()
+	tester = NeuralNetworkTester()
 
+	# save items into the data/models folder
 	if save_model:
 		torch.save(model.state_dict(), SAVE_PATH)
+
+		with open(os.path.join(DATA_PATH, "models", save_name + "_parameters.txt"), "w") as f:
+			f.writelines([str(param)+"\n" for param in dataloader_params])
+
 
 # run
 if __name__ == '__main__':

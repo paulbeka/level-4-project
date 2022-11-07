@@ -33,7 +33,7 @@ class SpaceshipIdentifierDataLoader:
 
 
 	def loadSpaceships(self, width, height):
-		spaceships = self.reader.getFileArray(self.root_folder + "\\spaceships.txt")
+		spaceships = self.reader.getFileArray(os.path.join(self.root_folder, "spaceships.txt"))
 		randomly_placed_spaceships = []
 
 		generator = RleGenerator(width, height)
@@ -54,6 +54,7 @@ class SpaceshipIdentifierDataLoader:
 
 			grid[aliveLoc[:,0], aliveLoc[:,1]] = 1
 
+			# add a bunch of noise around the spaceship by generating a random sample and placing ship there
 			if self.include_random_in_spaceship:
 				random_sample = generator.generateRandomGrid(self.random_density, False)
 				x_min, y_min = min(aliveLoc[:,0])-2, min(aliveLoc[:,1])-2
@@ -71,7 +72,7 @@ class SpaceshipIdentifierDataLoader:
 
 	# function used to generate an equal number of ships and random patterns in an n*m grid
 	# width, height : dimentions of the grid
-	def loadSpaceshipIdentifierDataset(self, width, height):
+	def loadData(self, width, height):
 		random_configs = [(item, 0) for item in self.reader.getFileArray(os.path.join(self.root_folder,"random_rles.txt"))]
 		spaceship_configs = self.loadSpaceships(width, height)
 
