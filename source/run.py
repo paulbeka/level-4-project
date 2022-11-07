@@ -1,9 +1,7 @@
-from nn_tester import NeuralNetworkTester
 
 
 def main():
-	
-	firstTester = NeuralNetworkTester()
+	pass
 	
 
 if __name__ == '__main__':

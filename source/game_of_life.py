@@ -67,6 +67,9 @@ class Game:
 			self.update()
 			if self.show_display:
 				self.render()
+		if self.show_display:
+			pygame.display.quit()
+		pygame.quit()
 
 
 	def update(self):
@@ -208,9 +211,8 @@ class Game:
 			self.cells = self.itemListToBeRendered[self.itemListToBeRenderedIndex][0]
 
 
-
-	def getState(self):
-		return self.cells
+	def kill(self):
+		self.running = False
 
 
 def main():
