@@ -7,6 +7,12 @@ class Game:
 	WHITE = (255, 255, 255)
 	BLACK = (0, 0, 0)
 	NEIGHBOUR_TEMPLATE = np.array([[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]])
+	DOUBLE_NEIGHBOUR_TEMPLATE = np.array(
+			[[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1],
+			[-2, -2], [-2, -1], [-2, 0], [-2, 1], [-2, 2], 
+			[2, 2], [2, 1], [2, 0], [2, 1], [2, 2],
+			[-1, 2], [0, 2], [1, 2], [-1, -2], [0, -2], [1, -2], [2, -2], [2, -1]]
+		)
 
 	def __init__(self, 
 				width, 
@@ -198,6 +204,7 @@ class Game:
 	def renderNextItemList(self, direction):
 		self.itemListToBeRenderedIndex += direction
 
+		# loop around the list
 		if self.itemListToBeRenderedIndex > len(self.itemListToBeRendered) - 1:
 			self.itemListToBeRenderedIndex = 0
 		elif self.itemListToBeRenderedIndex < 0:
@@ -205,7 +212,11 @@ class Game:
 
 		# check to see if list has an information attribute to be printed
 		if len(self.itemListToBeRendered[self.itemListToBeRenderedIndex]) > 1:
-			self.cells = np.array(self.itemListToBeRendered[self.itemListToBeRenderedIndex][0])
+			if not isinstance(self.itemListToBeRendered[self.itemListToBeRenderedIndex][0], np.ndarray):
+				self.cells = np.array(self.itemListToBeRendered[self.itemListToBeRenderedIndex][0])
+			else:
+				self.cells = self.itemListToBeRendered[self.itemListToBeRenderedIndex][0]
+				
 			print(self.itemListToBeRendered[self.itemListToBeRenderedIndex][1])
 		else:
 			self.cells = self.itemListToBeRendered[self.itemListToBeRenderedIndex][0]

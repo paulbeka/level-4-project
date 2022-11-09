@@ -1,6 +1,10 @@
 # This is a dataloader class to load data that can identify spaceships
 # Can be used to get random RLEs and random spaceship placements
 
+import sys
+
+sys.path.insert(1, "C:\\Workspace\\level-4-project\\source")
+
 from tools.rle_reader import RleReader
 from tools.rle_generator import RleGenerator
 from game_of_life import Game
@@ -48,55 +52,51 @@ class SpaceshipIdentifierDataLoader:
 			aliveLoc = np.argwhere(currSpaceship == 1)
 
 			# using the max function to make sure it does not crash if shape[x]-1 = -1
-			addWidthIndex = random.randint(0, max(width-currSpaceship.shape[0]-1, 0))
-			addHeightIndex = random.randint(0, max(height-currSpaceship.shape[1]-1, 0))
-
-			aliveLoc[:, 0] += addWidthIndex
-			aliveLoc[:, 1] += addHeightIndex
-
-			grid[aliveLoc[:,0], aliveLoc[:,1]] = 1
+			addWidthIndex = random.randint(0, max(width-currSpaceship.shape[0]-4, 0))
+			addHeightIndex = random.randint(0, max(height-currSpaceship.shape[1]-4, 0))
 
 			# add a bunch of noise around the spaceship by generating a random sample and placing ship there
 			if self.include_random_in_spaceship:
 
 				random_sample = generator.generateRandomGrid(self.random_density, False)
-				x_min, y_min = min(aliveLoc[:,0]), min(aliveLoc[:,1])
-				x_max, y_max = max(aliveLoc[:,0]), max(aliveLoc[:,1])
+				x_min, y_min = min(aliveLoc[:,0])-2, min(aliveLoc[:,1])-2
+				x_max, y_max = max(aliveLoc[:,0])+2, max(aliveLoc[:,1])+2
 
 				temp_grid = np.zeros((x_max-x_min+1, y_max-y_min+1))
-				print(temp_grid)
-				temp_grid[aliveLoc[:,0]-x_min, aliveLoc[:,1]-y_min] = 1
+				temp_grid[np.copy(aliveLoc[:,0])-x_min, np.copy(aliveLoc[:,1])-y_min] = 1
+				
+				# find where 0s should be placed
+				alive = np.argwhere(temp_grid == 1)
+				for cell in alive:
+					neighbours = Game.DOUBLE_NEIGHBOUR_TEMPLATE + cell
+					temp_grid[neighbours[:, 0], neighbours[:, 1]] = 2
 
-				# find the min/max of every row/col and set all inside the range to 0
+				# make sure the insides of the ship have space inside them
 				for i, row in enumerate(temp_grid):
-					alive = np.argwhere(row == 1)
-					if not len(alive):
-						temp_grid[i, :] = 2
-						continue
-					min_x, max_x = min(alive)[0], max(alive)[0]
-					temp_grid[i, 0:min_x-1] = 2
-					temp_grid[i, max_x+1:] = 2
+					cell_indexes = np.where(row == 2)
+					if cell_indexes[0].any():
+						temp_grid[i, cell_indexes[0][0]:cell_indexes[0][-1]] = 2
 
-				for i, col in enumerate(temp_grid.T):
-					alive = np.argwhere(col == 1)
-					if not len(alive):
-						temp_grid[:, i] = 2
-						continue
-					min_y, max_y = min(alive)[0], max(alive)[0]
-					temp_grid[0:min_y, i] += 2
-					temp_grid[max_y:, i] += 2
-
-				# place zeros and spaceship
-				zero_placements = np.argwhere(1 < temp_grid < 4)
-				random_sample[zero_placements[:,0]+x_min, zero_placements[:,1]+y_min] = 0
-				random_sample[aliveLoc[:,0], aliveLoc[:,1]] = 1
+				place_zeros = np.argwhere(temp_grid == 2)
+				random_sample[place_zeros[:, 0]+addWidthIndex, place_zeros[:, 1]+addHeightIndex] = 0  # make space for spaceship
+				random_sample[aliveLoc[:, 0]+addWidthIndex+2, aliveLoc[:, 1]+addHeightIndex+2] = 1  # place spaceship (add 2 for pre-space-padding)
 
 				randomly_placed_spaceships.append(random_sample)
 
 			else:
+				# remake the original generator
+				aliveLoc[:, 0] += addWidthIndex
+				aliveLoc[:, 1] += addHeightIndex
+					# FIX THIS ITS WRONG
+				
+				
+
+
+				grid[aliveLoc[:,0], aliveLoc[:,1]] = 1
 				randomly_placed_spaceships.append(grid)
 
-
+		#game.renderItemList([(item, 1) for item in randomly_placed_spaceships])
+		#game.run()
 		game.kill()
 
 		return [(item, 1) for item in randomly_placed_spaceships]
@@ -122,4 +122,20 @@ class SpaceshipIdentifierDataLoader:
 
 
 if __name__ == '__main__':
-	pass
+	dataloader_params = {'dataloader': [
+										1000, 
+										0.5, 
+										False, 
+										os.path.join("C:\\Workspace\\level-4-project\\source\\data", "spaceship_identification"), 
+										5, 
+										True
+									],
+					'width' : 100,
+					'height': 100,
+					'num_epochs' : 1,
+					'batch_size' : 5
+					}
+
+	dataloader = SpaceshipIdentifierDataLoader(*dataloader_params['dataloader'])
+
+	train_loader, test_loader = dataloader.loadData(100, 100)

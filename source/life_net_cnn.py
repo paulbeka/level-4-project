@@ -16,7 +16,7 @@ DATA_PATH = os.path.join(os.getcwd(), "data")
 
 
 ### HYPERPARAMETERS ###
-num_epochs = 10
+num_epochs = 20
 batch_size = 5
 learning_rate = 0.0005
 
