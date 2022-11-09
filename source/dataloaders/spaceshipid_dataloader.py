@@ -45,7 +45,6 @@ class SpaceshipIdentifierDataLoader:
 		game = Game(width, height, show_display=False)
 
 		for i in range(self.n_samples):
-			grid = np.zeros((width, height))
 			
 			# need to loop around the only spaceships that we have available
 			currSpaceship = spaceships[i % len(spaceships)]
@@ -87,10 +86,8 @@ class SpaceshipIdentifierDataLoader:
 				# remake the original generator
 				aliveLoc[:, 0] += addWidthIndex
 				aliveLoc[:, 1] += addHeightIndex
-					# FIX THIS ITS WRONG
-				
-				
 
+				grid = np.zeros((width, height))
 
 				grid[aliveLoc[:,0], aliveLoc[:,1]] = 1
 				randomly_placed_spaceships.append(grid)
