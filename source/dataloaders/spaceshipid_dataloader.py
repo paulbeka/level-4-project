@@ -53,7 +53,7 @@ class SpaceshipIdentifierDataLoader:
 		for i in range(self.n_samples):
 			
 			# need to loop around the only spaceships that we have available
-			currSpaceship = spaceships[i % len(spaceships)]
+			currSpaceship = self.spaceships[i % len(self.spaceships)]
 			aliveLoc = np.argwhere(currSpaceship == 1)
 
 			# using the max function to make sure it does not crash if shape[x]-1 = -1
@@ -107,11 +107,12 @@ class SpaceshipIdentifierDataLoader:
 	# width, height : dimentions of the grid
 	def loadData(self, width, height):
 		spaceship_configs = self.loadSpaceships(width, height)
+
+		# use (item, 0|1) to signify spaceship or not
 		if self.fixed_box_size:
 			generator = RleGenerator(width, height)
-			# get all the box sizes than parse it into the generator
-			box_sizes = [np.argwhere]
-			random_configs = generator.generateRandomInsideBoxSize(self.random_density, )
+			box_sizes = self.getBoxSizes()
+			random_configs = [(item, 0) for item in generator.generateRandomInsideBoxSize(self.n_samples, self.random_density, box_sizes)]
 		else:
 			random_configs = [(item, 0) for item in self.reader.getFileArray(os.path.join(self.root_folder,"random_rles.txt"))]
 
@@ -120,14 +121,26 @@ class SpaceshipIdentifierDataLoader:
 
 		train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=self.batch_size, shuffle=True)
 		test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=self.batch_size, shuffle=True)
-		
+
 		# TESTING ONLY
 		game = Game(100, 100)
-		game.renderItemList([item[0] for item in list(test_loader)])
+		game.renderItemList()  # WHY CANT WE SEE ANYTHIGN FIX IT
 		game.run()
 		game.kill()
 
 		return train_loader, test_loader
+
+
+	# get the box sizes of spaceships
+	def getBoxSizes(self):
+		box_sizes = []
+		for item in self.spaceships:
+			alive = np.argwhere(item == 1)
+			width = max(alive[:,0]) - min(alive[:, 0]) + 1
+			height = max(alive[:,1]) - min(alive[:,1]) + 1
+			box_sizes.append((width, height))
+
+		return box_sizes
 
 
 if __name__ == '__main__':

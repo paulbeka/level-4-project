@@ -33,10 +33,10 @@ width, height = 100, 100
 dataloader_params = {'dataloader': [
 										1000, 
 										0.5, 
-										False, 
+										True, 
 										os.path.join(DATA_PATH, "spaceship_identification"), 
 										5, 
-										True
+										False
 									],
 					'width' : width,
 					'height': height,

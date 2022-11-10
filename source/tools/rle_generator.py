@@ -92,24 +92,25 @@ class RleGenerator:
 
 
 	# Takes in a list of box sizes and returns a list of random configs inside those boxes
+	# n 		: number of grids to generate
 	# density	: represents the density of the cell counts
 	# box_sizes	: list of box sizes the random config can take
-	def generateRandomInsideBoxSize(self, density, box_sizes):
+	def generateRandomInsideBoxSize(self, n, density, box_sizes):
 		num_decimals = str(density)[::-1].find('.')
 		randomGrids = []
-		for shape in box_sizes:
+		for i in range(n):
+			shape = box_sizes[i % len(box_sizes)]
 			grid = np.random.randint(10**num_decimals, size=shape)
 
 			above_1_locations = np.argwhere(grid > density*(10**num_decimals))
 			
 			# Move the random box somewhere random on the grid
-			above_1_locations[:, 0] += random.randint(-(self.width // 2)+shape[0]+1, (self.width // 2)-shape[0]-1)
-			above_1_locations[:, 1] += random.randint(-(self.height // 2)+shape[1]+1, (self.height // 2)-shape[1]-1)
+			above_1_locations[:, 0] += random.randint(0, self.width-shape[0]-1)
+			above_1_locations[:, 1] += random.randint(0, self.height-shape[1]-1)
 
 			newGrid = np.zeros((self.width, self.height))
 			newGrid[above_1_locations[:, 0], above_1_locations[:, 1]] = 1
-
-			randomGrids.append(grid)
+			randomGrids.append(newGrid)
 
 		return randomGrids
 
