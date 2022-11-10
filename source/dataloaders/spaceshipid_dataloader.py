@@ -1,5 +1,6 @@
 # This is a dataloader class to load data that can identify spaceships
 # Can be used to get random RLEs and random spaceship placements
+# Compares spaceships to random configs and sees if they can be identified
 
 import sys
 
@@ -23,7 +24,9 @@ class SpaceshipIdentifierDataLoader:
 				root_folder,
 				batch_size=5,
 				include_random_in_spaceship = False,
-				ratio = 0.8):
+				ratio = 0.8,
+				width = 100,
+				height = 100):
 
 		self.n_samples = n_samples
 		self.random_density = random_density
@@ -36,9 +39,12 @@ class SpaceshipIdentifierDataLoader:
 
 		self.reader = RleReader()
 
+		self.spaceships = []
+
 
 	def loadSpaceships(self, width, height):
-		spaceships = self.reader.getFileArray(os.path.join(self.root_folder, "spaceships.txt"))
+		# save the spaceships in case of future use
+		self.spaceships = self.reader.getFileArray(os.path.join(self.root_folder, "spaceships.txt"))
 		randomly_placed_spaceships = []
 
 		generator = RleGenerator(width, height)
@@ -92,8 +98,6 @@ class SpaceshipIdentifierDataLoader:
 				grid[aliveLoc[:,0], aliveLoc[:,1]] = 1
 				randomly_placed_spaceships.append(grid)
 
-		#game.renderItemList([(item, 1) for item in randomly_placed_spaceships])
-		#game.run()
 		game.kill()
 
 		return [(item, 1) for item in randomly_placed_spaceships]
@@ -102,30 +106,38 @@ class SpaceshipIdentifierDataLoader:
 	# function used to generate an equal number of ships and random patterns in an n*m grid
 	# width, height : dimentions of the grid
 	def loadData(self, width, height):
-		random_configs = [(item, 0) for item in self.reader.getFileArray(os.path.join(self.root_folder,"random_rles.txt"))]
 		spaceship_configs = self.loadSpaceships(width, height)
+		if self.fixed_box_size:
+			generator = RleGenerator(width, height)
+			# get all the box sizes than parse it into the generator
+			box_sizes = [np.argwhere]
+			random_configs = generator.generateRandomInsideBoxSize(self.random_density, )
+		else:
+			random_configs = [(item, 0) for item in self.reader.getFileArray(os.path.join(self.root_folder,"random_rles.txt"))]
 
 		train_dataset = random_configs[0:self.n_train_samples] + spaceship_configs[0:self.n_train_samples]
 		test_dataset = random_configs[self.n_train_samples:] + spaceship_configs[self.n_train_samples:]
 
 		train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=self.batch_size, shuffle=True)
 		test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=self.batch_size, shuffle=True)
+		
+		# TESTING ONLY
+		game = Game(100, 100)
+		game.renderItemList([item[0] for item in list(test_loader)])
+		game.run()
+		game.kill()
+
 		return train_loader, test_loader
-
-
-	def generateNewRandomRleDataset(self):
-		generator = RleGenerator()
-
 
 
 if __name__ == '__main__':
 	dataloader_params = {'dataloader': [
 										1000, 
 										0.5, 
-										False, 
+										True, 
 										os.path.join("C:\\Workspace\\level-4-project\\source\\data", "spaceship_identification"), 
 										5, 
-										True
+										False
 									],
 					'width' : 100,
 					'height': 100,

@@ -9,6 +9,7 @@ class RleGenerator:
 		self.width, self.height = width, height
 
 
+	# Turns a given grid of 1s and 0s into an RLE code
 	def gridToRle(self, grid):
 		rle = f"x={grid.shape[0]},y={grid.shape[1]}\n"
 		rowCount = 1
@@ -62,6 +63,7 @@ class RleGenerator:
 		return rle
 
 
+	# Turns a normalizes pattern into RLE code
 	def normalizedPatternToRle(self, pattern):
 		dims = [max(pattern[:, 0])+1, max(pattern[:, 1])+1]
 		grid = np.zeros((dims[0], dims[1]))
@@ -69,6 +71,7 @@ class RleGenerator:
 		return self.gridToRle(grid)
 
 
+	# GENERATES RANDOM GRID, WITH OPTION OF RANDOM BOX SIZES
 	# density        : represents the density of the cell counts
 	# random_size_f  : flag to tell if the cells generated are put inside a random box
 	def generateRandomGrid(self, density, random_size_f):
@@ -82,11 +85,36 @@ class RleGenerator:
 			finalGrid = np.zeros((self.width, self.height))
 			above_1_locations = np.argwhere(grid > density*(10**num_decimals))
 			finalGrid[above_1_locations[:,0], above_1_locations[:,1]] = 1
+
 			return finalGrid
 		except:
 			return self.generateRandomRle(density, random_size_f)
 
 
+	# Takes in a list of box sizes and returns a list of random configs inside those boxes
+	# density	: represents the density of the cell counts
+	# box_sizes	: list of box sizes the random config can take
+	def generateRandomInsideBoxSize(self, density, box_sizes):
+		num_decimals = str(density)[::-1].find('.')
+		randomGrids = []
+		for shape in box_sizes:
+			grid = np.random.randint(10**num_decimals, size=shape)
+
+			above_1_locations = np.argwhere(grid > density*(10**num_decimals))
+			
+			# Move the random box somewhere random on the grid
+			above_1_locations[:, 0] += random.randint(-(self.width // 2)+shape[0]+1, (self.width // 2)-shape[0]-1)
+			above_1_locations[:, 1] += random.randint(-(self.height // 2)+shape[1]+1, (self.height // 2)-shape[1]-1)
+
+			newGrid = np.zeros((self.width, self.height))
+			newGrid[above_1_locations[:, 0], above_1_locations[:, 1]] = 1
+
+			randomGrids.append(grid)
+
+		return randomGrids
+
+
+	# Returns a random RLE code
 	# density        : represents the density of the cell counts
 	# random_size_f  : flag to tell if the cells generated are put inside a random box
 	def generateRandomRle(self, density, random_size_f):
@@ -108,4 +136,4 @@ if __name__ == "__main__":
 	generator = RleGenerator(100, 100)
 
 	# generating a random test file:
-	generator.generateRandomRleFile(1000, density=0.5, random_size_f=False)
+	generator.generateRandomRleFile(1000, density=0.5, random_size_f=True)
