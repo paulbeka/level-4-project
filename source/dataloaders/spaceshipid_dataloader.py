@@ -24,9 +24,8 @@ class SpaceshipIdentifierDataLoader:
 				root_folder,
 				batch_size=5,
 				include_random_in_spaceship = False,
-				ratio = 0.8,
-				width = 100,
-				height = 100):
+				exclude_spaceships_ratio = 0,
+				ratio = 0.8):
 
 		self.n_samples = n_samples
 		self.random_density = random_density
@@ -34,6 +33,7 @@ class SpaceshipIdentifierDataLoader:
 		self.root_folder = root_folder
 		self.batch_size = batch_size
 		self.include_random_in_spaceship = include_random_in_spaceship
+		self.exclude_spaceships_ratio = exclude_spaceships_ratio
 
 		self.n_train_samples = int(n_samples * ratio)
 
@@ -99,7 +99,6 @@ class SpaceshipIdentifierDataLoader:
 				randomly_placed_spaceships.append(grid)
 
 		game.kill()
-
 		return [(item, 1) for item in randomly_placed_spaceships]
 
 
@@ -122,10 +121,10 @@ class SpaceshipIdentifierDataLoader:
 		train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=self.batch_size, shuffle=True)
 		test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=self.batch_size, shuffle=True)
 
-		# TESTING ONLY
-		game = Game(100, 100)
-		game.renderItemList()  # WHY CANT WE SEE ANYTHIGN FIX IT
-		game.run()
+		# # TESTING ONLY
+		# game = Game(100, 100)
+		# game.renderItemList([item[0] for item in list(test_loader)])
+		# game.run()
 		game.kill()
 
 		return train_loader, test_loader
