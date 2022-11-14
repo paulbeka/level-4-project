@@ -7,6 +7,7 @@ from tools.rle_reader import RleReader
 import numpy as np
 import random
 import os
+import torch
 
 
 class SpaceshipCompareDataloader:
@@ -16,18 +17,21 @@ class SpaceshipCompareDataloader:
 				root_folder,
 				delete_count,
 				exclude_ratio = 0,
+				batch_size=5,
 				ratio=0.8):
 		
 		self.n_samples = n_samples
 		self.root_folder = root_folder
 		self.n_delete_cells = delete_count
 		self.exclude_ratio = exclude_ratio
+		self.batch_size = batch_size	
 
 		self.n_train_samples = int(n_samples * ratio)
 
 		self.reader = RleReader()
 
 
+	# Generate half real spaceships, half messed up spaceships
 	def loadSpaceships(self, spaceships, width, height):
 
 		configurations = []
@@ -39,16 +43,18 @@ class SpaceshipCompareDataloader:
 
 			alive = np.argwhere(spaceship == 1)	
 			# randomly remove parts of the spaceship (as you don't want to favour specific ships)
-			if bool(random.getrandbits(1)):
+			fakeShip = bool(random.getrandbits(1))
+			if fakeShip:
 				for i in range(min(self.n_delete_cells, len(alive) - 5)):	# make sure you don't delete all the cells
-					alive = np.delete(alive, random.randint(0, len(alive)-1))
+					alive = np.delete(alive, random.randint(0, len(alive)-1), axis=0)
 
 			newGrid[alive[:, 0], alive[:, 1]] = 1
-			configurations.append(newGrid)
+			configurations.append((newGrid, fakeShip))  # fakeShip is boolean check for the dataset
 
 		return configurations
 
 
+	# load the dataset with the correct exclusion ratio
 	def generateSpaceships(self, width, height):
 		spaceships = self.reader.getFileArray(os.path.join(self.root_folder, "spaceships.txt"))
 
