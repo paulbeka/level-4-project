@@ -4,6 +4,7 @@ import json
 
 from networks.lifenet_cnn import LifeNetCNN
 from dataloaders.spaceshipid_dataloader import SpaceshipIdentifierDataLoader
+from dataloaders.spaceship_comparisons_dataloader import SpaceshipCompareDataloader
 from game_of_life import Game
 
 
@@ -18,7 +19,7 @@ class NeuralNetworkTester:
 
 		self.width, self.height = params['width'], params['height']
 
-		self.model = Network(2, 5).double()
+		self.model = Network(2, 1).double()
 		self.model.load_state_dict(torch.load(path))
 		self.model.eval()
 		
@@ -62,8 +63,10 @@ class NeuralNetworkTester:
 
 
 if __name__ == '__main__':
-	tester = NeuralNetworkTester(LifeNetCNN, 
-		SpaceshipIdentifierDataLoader,
-		"C:\\Workspace\\level-4-project\\source\\data\\models\\test")
+	# tester = NeuralNetworkTester(LifeNetCNN, 
+	# 	SpaceshipIdentifierDataLoader,
+	# 	"C:\\Workspace\\level-4-project\\source\\data\\models\\test")
+
+	tester = NeuralNetworkTester(LifeNetCNN, SpaceshipCompareDataloader, "C:\\Workspace\\level-4-project\\source\\data\\models\\test")
 
 	tester.gameDisplayResults()

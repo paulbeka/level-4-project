@@ -17,7 +17,7 @@ class SpaceshipCompareDataloader:
 				root_folder,
 				delete_count,
 				exclude_ratio = 0,
-				batch_size=5,
+				batch_size=1,
 				ratio=0.8):
 		
 		self.n_samples = n_samples
@@ -38,12 +38,14 @@ class SpaceshipCompareDataloader:
 
 		for i in range(self.n_samples):
 			spaceship = spaceships[i % len(spaceships)]
-
-			newGrid = np.zeros((width, height))
-
 			alive = np.argwhere(spaceship == 1)	
+
+			w = int(max(alive[:, 0]) - min(alive[:, 0])) + 1
+			h = int(max(alive[:, 1]) - min(alive[:, 1])) + 1
+			newGrid = np.zeros((w, h))
+
 			# randomly remove parts of the spaceship (as you don't want to favour specific ships)
-			fakeShip = bool(random.getrandbits(1))
+			fakeShip = random.randint(0, 1)
 			if fakeShip:
 				for i in range(min(self.n_delete_cells, len(alive) - 5)):	# make sure you don't delete all the cells
 					alive = np.delete(alive, random.randint(0, len(alive)-1), axis=0)
@@ -82,7 +84,7 @@ class SpaceshipCompareDataloader:
 		test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=self.batch_size, shuffle=True)
 
 		game = Game(100, 100)
-		game.renderItemList([item[0] for item in list(test_loader)])
+		game.renderItemList([item for item in test_dataset])
 		game.run()
 		game.kill()
 

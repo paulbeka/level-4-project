@@ -8,6 +8,7 @@ import json
 from game_of_life import Game
 from tools.rle_reader import RleReader
 from dataloaders.spaceshipid_dataloader import SpaceshipIdentifierDataLoader
+from dataloaders.spaceship_comparisons_dataloader import SpaceshipCompareDataloader
 from networks.lifenet_cnn import LifeNetCNN
 
 
@@ -16,9 +17,9 @@ DATA_PATH = os.path.join(os.getcwd(), "data")
 
 
 ### HYPERPARAMETERS ###
-num_epochs = 20
-batch_size = 5
-learning_rate = 0.0005
+num_epochs = 1
+batch_size = 1
+learning_rate = 0.0001
 
 save_model = True  # set to true if you wish model to be saved
 save_name = ""
@@ -30,13 +31,24 @@ width, height = 100, 100
 
 ### LOAD DATA ###
 
+# dataloader_params = {'dataloader': [
+# 										1000, 
+# 										0.5, 
+# 										True, 
+# 										os.path.join(DATA_PATH, "spaceship_identification"), 
+# 										5, 
+# 										False
+# 									],
+# 					'width' : width,
+# 					'height': height,
+# 					'num_epochs' : num_epochs,
+# 					'batch_size' : batch_size
+# 					}
+
 dataloader_params = {'dataloader': [
-										1000, 
-										0.5, 
-										True, 
-										os.path.join(DATA_PATH, "spaceship_identification"), 
-										5, 
-										False
+										1000,  
+										os.path.join("C:\\Workspace\\level-4-project\\source\\data", "spaceship_identification"), 
+										3
 									],
 					'width' : width,
 					'height': height,
@@ -44,7 +56,8 @@ dataloader_params = {'dataloader': [
 					'batch_size' : batch_size
 					}
 
-dataloader = SpaceshipIdentifierDataLoader(*dataloader_params['dataloader'])
+#dataloader = SpaceshipIdentifierDataLoader(*dataloader_params['dataloader'])
+dataloader = SpaceshipCompareDataloader(*dataloader_params['dataloader'])
 
 train_loader, test_loader = dataloader.loadData(width, height)
 

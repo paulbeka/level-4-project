@@ -93,6 +93,7 @@ class SpaceshipIdentifierDataLoader:
 				grid = np.zeros((width, height))
 
 				grid[aliveLoc[:,0], aliveLoc[:,1]] = 1
+				np.rot90(grid, random.randint(0, 2))  # rotate the ship in a different direction
 				randomly_placed_spaceships.append(grid)
 
 		game.kill()
