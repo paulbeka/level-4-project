@@ -17,7 +17,7 @@ DATA_PATH = os.path.join(os.getcwd(), "data")
 
 
 ### HYPERPARAMETERS ###
-num_epochs = 1
+num_epochs = 5
 batch_size = 1
 learning_rate = 0.0001
 
@@ -31,24 +31,13 @@ width, height = 100, 100
 
 ### LOAD DATA ###
 
-# dataloader_params = {'dataloader': [
-# 										1000, 
-# 										0.5, 
-# 										True, 
-# 										os.path.join(DATA_PATH, "spaceship_identification"), 
-# 										5, 
-# 										False
-# 									],
-# 					'width' : width,
-# 					'height': height,
-# 					'num_epochs' : num_epochs,
-# 					'batch_size' : batch_size
-# 					}
-
 dataloader_params = {'dataloader': [
-										1000,  
-										os.path.join("C:\\Workspace\\level-4-project\\source\\data", "spaceship_identification"), 
-										3
+										1000, 
+										0.5, 
+										True, 
+										os.path.join(DATA_PATH, "spaceship_identification"), 
+										1, 
+										False
 									],
 					'width' : width,
 					'height': height,
@@ -56,8 +45,19 @@ dataloader_params = {'dataloader': [
 					'batch_size' : batch_size
 					}
 
-#dataloader = SpaceshipIdentifierDataLoader(*dataloader_params['dataloader'])
-dataloader = SpaceshipCompareDataloader(*dataloader_params['dataloader'])
+# dataloader_params = {'dataloader': [
+# 										1000,  
+# 										os.path.join("C:\\Workspace\\level-4-project\\source\\data", "spaceship_identification"), 
+# 										3
+# 									],
+# 					'width' : width,
+# 					'height': height,
+# 					'num_epochs' : num_epochs,
+# 					'batch_size' : batch_size
+# 					}
+
+dataloader = SpaceshipIdentifierDataLoader(*dataloader_params['dataloader'])
+#dataloader = SpaceshipCompareDataloader(*dataloader_params['dataloader'])
 
 train_loader, test_loader = dataloader.loadData(width, height)
 
@@ -81,8 +81,10 @@ for epoch in range(num_epochs):
 		loss.backward()
 		optimizer.step()
 
-		if i % 10 == 0:
+		if i % 100 == 0:
 			print(f"Loss: {loss.item():.9f}")
+
+	print(f"Epoch: {epoch+1}/{num_epochs}")
 
 
 ### TESTING ###

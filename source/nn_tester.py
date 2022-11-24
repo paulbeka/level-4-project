@@ -41,7 +41,6 @@ class NeuralNetworkTester:
 
 			resultList += [item for item in zip(configs, predictions)]
 
-
 		accuracy = 100 * (correct / samples)
 		stats = {
 			'resultList' : resultList,
@@ -63,10 +62,10 @@ class NeuralNetworkTester:
 
 
 if __name__ == '__main__':
-	# tester = NeuralNetworkTester(LifeNetCNN, 
-	# 	SpaceshipIdentifierDataLoader,
-	# 	"C:\\Workspace\\level-4-project\\source\\data\\models\\test")
+	tester = NeuralNetworkTester(LifeNetCNN, 
+		SpaceshipIdentifierDataLoader,
+		"C:\\Workspace\\level-4-project\\source\\data\\models\\noise_or_spaceship")
 
-	tester = NeuralNetworkTester(LifeNetCNN, SpaceshipCompareDataloader, "C:\\Workspace\\level-4-project\\source\\data\\models\\test")
+	#tester = NeuralNetworkTester(LifeNetCNN, SpaceshipCompareDataloader, "C:\\Workspace\\level-4-project\\source\\data\\models\\noise_or_spaceship")
 
 	tester.gameDisplayResults()

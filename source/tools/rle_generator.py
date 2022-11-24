@@ -105,10 +105,10 @@ class RleGenerator:
 			above_1_locations = np.argwhere(grid > density*(10**num_decimals))
 			
 			# Move the random box somewhere random on the grid
-			above_1_locations[:, 0] += random.randint(0, self.width-shape[0]-1)
-			above_1_locations[:, 1] += random.randint(0, self.height-shape[1]-1)
+			# above_1_locations[:, 0] += random.randint(0, self.width-shape[0]-1)
+			# above_1_locations[:, 1] += random.randint(0, self.height-shape[1]-1)
 
-			newGrid = np.zeros((self.width, self.height))
+			newGrid = np.zeros((shape[0], shape[1]))
 			newGrid[above_1_locations[:, 0], above_1_locations[:, 1]] = 1
 			randomGrids.append(newGrid)
 

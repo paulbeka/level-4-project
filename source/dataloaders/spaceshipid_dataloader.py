@@ -54,8 +54,9 @@ class SpaceshipIdentifierDataLoader:
 			aliveLoc = np.argwhere(currSpaceship == 1)
 
 			# using the max function to make sure it does not crash if shape[x]-1 = -1
-			addWidthIndex = random.randint(0, max(width-currSpaceship.shape[0]-4, 0))
-			addHeightIndex = random.randint(0, max(height-currSpaceship.shape[1]-4, 0))
+			# addWidthIndex = random.randint(0, max(width-currSpaceship.shape[0]-4, 0))
+			# addHeightIndex = random.randint(0, max(height-currSpaceship.shape[1]-4, 0))
+			addWidthIndex, addHeightIndex = 0, 0  # SET TO 0 SINCE FULLY CONVOLUTIONAL NOW
 
 			# add a bunch of noise around the spaceship by generating a random sample and placing ship there
 			if self.include_random_in_spaceship:
@@ -145,7 +146,7 @@ class SpaceshipIdentifierDataLoader:
 
 		# TESTING ONLY
 		game = Game(100, 100)
-		game.renderItemList([item[0] for item in list(test_loader)])
+		game.renderItemList([np.array(item[0]) for item in list(train_loader)])
 		game.run()
 		game.kill()
 
