@@ -143,8 +143,104 @@ s said
 ### 1 Nov 2022
 * *3 hours* worked on testing and ideas
 
+
+## Week 6
+
 ### 2 Nov 2022
 * *3 hours* testing classes 
 
 ### 3 Nov 2022
-* *3 hours* made slides for meeting tomorrow, emailed supervisor, worked on more testing 
+* *3 hours* made slides for meeting tomorrow, emailed supervisor, worked on more testing
+
+### 4 Nov 2022
+* *2 hours* Made a neural network tester class
+* *1 hour* met with advisor and reviewed meetin
+
+### 5 Nov 2022
+* *0 hours* no progress :(
+
+### 6 Nov 2022
+* *1 hour* worked on the testing class
+
+### 7 Nov 2022
+* *4 hours* worked on testing class and a new form of CNN
+
+### 8 Nov 2022
+* *2 hours* worked on the random cell generator function
+
+
+## Week 7
+
+### 9 Nov 2022
+* *3 hours* worked on the dataloader- works well now.
+
+### 10 Nov 2022
+* *4 hours* Dataloader loads random boxes correctly and CNN can differentiate them
+
+### 11 Nov 2022
+* *4 hours* Worked on a new dataloader, fixed previous dataloader, met with JW and prepared slides, then reviewed meeting
+
+### 12 Nov 2022
+* *0 hours* No progress
+
+### 13 Nov 2022
+* *0 hours* No progress
+
+### 14 Nov 2022
+* *1 hour* Came up with new dataloader plan and fixed bugs in the code for spaceship_comparisons_dataloader#
+
+### 15 Nov 2022
+* *2 hours* more testing and things. Not much progress.
+
+
+## Week 8
+
+### 16 Nov 2022
+* *1 hour* Removing 1 cell of a spaceship can now be detected!
+
+### 17 Nov 2022
+* *1 hours* Worked on the slides for the meeting and research for finding spaceships
+
+### 18 Nov 2022
+* *2 hours* Met with advisor, worked out some ideas for the project, and tried to fix code but couldn't :(
+
+### 19 Nov 2022
+* *0 hours* No progress
+
+### 20 Nov 2022
+* *0 hours* No progress
+
+### 21 Nov 2022
+* *1 hour* started working on the search algorithm
+
+### 22 Nov 2022
+* *5 hours* Started the search process, lots of progress but there's a really weird bug
+
+
+## Week 9
+
+### 23 Nov 2022
+* *3 hour* tried to see if oscillators would work on my code
+
+### 24 Nov 2022
+* *1 hour* Worked on the slides and emailed JW. Also researched oscillator work
+
+### 25 Nov 2022
+* *3 hours* worked more on oscillators, met with supervisor
+
+### 26 Nov 2022
+* *2 hours* general research
+
+### 27 Nov 2022
+* *2 hours* no progress on the search method
+
+### 28 Nov 2022
+* *2 hours* fixed the search bug- kind of 
+
+### 29 Nov 2022
+* *2 hours* Was not able to get a proper fix to the search bug.
+
+
+## Week 10
+
+### 30 Nov 2022

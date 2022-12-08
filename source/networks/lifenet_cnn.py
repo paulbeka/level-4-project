@@ -16,13 +16,20 @@ class LifeNetCNN(nn.Module):
 		self.fc2 = nn.Linear(100, 84)
 		self.fc3 = nn.Linear(84, num_classes)
 
+		self.testFC = nn.Linear(100*100, 100)
+		self.testFC2 = nn.Linear(100, 84)
+		self.testFC3 = nn.Linear(84, num_classes)
+
 
 	def forward(self, x):
 		x = torch.tensor(np.expand_dims(x, axis=1))
-		x = self.pool(F.relu(self.conv1(x)))
-		x = self.pool2(F.relu(self.conv2(x)))
-		x = x.view(-1, 16*22*22)
-		x = F.relu(self.fc1(x))
-		x = F.relu(self.fc2(x))
-		x = self.fc3(x)
+		# x = self.pool(F.relu(self.conv1(x)))
+		# x = self.pool2(F.relu(self.conv2(x)))
+		x = x.view(-1, 100*100)
+		# x = F.relu(self.fc1(x))
+		# x = F.relu(self.fc2(x))
+		# x = self.fc3(x)
+		x = F.relu(self.testFC(x))
+		x = F.relu(self.testFC2(x))
+		x = self.testFC3(x)
 		return x

@@ -17,7 +17,7 @@ DATA_PATH = os.path.join(os.getcwd(), "data")
 
 
 ### HYPERPARAMETERS ###
-num_epochs = 5
+num_epochs = 50
 batch_size = 1
 learning_rate = 0.0001
 
@@ -45,19 +45,19 @@ dataloader_params = {'dataloader': [
 					'batch_size' : batch_size
 					}
 
-# dataloader_params = {'dataloader': [
-# 										1000,  
-# 										os.path.join("C:\\Workspace\\level-4-project\\source\\data", "spaceship_identification"), 
-# 										3
-# 									],
-# 					'width' : width,
-# 					'height': height,
-# 					'num_epochs' : num_epochs,
-# 					'batch_size' : batch_size
-# 					}
+dataloader_params = {'dataloader': [
+										1000,  
+										os.path.join("C:\\Workspace\\level-4-project\\source\\data", "spaceship_identification"), 
+										1
+									],
+					'width' : width,
+					'height': height,
+					'num_epochs' : num_epochs,
+					'batch_size' : batch_size
+					}
 
-dataloader = SpaceshipIdentifierDataLoader(*dataloader_params['dataloader'])
-#dataloader = SpaceshipCompareDataloader(*dataloader_params['dataloader'])
+#dataloader = SpaceshipIdentifierDataLoader(*dataloader_params['dataloader'])
+dataloader = SpaceshipCompareDataloader(*dataloader_params['dataloader'])
 
 train_loader, test_loader = dataloader.loadData(width, height)
 
@@ -73,7 +73,6 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 total_steps = len(train_loader)
 for epoch in range(num_epochs):
 	for i, (configs, labels) in enumerate(train_loader):
-
 		outputs = model(configs)
 		loss = criterion(outputs, labels)
 

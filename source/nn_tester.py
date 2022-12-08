@@ -39,7 +39,7 @@ class NeuralNetworkTester:
 			samples += labels.shape[0]
 			correct += (predictions == labels).sum().item()
 
-			resultList += [item for item in zip(configs, predictions)]
+			resultList += [item for item in zip(configs, torch.softmax(outputs, dim=1))]
 
 		accuracy = 100 * (correct / samples)
 		stats = {
@@ -64,7 +64,7 @@ class NeuralNetworkTester:
 if __name__ == '__main__':
 	tester = NeuralNetworkTester(LifeNetCNN, 
 		SpaceshipIdentifierDataLoader,
-		"C:\\Workspace\\level-4-project\\source\\data\\models\\noise_or_spaceship")
+		"C:\\Workspace\\level-4-project\\source\\data\\models\\new_test")
 
 	#tester = NeuralNetworkTester(LifeNetCNN, SpaceshipCompareDataloader, "C:\\Workspace\\level-4-project\\source\\data\\models\\noise_or_spaceship")
 

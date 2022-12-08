@@ -42,16 +42,19 @@ class SpaceshipCompareDataloader:
 
 			w = int(max(alive[:, 0]) - min(alive[:, 0])) + 1
 			h = int(max(alive[:, 1]) - min(alive[:, 1])) + 1
-			newGrid = np.zeros((w, h))
+
+			widthBoundary, heightBoundary = 100, 100
+
+			newGrid = np.zeros((widthBoundary, heightBoundary))
 
 			# randomly remove parts of the spaceship (as you don't want to favour specific ships)
 			fakeShip = random.randint(0, 1)
 			if fakeShip:
-				for i in range(min(self.n_delete_cells, len(alive) - 5)):	# make sure you don't delete all the cells
+				for i in range(min(self.n_delete_cells, len(alive) - 4)):	# make sure you don't delete all the cells
 					alive = np.delete(alive, random.randint(0, len(alive)-1), axis=0)
 
 			newGrid[alive[:, 0], alive[:, 1]] = 1
-			configurations.append((newGrid, fakeShip))  # fakeShip is boolean check for the dataset
+			configurations.append((newGrid, 1 - fakeShip))  # fakeShip is boolean check for the dataset
 
 		return configurations
 

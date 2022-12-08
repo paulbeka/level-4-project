@@ -35,6 +35,8 @@ class SpaceshipIdentifierDataLoader:
 		self.include_random_in_spaceship = include_random_in_spaceship
 		self.exclude_spaceships_ratio = exclude_spaceships_ratio
 
+		self.imbalance_ratio = 4	# change this to give more random configs (INT ONLY)
+
 		self.n_train_samples = int(n_samples * ratio)
 
 		self.reader = RleReader()
@@ -66,6 +68,7 @@ class SpaceshipIdentifierDataLoader:
 				x_max, y_max = max(aliveLoc[:,0])+2, max(aliveLoc[:,1])+2
 
 				temp_grid = np.zeros((x_max-x_min+1, y_max-y_min+1))
+
 				temp_grid[np.copy(aliveLoc[:,0])-x_min, np.copy(aliveLoc[:,1])-y_min] = 1
 				
 				# find where 0s should be placed
@@ -132,14 +135,20 @@ class SpaceshipIdentifierDataLoader:
 
 			else:
 				box_sizes = self.getBoxSizes(spaceships)
-				random_configs = [(item, 0) for item in generator.generateRandomInsideBoxSize(self.n_samples, self.random_density, box_sizes)]
+				random_configs = []
+				for item in generator.generateRandomInsideBoxSize(self.n_samples*self.imbalance_ratio, self.random_density, box_sizes):
+					grid = np.zeros((width, height))
+					aliveLoc = np.argwhere(item == 1)
+					grid[aliveLoc[:, 0], aliveLoc[:, 1]] = 1
+					random_configs.append((grid, 0))
+
 		# load random data onto the board FIX THIS ITS BROKEN CAUSE THE FILE HAS ONLY 100x100 SIZE STRUCTURES
 		else:
 			random_configs = [(item, 0) for item in self.reader.getFileArray(os.path.join(self.root_folder,"random_rles.txt"))]
 
 		# create the datset and put inside of a dataloader class
-		train_dataset = random_configs[0:self.n_train_samples] + spaceship_configs[0:self.n_train_samples]
-		test_dataset = random_configs[self.n_train_samples:] + spaceship_configs[self.n_train_samples:]
+		train_dataset = random_configs[0:self.n_train_samples*self.imbalance_ratio] + spaceship_configs[0:self.n_train_samples]
+		test_dataset = random_configs[self.n_train_samples*self.imbalance_ratio:] + spaceship_configs[self.n_train_samples:]
 
 		train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=self.batch_size, shuffle=True)
 		test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=self.batch_size, shuffle=True)
