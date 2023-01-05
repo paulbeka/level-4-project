@@ -10,7 +10,7 @@ import numpy as np
 
 def extract_all_configs(FILENAME):
 
-	game = Game()
+	game = Game(100, 100)
 	reader = RleReader()
 	generator = RleGenerator()
 
@@ -20,14 +20,14 @@ def extract_all_configs(FILENAME):
 	for rle in rle_list:
 		config_list = []
 
-		config = reader.getConfig(rle)
+		config = reader.placeConfigInBox(reader.getConfig(rle), 100, 100)
 		currConfig = game.evolve(config.copy())
 
-		while config != currConfig:
+		while not np.array_equal(game.patternIdentity(config), game.patternIdentity(currConfig)):
 			for _ in range(4):
 				# spin around 4 times to get all the configurations
 				config_list.append(game.patternIdentity(currConfig))
-				np.rot90(config)
+				currConfig = np.rot90(currConfig)
 
 			currConfig = game.evolve(currConfig)
 
@@ -40,13 +40,14 @@ def extract_all_configs(FILENAME):
 
 def main():
 
-	FILENAME = ""
-	SAVE_FILE = ""
+	FILENAME = "C:\\Workspace\\level-4-project\\source\\data\\spaceship_identification\\spaceships.txt"
+	SAVE_FILE = "C:\\Workspace\\level-4-project\\source\\data\\spaceship_identification\\spaceships_extended.txt"
 
 	extended_rle_list = extract_all_configs(FILENAME)
 
 	with open(SAVE_FILE, "w") as f:
-		f.writelines(extended_rle_list)
+		for line in extended_rle_list:
+			f.write(line + "\n")
 
 
 if __name__ == "__main__":

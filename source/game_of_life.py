@@ -185,11 +185,13 @@ class Game:
 
 	# find the pattern identity of an object
 	def patternIdentity(self, pattern):
-		reference = (min(pattern[:,0]), min(pattern[:,1]))
-		new = np.copy(pattern)
-		new[:, 0] -= reference[0]
-		new[:, 1] -= reference[1]
-		return new
+		modifiedPattern = pattern.copy()
+		if pattern.shape[1] != 2:
+			modifiedPattern = np.argwhere(pattern == 1)
+		reference = (min(modifiedPattern[:,0]), min(modifiedPattern[:,1]))
+		modifiedPattern[:, 0] -= reference[0]
+		modifiedPattern[:, 1] -= reference[1]
+		return modifiedPattern
 
 
 	### RENDERING MISC ITEMS ###
