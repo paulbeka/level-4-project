@@ -31,24 +31,24 @@ width, height = 100, 100
 
 ### LOAD DATA ###
 
-dataloader_params = {'dataloader': [
-										1000, 
-										0.5, 
-										True, 
-										os.path.join(DATA_PATH, "spaceship_identification"), 
-										1, 
-										False
-									],
-					'width' : width,
-					'height': height,
-					'num_epochs' : num_epochs,
-					'batch_size' : batch_size
-					}
+# dataloader_params = {'dataloader': [
+# 										1000, 
+# 										0.5, 
+# 										True, 
+# 										os.path.join(DATA_PATH, "spaceship_identification"), 
+# 										1, 
+# 										False
+# 									],
+# 					'width' : width,
+# 					'height': height,
+# 					'num_epochs' : num_epochs,
+# 					'batch_size' : batch_size
+# 					}
 
 dataloader_params = {'dataloader': [
 										1000,  
 										os.path.join("C:\\Workspace\\level-4-project\\source\\data", "spaceship_identification"), 
-										1
+										0
 									],
 					'width' : width,
 					'height': height,
@@ -56,8 +56,8 @@ dataloader_params = {'dataloader': [
 					'batch_size' : batch_size
 					}
 
-#dataloader = SpaceshipIdentifierDataLoader(*dataloader_params['dataloader'])
-dataloader = SpaceshipCompareDataloader(*dataloader_params['dataloader'])
+#dataloader = SpaceshipIdentifierDataLoader(*dataloader_params['dataloader'])  # this dataloader compares SH to noise
+dataloader = SpaceshipCompareDataloader(*dataloader_params['dataloader'])	# this dataloader removes cells from SH
 
 train_loader, test_loader = dataloader.loadData(width, height)
 
@@ -107,8 +107,3 @@ with torch.no_grad():
 
 		with open(os.path.join(DATA_PATH, "models", save_name + "_parameters.txt"), "w") as f:
 			json.dump(dataloader_params, f)
-
-
-# run
-if __name__ == '__main__':
-	pass

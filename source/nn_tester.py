@@ -56,6 +56,8 @@ class NeuralNetworkTester:
 
 		results = stats['resultList']
 
+		print(f"Accuracy: {stats['accuracy']}%")
+
 		game = Game(self.width, self.height)
 		game.renderItemList(results)
 		game.run()
@@ -63,8 +65,8 @@ class NeuralNetworkTester:
 
 if __name__ == '__main__':
 	tester = NeuralNetworkTester(LifeNetCNN, 
-		SpaceshipIdentifierDataLoader,
-		"C:\\Workspace\\level-4-project\\source\\data\\models\\new_test")
+		SpaceshipCompareDataloader,
+		"C:\\Workspace\\level-4-project\\source\\data\\models\\comparisons_extended")
 
 	#tester = NeuralNetworkTester(LifeNetCNN, SpaceshipCompareDataloader, "C:\\Workspace\\level-4-project\\source\\data\\models\\noise_or_spaceship")
 

@@ -15,18 +15,18 @@ class SpaceshipCompareDataloader:
 	def __init__(self,
 				n_samples,
 				root_folder,
-				delete_count,
+				delete_coef,
 				exclude_ratio = 0,
 				batch_size=1,
-				ratio=0.8):
+				test_to_train_ratio=0.8):
 		
 		self.n_samples = n_samples
 		self.root_folder = root_folder
-		self.n_delete_cells = delete_count
+		self.delete_coef = delete_coef
 		self.exclude_ratio = exclude_ratio
 		self.batch_size = batch_size	
 
-		self.n_train_samples = int(n_samples * ratio)
+		self.n_train_samples = int(n_samples * test_to_train_ratio)
 
 		self.reader = RleReader()
 
@@ -50,7 +50,7 @@ class SpaceshipCompareDataloader:
 			# randomly remove parts of the spaceship (as you don't want to favour specific ships)
 			fakeShip = random.randint(0, 1)
 			if fakeShip:
-				for i in range(min(self.n_delete_cells, len(alive) - 4)):	# make sure you don't delete all the cells
+				for i in range(int(self.delete_coef * len(alive))+1):	# delete cells
 					alive = np.delete(alive, random.randint(0, len(alive)-1), axis=0)
 
 			newGrid[alive[:, 0], alive[:, 1]] = 1
@@ -61,7 +61,7 @@ class SpaceshipCompareDataloader:
 
 	# load the dataset with the correct exclusion ratio
 	def generateSpaceships(self, width, height):
-		spaceships = self.reader.getFileArray(os.path.join(self.root_folder, "spaceships.txt"))
+		spaceships = self.reader.getFileArray(os.path.join(self.root_folder, "spaceships_extended.txt"))
 
 		if self.exclude_ratio > 0:
 			excluded_spaceship_indexes = random.sample(range(0, len(spaceships)-1), len(spaceships)*self.exclude_spaceships_ratio)
@@ -79,6 +79,7 @@ class SpaceshipCompareDataloader:
 
 	def loadData(self, width, height):
 		spaceship_configs = self.generateSpaceships(width, height)
+		random.shuffle(spaceship_configs)  # make sure the ships are not ordered
 
 		train_dataset = spaceship_configs[0:self.n_train_samples]
 		test_dataset = spaceship_configs[self.n_train_samples:]

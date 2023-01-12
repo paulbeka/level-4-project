@@ -28,7 +28,7 @@ class RleReader:
 		if not os.path.exists(filename):
 			assert False, f"File {filename} does not exist."
 
-		with open(filename) as f:
+		with open(filename, errors="ignore") as f:
 			items = f.readlines()
 
 		codes = []

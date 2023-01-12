@@ -1,8 +1,10 @@
 from networks.lifenet_cnn import LifeNetCNN
 from game_of_life import Game
+from tools.rle_reader import RleReader
 
 import torch
 import numpy as np
+import random
 
 # now create an A* / tree search to find the correct cells to place
 # first test to see if a complete spaceship will have a higher score than 
@@ -18,22 +20,27 @@ class PlaceSearcher:
 		self.model.eval()
 
 
+	def testLoader(self):
+		rle_reader = RleReader()
+		arr = rle_reader.getFileArray("C:\\Workspace\\level-4-project\\source\\data\\spaceship_identification\\spaceships_extended.txt")
+		selected_ship = arr[25]
+		return selected_ship
+
+
 	def search(self, n_iters):
-		searchBlock = np.random.randint(2, size=(self.width, self.height)).astype(np.double) # random config
-		padWidth, padHeight = 100, 100
-		#searchBlock = np.zeros((padWidth, padHeight)).astype(np.double)
+		#searchBlock = np.random.randint(2, size=(self.width, self.height)).astype(np.double) # random config
+		#searchBlock = np.zeros((padWidth, padHeight)).astype(np.double) # empty config
+		alive = np.argwhere(self.testLoader() == 1)
+		for _ in range(1):
+			delete_cell = random.randint(0, len(alive)-1)
+			print(alive[delete_cell])
+			alive = np.delete(alive, delete_cell, axis=0)
 
-		# TEST CONFIGURATION
-		#searchBlock[0, 1] = 1.0
-		#searchBlock[1, 0] = 1.0
-		#searchBlock[0, 2] = 1.0
-		#searchBlock[1, 2] = 1.0
-		#searchBlock[2, 2] = 1.0
-
-		searchBlock.resize(1, padWidth, padHeight)
+		searchBlock = np.zeros((1, 100, 100))
+		searchBlock[0, alive[:, 0], alive[:, 1]] = 1
 		searchBlock = torch.from_numpy(searchBlock)
 
-		n_flips = 100
+		n_flips = 1
 
 		bestConfigs = []
 
@@ -43,7 +50,7 @@ class PlaceSearcher:
 				for _ in range(n_flips):
 
 					possibleFlips = []
-					threshold = 0.005
+					threshold = 0
 
 					# current state: the value we want flipped is not working
 
@@ -61,18 +68,21 @@ class PlaceSearcher:
 								
 					if possibleFlips:
 						possibleFlips.sort(key=lambda x: x[2], reverse=True)
+						print(possibleFlips)
 						x, y, val = possibleFlips[0]
 						searchBlock[0, x, y] = 1.0 - searchBlock[0, x, y]
 						bestConfigs.append((searchBlock, torch.softmax(self.model(searchBlock), dim=1)[0, 1]))
 
 
-					#print(f"Current score: {first[0,1]}")
-
 		bestConfigs.sort(key=lambda x: x[1])
 		print([item[1].item() for item in bestConfigs])
-		return bestConfigs[-1][0]
+		if bestConfigs:
+			return bestConfigs[-1][0]
+		else:
+			return searchBlock
 
 
+ 	### NEED TO DEVELOP PROPERLY ###
 	def checkSpaceship(self, config):
 		# move forward x amount of times
 		# check if repeat pattern and moved
@@ -81,7 +91,7 @@ class PlaceSearcher:
 		n_steps = 4
 		for _ in range(n_steps):
 			nextConfig = evolve(config)
-			if nextConfig == config and min(nextConfig) < min(config):
+			if nextConfig == config and min(nextConfig) != min(config):
 				return True
 
 		return False
@@ -96,6 +106,6 @@ class PlaceSearcher:
 
 
 if __name__ == '__main__':
-	placeSearcher = PlaceSearcher(15, 15, "C:\\Workspace\\level-4-project\\source\\data\\models\\almost_identifier")
+	placeSearcher = PlaceSearcher(15, 15, "C:\\Workspace\\level-4-project\\source\\data\\models\\test")
 	result = placeSearcher.search(1)
 	placeSearcher.displayResult(result)

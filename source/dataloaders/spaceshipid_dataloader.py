@@ -108,7 +108,7 @@ class SpaceshipIdentifierDataLoader:
 	# function used to generate an equal number of ships and random patterns in an n*m grid
 	# width, height : dimentions of the grid
 	def loadData(self, width, height):
-		spaceships = self.reader.getFileArray(os.path.join(self.root_folder, "spaceships.txt"))
+		spaceships = self.reader.getFileArray(os.path.join(self.root_folder, "spaceships_extended.txt"))
 		spaceship_configs = []
 
 		# generates the spaceship configurations
