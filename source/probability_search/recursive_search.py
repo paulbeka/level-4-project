@@ -10,6 +10,7 @@ from dataloaders.probability_grid_dataloader import getPairSolutions
 ROOT_PATH = os.path.abspath(os.getcwd())
 
 
+# ensures no values go above 1 or 0 when adding change vector
 def addChangeVector(change, target):
 	result = change + target
 	remove_ones = torch.argwhere(result > 1)
@@ -29,12 +30,13 @@ n_items = 1
 testIterator = iter(test)
 
 ## PARAMETERS
-n_iters = 5  # number of iterations on probability
+n_iters = 25  # number of iterations on probability
 scalar = 0.1
 
 with torch.no_grad():
 	for i in range(n_items):
-		result, solution = testIterator.next()
+		# result, solution = testIterator.next()	# use the test data to see if can rebuilt
+		result = np.zeros((1, 20, 20))	# 20x20 test matrix
 
 		for i in range(n_iters):
 			changes = model(result)[0]
