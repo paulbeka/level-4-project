@@ -335,3 +335,7 @@ WINTER BREAK- BARELY ANYTHING DONE
 ### 14 Jan 2023
 * *2 hours* Worked on a new dataloader to get the probability grids
 * *2 hours* Created the new neural network to predict cell location probabilities
+
+### 15 Jan 2023
+* *2 hours* Working on the probability neural network
+* *2 hours* more work done on the probability neural network visualizer
