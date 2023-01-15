@@ -244,3 +244,94 @@ s said
 ## Week 10
 
 ### 30 Nov 2022
+* *4 hours* Kept working on the search algorithm
+
+### 1 Dec 2022
+* *2 hours* research + preparing meeting with supervisor
+
+### 2 Dec 2022
+* *2 hours* meeting with supervisor + recap of work done
+
+### 3 Dec 2022
+* *2 hours* Worked on what was said on supervisor meeting
+
+### 4 Dec 2022
+* *2 hours* More work done on the searching algorithm - no progress
+
+### 5 Dec 2022
+* *2 hours* More work done on the searching algorithm - no progress
+
+### 6 Dec 2022
+* *2 hours* Code restructuring and fixing general annoying bugs
+
+
+## Week 11
+
+### 7 Dec 2022
+* *6 hours* Working on the search algorithm
+
+### 8 Dec 2022
+* *8 hours* research + preparing meeting with supervisor + algorithm work
+
+### 9 Dec 2022
+* *8 hours* Trying to fix the spaceship repair issue + meeting with supervisor
+
+### 10 Dec 2022
+* *8 hours* Still working on spaceship repair + supervisor meeting recap
+
+### 11 Dec 2022
+* *8 hours* More work done on the searching algorithm and its not working
+
+### 12 Dec 2022
+* *0 hours*
+
+### 13 Dec 2022
+* *0 hours*
+
+WINTER BREAK- BARELY ANYTHING DONE
+
+## Week 0 - AFTER BREAK
+
+## 2 Jan 2023
+* *8 hours* Started work on getting RLEs for all configurations of spaceship- expanded dataset significantly
+
+## 3 Jan 2023
+* *8 hours* Restructuring on the neural network and general testing- nothing really improved
+
+## 4 Jan 2023
+* *8 hours* Worked on the dataloader for the missing spaceship parts
+
+## 5 Jan 2023
+* *7 hours* Testing of the new dataloader class with the search algorithm, fixing parts of the dataloader, misc work
+
+### 6 Jan 2023
+* *0 hours*
+
+### 7 Jan 2023
+* *2 hours* Trying to make the neural network work with the new data
+
+### 8 Jan 2023
+* *0 hours*
+
+
+## Week 1 - AFTER BREAK
+
+### 9 Jan 2023
+* *0 hours* 
+
+### 10 Jan 2023
+* *0 hours*
+
+### 11 Jan 2023
+* *4 hours* worked on fixing the accuracy of the neural network- it's stuck at 50%
+
+### 12 Jan 2023
+* *3 hours* Finished the tree searching algorithm accelerated with model- the model needs to be trained to work properly.	
+
+### 13 Jan 2023
+* *1 hour* met with supervisor and reviewed meeting
+* *1 hour* started to work on new ideas
+
+### 14 Jan 2023
+* *2 hours* Worked on a new dataloader to get the probability grids
+* *2 hours* Created the new neural network to predict cell location probabilities

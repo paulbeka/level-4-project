@@ -91,3 +91,4 @@ def tree_search(width, height):
 
 if __name__ == "__main__":
 	tree_search(10, 10)
+	

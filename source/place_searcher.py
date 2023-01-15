@@ -104,7 +104,6 @@ class PlaceSearcher:
 		game.kill()
 
 
-
 if __name__ == '__main__':
 	placeSearcher = PlaceSearcher(15, 15, "C:\\Workspace\\level-4-project\\source\\data\\models\\test")
 	result = placeSearcher.search(1)
