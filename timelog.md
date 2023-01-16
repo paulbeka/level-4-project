@@ -338,4 +338,10 @@ WINTER BREAK- BARELY ANYTHING DONE
 
 ### 15 Jan 2023
 * *2 hours* Working on the probability neural network
-* *2 hours* more work done on the probability neural network visualizer
+* *3 hours* more work done on the probability neural network visualizer
+
+
+## Week 2 - AFTER BREAK
+
+### 16 Jan 2023
+* *2 hours* Worked on the probability network, the loss function is finally showing normal levels

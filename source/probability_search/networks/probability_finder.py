@@ -14,7 +14,8 @@ class ProbabilityFinder(nn.Module):
 		self.conv2 = nn.Conv2d(3, 16, batch_size)
 		self.pool2 = nn.AdaptiveAvgPool2d((22, 22))
 		self.fc1 = nn.Linear(16*22*22, 100)
-		self.fc2 = nn.Linear(100, 100*100)
+		self.fc2 = nn.Linear(100, 100)
+		self.fc3 = nn.Linear(100, 100*100)
 		
 
 	def forward(self, x):
@@ -25,6 +26,7 @@ class ProbabilityFinder(nn.Module):
 		x = x.reshape(self.batch_size, 7744)
 		x = F.relu(self.fc1(x))
 		x = F.relu(self.fc2(x))
+		x = self.fc3(x)
 		x = x.reshape(1, 100, 100)
 		x = torch.nn.AdaptiveAvgPool2d((dimx, dimy))(x)
 		return x

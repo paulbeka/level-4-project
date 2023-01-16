@@ -21,7 +21,7 @@ def addChangeVector(change, target):
 
 
 train, test = getPairSolutions(0.8, 1, 1)
-model_path = os.path.join(ROOT_PATH, "models", "prob_test")
+model_path = os.path.join(ROOT_PATH, "models", "probability_model")
 model = ProbabilityFinder(1).double()
 model.load_state_dict(torch.load(model_path))
 model.eval()
@@ -30,13 +30,13 @@ n_items = 1
 testIterator = iter(test)
 
 ## PARAMETERS
-n_iters = 25  # number of iterations on probability
+n_iters = 4  # number of iterations on probability
 scalar = 0.1
 
 with torch.no_grad():
 	for i in range(n_items):
-		# result, solution = testIterator.next()	# use the test data to see if can rebuilt
-		result = np.zeros((1, 20, 20))	# 20x20 test matrix
+		result, solution = testIterator.next()	# use the test data to see if can rebuilt
+		#result = np.zeros((1, 20, 20))	# 20x20 test matrix
 
 		for i in range(n_iters):
 			changes = model(result)[0]

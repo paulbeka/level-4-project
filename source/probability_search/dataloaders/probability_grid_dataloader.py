@@ -31,7 +31,7 @@ def getPairSolutions(train_ratio, n_pairs, batch_size):
 
 	for ship, mock in zip(ships, mock_data):
 		for mockItem in mock:
-			solution = ship.copy() - mock
+			solution = ship.copy() - mockItem
 			data.append((mockItem, solution))
 
 	n_train_samples = int(train_ratio * len(data))
