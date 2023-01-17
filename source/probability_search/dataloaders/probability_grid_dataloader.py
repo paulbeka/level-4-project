@@ -17,23 +17,8 @@ def generateMockData(sizes, n_pairs):
 	return mockList
 
 
-# produce pairs of probability map -> solution to get to spaceship
-def getPairSolutions(train_ratio, n_pairs, batch_size):
-	rle_reader = RleReader()
-	ships = rle_reader.getFileArray("C:\\Workspace\\level-4-project\\source\\data\\spaceship_identification\\spaceships_extended.txt")
-
-	sizes = []
-	for ship in ships:
-		sizes.append(ship.shape)
-
-	mock_data = generateMockData(sizes, n_pairs)
-	data = []
-
-	for ship, mock in zip(ships, mock_data):
-		for mockItem in mock:
-			solution = ship.copy() - mockItem
-			data.append((mockItem, solution))
-
+# generate the torch dataloader classes
+def generateDataloader(data, train_ratio, batch_size):
 	n_train_samples = int(train_ratio * len(data))
 
 	train_dataset = data[0:n_train_samples]
@@ -43,3 +28,36 @@ def getPairSolutions(train_ratio, n_pairs, batch_size):
 	test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
 
 	return train_loader, test_loader
+
+
+def getShipAndMockData(n_pairs):
+	rle_reader = RleReader()
+	ships = rle_reader.getFileArray("C:\\Workspace\\level-4-project\\source\\data\\spaceship_identification\\spaceships_extended.txt")
+
+	sizes = []
+	for ship in ships:
+		sizes.append(ship.shape)
+
+	mock_data = generateMockData(sizes, n_pairs)
+	return ships, mock_data
+
+
+# produce pairs of probability map -> solution to get to spaceship
+def getRandomPairSolutions(train_ratio, n_pairs, batch_size):
+	
+	ships, mock_data = getShipAndMockData(n_pairs)
+	data = []
+
+	for ship, mock in zip(ships, mock_data):
+		for mockItem in mock:
+			solution = ship.copy() - mockItem
+			print(solution)
+			data.append((mockItem, solution))
+
+	return generateDataloader(data, train_ratio, batch_size)
+
+
+def getFilledPairSolutions()
+
+
+def getEmptyPairSolutions():
