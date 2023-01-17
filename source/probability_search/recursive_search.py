@@ -20,8 +20,13 @@ def addChangeVector(change, target):
 	return result 
 
 
-train, test = getPairSolutions(0.8, 1, 1)
-model_path = os.path.join(ROOT_PATH, "models", "100_prob_network")
+
+def itercycle():
+	pass
+
+
+train, test = getPairSolutions(0.8, 1, 1, "empty")
+model_path = os.path.join(ROOT_PATH, "models", "empty_prob")
 model = ProbabilityFinder(1).double()
 model.load_state_dict(torch.load(model_path))
 model.eval()
@@ -35,13 +40,15 @@ scalar = 0.1
 
 with torch.no_grad():
 	for i in range(n_items):
-		result, solution = testIterator.next()	# use the test data to see if can rebuilt
+		# use the test data to see if can rebuilt
+		result, solution = testIterator.next()
 		result = result + solution
-		# remove one cell from the structure
-		alive = torch.argwhere(result == 1)
-		print(alive[0][1:])
-		result[alive[0, 1], alive[0, 2]] = 0
-		# result = np.zeros((1, 20, 20))	# 20x20 test matrix
+		alive = np.argwhere(result.numpy() == 1)	 # remove one cell from the structure
+		alive = np.delete(alive, 0, axis=0)
+		print(alive[0])
+
+		# result[alive[0, 1], alive[0, 2]] = 0
+		# result = np.zeros((1, 10, 19))	# 20x20 test matrix
 		# result = np.random.rand(1, 20, 20)
 
 		for i in range(n_iters):

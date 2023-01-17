@@ -345,3 +345,7 @@ WINTER BREAK- BARELY ANYTHING DONE
 
 ### 16 Jan 2023
 * *2 hours* Worked on the probability network, the loss function is finally showing normal levels
+* *1 hour* More on the probability network, which does not work as intended. Brainstorming plans to improve it
+
+### 17 Jan 2023
+* *1 hour* Started working on a plan for testing the algorithm

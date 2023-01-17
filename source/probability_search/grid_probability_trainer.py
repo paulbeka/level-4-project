@@ -9,7 +9,7 @@ from dataloaders.probability_grid_dataloader import getPairSolutions
 
 
 ### HYPERPARAMETERS ###
-num_epochs = 3
+num_epochs = 10
 batch_size = 1
 learning_rate = 0.000001
 n_errors_per_spaceship = 1
@@ -20,13 +20,14 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 
 ### DATA LOADING ###
-train_loader, test_loader = getPairSolutions(0.8, n_errors_per_spaceship, batch_size)  # n_pairs : fake data for every ship
+train_loader, test_loader = getPairSolutions(0.8, n_errors_per_spaceship, batch_size, "empty")  # n_pairs : fake data for every ship
 
 
 ### NEURAL NET ###
 total_steps = len(train_loader)
 for epoch in range(num_epochs):
 	for i, (configs, labels) in enumerate(train_loader):
+		labels = labels[0]
 		outputs = model(configs)
 		loss = criterion(outputs, labels)
 
