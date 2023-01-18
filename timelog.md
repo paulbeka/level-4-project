@@ -349,3 +349,6 @@ WINTER BREAK- BARELY ANYTHING DONE
 
 ### 17 Jan 2023
 * *1 hour* Started working on a plan for testing the algorithm
+* *4 hours* Working on using models to improve the recursive probability model algorithm
+
+### 18 Jan 2023
