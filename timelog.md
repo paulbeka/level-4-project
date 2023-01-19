@@ -352,3 +352,6 @@ WINTER BREAK- BARELY ANYTHING DONE
 * *4 hours* Working on using models to improve the recursive probability model algorithm
 
 ### 18 Jan 2023
+* *2 hours* fixed the bug with adding weights to the recursive solver
+* *2 hours* Worked on a new version of the dataloader class which deconstructs & reconstructs spaceship
+* *2 hours* Worked on the paper & more research done

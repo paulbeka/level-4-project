@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 import torch
+import random
 
 sys.path.insert(1, "C:\\Workspace\\level-4-project\\source")
 
@@ -15,6 +16,27 @@ def generateMockData(sizes, n_pairs):
 		mockList.append(sizeMockList)
 
 	return mockList
+
+
+# make a pair for each deconstructed ship part and the probability network assosiated
+# MULTIPLE WAYS TO DO THIS:
+# 1. Remove 1 random cell and train it
+# 2. Remove 1 cell at a time and save every config	<--- WE'RE DOING THIS ONE RIGHT NOW
+# 3. Match all missing cells with best config
+# 4. Remove one cell and make solution matrix that specific cell
+def deconstructReconstructPairs(ships):
+	data = []
+	for ship in ships:
+		ship_deconstructed = []
+		alive = np.argwhere(ship == 1)
+		for i in range(len(alive)-2):
+			alive = np.delete(alive, random.randint(0, len(alive)-1), axis=0)
+			tempGrid = np.zeros_like(ship)
+			tempGrid[alive[:, 0], alive[:, 1]] = 1
+			ship_deconstructed.append(tempGrid)
+		data.append(ship_deconstructed)
+
+	return data
 
 
 # produce pairs of probability map -> solution to get to spaceship
@@ -38,6 +60,8 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	elif data_type == "empty":
 		mock_data = [[np.zeros(size)] for size in sizes]
 		n_pairs = 1
+	elif data_type == "deconstruct":
+		mock_data = deconstructReconstructPairs(ships)
 	else:
 		raise Exception("Not a valid data training type: use random, full, or empty.")
 	data = []

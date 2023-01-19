@@ -20,7 +20,8 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 
 ### DATA LOADING ###
-train_loader, test_loader = getPairSolutions(0.8, n_errors_per_spaceship, batch_size, "random")  # n_pairs : fake data for every ship
+train_loader, test_loader = getPairSolutions(0.8, n_errors_per_spaceship, batch_size, "deconstruct")  # n_pairs : fake data for every ship
+print("Data loaded.")
 
 
 ### NEURAL NET ###
@@ -37,6 +38,9 @@ for epoch in range(num_epochs):
 
 		if i % 100 == 0:
 			print(f"Loss: {loss.item():.9f}")
+
+		if i % 1000 == 0:
+			print(f"{i}/{len(train_loader)} datasets done")
 
 	print(f"Epoch: {epoch+1}/{num_epochs}")
 

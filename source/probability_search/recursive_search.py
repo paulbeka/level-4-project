@@ -41,7 +41,7 @@ train, test = getPairSolutions(0.8, 1, 1, "empty")
 
 ## LOADING MODELS
 pipeline = []
-pipe_names = ["10_epoch_empty"]
+pipe_names = ["2_epoch_1_rand_cell_removed_every_iter"]
 
 for item in pipe_names:
 	model_path = os.path.join(ROOT_PATH, "models", item)
