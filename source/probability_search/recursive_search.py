@@ -3,7 +3,7 @@ import torch
 import os
 import matplotlib.pyplot as plt
 
-from networks.probability_finder import ProbabilityFinder
+from networks.convolution_probability_network import ProbabilityFinder
 from dataloaders.probability_grid_dataloader import getPairSolutions
 
 
@@ -41,7 +41,7 @@ train, test = getPairSolutions(0.8, 1, 1, "empty")
 
 ## LOADING MODELS
 pipeline = []
-pipe_names = ["2_epoch_1_rand_cell_removed_every_iter"]
+pipe_names = ["20_epoch_empty"]
 
 for item in pipe_names:
 	model_path = os.path.join(ROOT_PATH, "models", item)
@@ -52,7 +52,7 @@ for item in pipe_names:
 
 
 ## PARAMETERS
-n_iters = 1  # number of iterations on probability
+n_iters = 3  # number of iterations on probability
 scalar = 0.1
 n_items = 1
 testIterator = iter(test)
@@ -60,7 +60,7 @@ testIterator = iter(test)
 with torch.no_grad():
 	for i in range(n_items):
 		# INITIAL TEST STARTING STATES
-		# use the test data to see if can rebuilt
+		#use the test data to see if can rebuilt
 		_, initialState = testIterator.next()
 		alive = np.argwhere(initialState.numpy() == 1)	 # remove one cell from the structure
 		print(f"The cell being removed is: {alive[0][1:]}")
@@ -68,6 +68,7 @@ with torch.no_grad():
 		initialState = np.zeros_like(initialState)
 		initialState[0, alive[:, 1], alive[:, 2]] = 1
 		initialState = torch.from_numpy(initialState)
+
 		# initialState = torch.from_numpy(np.zeros((1, 10, 19)))	# 20x20 test matrix
 		# initialState = torch.from_numpy(np.random.rand(1, 20, 20))
 

@@ -22,8 +22,7 @@ def generateMockData(sizes, n_pairs):
 # MULTIPLE WAYS TO DO THIS:
 # 1. Remove 1 random cell and train it
 # 2. Remove 1 cell at a time and save every config	<--- WE'RE DOING THIS ONE RIGHT NOW
-# 3. Match all missing cells with best config
-# 4. Remove one cell and make solution matrix that specific cell
+# 3. Remove one cell and make solution matrix that specific cell
 def deconstructReconstructPairs(ships):
 	data = []
 	for ship in ships:
@@ -34,6 +33,26 @@ def deconstructReconstructPairs(ships):
 			tempGrid = np.zeros_like(ship)
 			tempGrid[alive[:, 0], alive[:, 1]] = 1
 			ship_deconstructed.append(tempGrid)
+		data.append(ship_deconstructed)
+
+	return data
+
+
+# Remove n cells m different times in different locations
+def ratioDeconstruct(ships, max_destruction_ratio, n_pairs):
+	data = []
+	for ship in ships:
+		alive = np.argwhere(ship == 1)
+		n_max_deconstruct = int(len(alive) * max_destruction_ratio)
+		ship_deconstructed = []
+		for i in range(min(n_max_deconstruct, len(alive)-1)):
+			for _ in range(n_pairs):
+				alive = np.delete(alive, [random.randint(0, len(alive)-1) for _ in range(i+1)], axis=0)
+				tempGrid = np.zeros_like(ship)
+				tempGrid[alive[:, 0], alive[:, 1]] = 1
+				ship_deconstructed.append(tempGrid)
+				alive = np.argwhere(ship == 1)
+
 		data.append(ship_deconstructed)
 
 	return data
@@ -62,6 +81,8 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 		n_pairs = 1
 	elif data_type == "deconstruct":
 		mock_data = deconstructReconstructPairs(ships)
+	elif data_type == "advanced_deconstruct":
+		mock_data = ratioDeconstruct(ships, 0.3, 10)
 	else:
 		raise Exception("Not a valid data training type: use random, full, or empty.")
 	data = []

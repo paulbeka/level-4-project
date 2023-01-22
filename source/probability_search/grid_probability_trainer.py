@@ -4,15 +4,16 @@ import torch.nn.functional as F
 import numpy as np
 import os
 
-from networks.probability_finder import ProbabilityFinder
+# from networks.probability_finder import ProbabilityFinder
+from networks.convolution_probability_network import ProbabilityFinder
 from dataloaders.probability_grid_dataloader import getPairSolutions
 
 
 ### HYPERPARAMETERS ###
-num_epochs = 2
+num_epochs = 3
 batch_size = 1
-learning_rate = 0.000001
-n_errors_per_spaceship = 100
+learning_rate = 0.0001
+n_errors_per_spaceship = 1000
 
 model =  ProbabilityFinder(batch_size).double()
 criterion = nn.MSELoss()
@@ -20,7 +21,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 
 ### DATA LOADING ###
-train_loader, test_loader = getPairSolutions(0.8, n_errors_per_spaceship, batch_size, "deconstruct")  # n_pairs : fake data for every ship
+train_loader, test_loader = getPairSolutions(0.8, n_errors_per_spaceship, batch_size, "random")  # n_pairs : fake data for every ship
 print("Data loaded.")
 
 
@@ -36,10 +37,8 @@ for epoch in range(num_epochs):
 		loss.backward()
 		optimizer.step()
 
-		if i % 100 == 0:
+		if i % 10000 == 0:
 			print(f"Loss: {loss.item():.9f}")
-
-		if i % 1000 == 0:
 			print(f"{i}/{len(train_loader)} datasets done")
 
 	print(f"Epoch: {epoch+1}/{num_epochs}")

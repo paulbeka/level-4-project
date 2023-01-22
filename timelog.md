@@ -355,3 +355,13 @@ WINTER BREAK- BARELY ANYTHING DONE
 * *2 hours* fixed the bug with adding weights to the recursive solver
 * *2 hours* Worked on a new version of the dataloader class which deconstructs & reconstructs spaceship
 * *2 hours* Worked on the paper & more research done
+
+### 19 Jan 2023
+* *1 hour* Worked on the presentation and emailed JW
+* *2 hours* Worked on the project code, adding a new dataloader
+
+### 20 Jan 2023
+* *1 hour* Met JW and review meeting notes
+
+### 21 Jan 2023
+* *2 hours* Worked on the new neural network configuration
