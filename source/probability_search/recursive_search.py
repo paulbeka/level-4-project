@@ -28,9 +28,9 @@ def itercycle(model_pipeline, initialState, n_iters):
 		for model in model_pipeline:
 			modeled_change = model(workState)
 
-			plt.imshow(modeled_change[0], cmap='gray_r', interpolation='nearest')	
-			plt.colorbar()
-			plt.show()
+			# plt.imshow(modeled_change[0], cmap='gray_r', interpolation='nearest')	
+			# plt.colorbar()
+			# plt.show()
 
 			workState = addChangeVector(workState, modeled_change)
 
@@ -41,7 +41,7 @@ train, test = getPairSolutions(0.8, 1, 1, "empty")
 
 ## LOADING MODELS
 pipeline = []
-pipe_names = ["20_epoch_empty"]
+pipe_names = ["3_epoch_10_iter_advanced_deconstruct"]
 
 for item in pipe_names:
 	model_path = os.path.join(ROOT_PATH, "models", item)
@@ -52,7 +52,7 @@ for item in pipe_names:
 
 
 ## PARAMETERS
-n_iters = 3  # number of iterations on probability
+n_iters = 5  # number of iterations on probability
 scalar = 0.1
 n_items = 1
 testIterator = iter(test)
@@ -60,7 +60,7 @@ testIterator = iter(test)
 with torch.no_grad():
 	for i in range(n_items):
 		# INITIAL TEST STARTING STATES
-		#use the test data to see if can rebuilt
+		# #use the test data to see if can rebuilt
 		_, initialState = testIterator.next()
 		alive = np.argwhere(initialState.numpy() == 1)	 # remove one cell from the structure
 		print(f"The cell being removed is: {alive[0][1:]}")
@@ -69,7 +69,7 @@ with torch.no_grad():
 		initialState[0, alive[:, 1], alive[:, 2]] = 1
 		initialState = torch.from_numpy(initialState)
 
-		# initialState = torch.from_numpy(np.zeros((1, 10, 19)))	# 20x20 test matrix
+		# initialState = torch.from_numpy(np.zeros((1, 20, 20)))	# 20x20 test matrix
 		# initialState = torch.from_numpy(np.random.rand(1, 20, 20))
 
 		result = itercycle(pipeline, initialState, n_iters)[0]

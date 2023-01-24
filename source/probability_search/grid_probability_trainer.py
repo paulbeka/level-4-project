@@ -13,7 +13,7 @@ from dataloaders.probability_grid_dataloader import getPairSolutions
 num_epochs = 3
 batch_size = 1
 learning_rate = 0.0001
-n_errors_per_spaceship = 1000
+n_errors_per_spaceship = 10
 
 model =  ProbabilityFinder(batch_size).double()
 criterion = nn.MSELoss()
@@ -21,7 +21,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 
 ### DATA LOADING ###
-train_loader, test_loader = getPairSolutions(0.8, n_errors_per_spaceship, batch_size, "random")  # n_pairs : fake data for every ship
+train_loader, test_loader = getPairSolutions(0.8, n_errors_per_spaceship, batch_size, "advanced_deconstruct")  # n_pairs : fake data for every ship
 print("Data loaded.")
 
 

@@ -365,3 +365,12 @@ WINTER BREAK- BARELY ANYTHING DONE
 
 ### 21 Jan 2023
 * *2 hours* Worked on the new neural network configuration
+
+### 22 Jan 2023
+* *1 hour* trained the new network
+
+
+# Week 3 - AFTER BREAK
+
+### 23 Jan 2023
+* *1 hour* Asked questions and general help seeking to try and fix my network problems
