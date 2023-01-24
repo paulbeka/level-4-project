@@ -374,3 +374,6 @@ WINTER BREAK- BARELY ANYTHING DONE
 
 ### 23 Jan 2023
 * *1 hour* Asked questions and general help seeking to try and fix my network problems
+
+### 24 Jan 2023
+* *3 hours* worked on analytics for the model
