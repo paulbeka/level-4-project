@@ -3,6 +3,7 @@ import torch
 import os
 import random
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from networks.convolution_probability_network import ProbabilityFinder
 from dataloaders.probability_grid_dataloader import getPairSolutions
@@ -55,60 +56,66 @@ def createTestingShipWithCellsMissing(ship, n_cells_missing):
 
 
 def run_recursion(pipeline, remove_counts_list, n_iters, n_items):
-	removed_cells = None
-	testIterator = iter(train)
-	final_scores = []
+	testIterator = iter(train)	# use train iterator as there are more values
+	final_scores = {}
 
 	with torch.no_grad():
 		for n_removed_cells in remove_counts_list:
 			removed_cell_result_list = []
 			for i in range(n_items):
-				# INITIAL TEST STARTING STATES
 				initialState, removed_cells = createTestingShipWithCellsMissing(testIterator.next()[1], n_removed_cells)
-				# initialState = torch.from_numpy(np.zeros((1, 20, 20)))	# 20x20 test matrix
-				# initialState = torch.from_numpy(np.random.rand(1, 20, 20))
 
-				result = itercycle(pipeline, initialState, n_iters)[0]
-				result = result.numpy() # remove extra batch dimention used by neural net
+				result = itercycle(pipeline, initialState, n_iters)[0].numpy() # remove extra batch dimention used by neural net
 
-				if removed_cells:
-					positive_scores = [result[x[0], x[1]] for x in removed_cells]
-					
-					# find the new cells w probability not supposed to be there
-					result_with_probs = np.argwhere(result > 0)
-					alive = np.argwhere(initialState == 1)
-					negative_scores = [result[x[0], x[1]] for x in result_with_probs if not x in list(alive)]
+				result_with_probs = np.argwhere(result > 0)
+				result_with_good_probs = np.argwhere(result > 0.5)
 
-					scores = ((sum(positive_scores) / len(positive_scores), sum(negative_scores) / len(negative_scores)))
-					removed_cell_result_list.append(scores)
+				original_alive_cells = np.argwhere(initialState == 1)
+				negative_scores = [result[x[0], x[1]] for x in result_with_probs if not x in list(original_alive_cells)]
+				intactness_list = [result[x[0], x[1]] for x in result_with_good_probs if x in list(original_alive_cells)]
 
-				### DISPLAY FINAL RESULT
-				# plt.imshow(result, cmap='gray_r', interpolation='nearest')	
-				# plt.title("Last iteration")
-				# plt.colorbar()
-				# plt.show()
+				result_dict = {
+					"positive_values" : [result[x[0], x[1]] for x in removed_cells],
+					"negative_values" : negative_scores,
+					"intactness_values" : intactness_list
+				} 
+
+				removed_cell_result_list.append(result_dict)
+
 
 			avg_positive = sum([result[0] for result in removed_cell_result_list]) / n_items
 			avg_negative = sum([result[1] for result in removed_cell_result_list]) / n_items
+
+
 			final_scores.append((n_removed_cells, (avg_positive, avg_negative)))
 
 	return final_scores
 
 
 def run_tests(pipeline):
-	MAX_ITER = 30
+	MAX_ITER = 20
 	MAX_REMOVE_COUNT = 10
 
 	test_n_iters = [i+1 for i in range(MAX_ITER)]
 	remove_counts_list = [i+1 for i in range(MAX_REMOVE_COUNT)]
-	test_n_spaceships = [20]
-	# CHECK IF SPACESHIP STILL INTACT, LOOP OVER SEVERAL DESTRUCTION VALUES
-	for n_spaceships in test_n_spaceships:
-		print(f"### N_SPACESHIPS = {n_spaceships} ###")
-		for n_iters in test_n_iters:
-			result_counts = run_recursion(pipeline, remove_counts_list, n_iters, n_spaceships)
-			for result in result_counts:
-				print(f"n_iters = {n_iters}, n_removed_cells = {result[0]}: positive average = {result[1][0]}, negative average = {result[1][1]}")
+	test_n_spaceships = 20
+
+	result_dict = {
+			"n_iters" : test_n_iters,
+			"remove_counts_list" : remove_counts_list,
+
+		}
+
+	# STORE THIS STUFF IN PANDAS
+	# DISPLAY COOL GRAPHS WITH REMOVE-INTEGRITY, and ITER-INTEGRITY
+	# THEN USE THE NETWORK IN A TREE SEARCH
+
+	print(f"### N_SPACESHIPS = {test_n_spaceships} ###")
+	for n_iters in test_n_iters:
+		print("-----")
+		result_counts = run_recursion(pipeline, remove_counts_list, n_iters, test_n_spaceships)
+		for result in result_counts:
+			print(f"n_iters = {n_iters}, n_removed_cells = {result[0]}: positive average = {result[1][0]}, negative average = {result[1][1]}, intactness = {result[1][2]}")
 
 
 train, test = getPairSolutions(0.8, 1, 1, "empty")
