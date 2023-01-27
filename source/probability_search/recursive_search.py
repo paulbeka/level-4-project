@@ -1,3 +1,4 @@
+# RENAME THIS FILE TO recursive_analytics
 import numpy as np
 import torch
 import os
@@ -55,62 +56,76 @@ def createTestingShipWithCellsMissing(ship, n_cells_missing):
 	return initialState, removed_cells
 
 
-def run_recursion(pipeline, remove_counts_list, n_iters, n_items):
+def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
 	testIterator = iter(train)	# use train iterator as there are more values
-	final_scores = {}
 
 	with torch.no_grad():
+		result_dict = {
+			"n_iters" : [],
+			"n_removed_cells" : [],
+			"positive_scores" : [],
+			"negative_scores" : [],
+			"intactness_scores" : []
+		}
+
 		for n_removed_cells in remove_counts_list:
-
-			result_dict = {
-				"positive_scores" : [],
-				"negative_scores" : [],
-				"intactness_scores" : []
-			}
-
 			for i in range(n_items):
 				initialState, removed_cells = createTestingShipWithCellsMissing(testIterator.next()[1], n_removed_cells)
 
 				result = itercycle(pipeline, initialState, n_iters)[0].numpy() # remove extra batch dimention used by neural net
 
-				result_with_probs = np.argwhere(result > 0)
-				result_with_good_probs = np.argwhere(result > 0.5)
+				result_with_probs = [tuple(x) for x in list(np.argwhere(result > 0))]
+				original_alive_cells = [tuple(x) for x in list(np.argwhere(initialState[0] == 1).reshape(-1, 2))]
 
-				original_alive_cells = np.argwhere(initialState == 1)
-				negative_scores = [result[x[0], x[1]] for x in result_with_probs if not x in list(original_alive_cells)]
-				intactness_list = [result[x[0], x[1]] for x in result_with_good_probs if x in list(original_alive_cells)]
+				positive_scores = [result[x[0], x[1]] for x in removed_cells]
+				negative_scores = [result[x[0], x[1]] for x in result_with_probs if not x in original_alive_cells]
+				intactness_list = [result[x[0], x[1]] for x in result_with_probs if x in original_alive_cells]
+				# prevent mean on empty slice
+				if not positive_scores:	positive_scores = [0]
+				if not negative_scores:	negative_scores = [0]
+				if not intactness_list:	intactness_list = [0]
 
-				result_dict["positive_scores"].append(np.mean([result[x[0], x[1]] for x in removed_cells]))
+				result_dict["n_iters"].append(n_iters)
+				result_dict["n_removed_cells"].append(n_removed_cells)
+				result_dict["positive_scores"].append(np.mean())
 				result_dict["negative_scores"].append(np.mean(negative_scores))
 				result_dict["intactness_scores"].append(np.mean(intactness_list))
 
-
-			final_scores = pd.DataFrame(result_dict)
-			print(final_scores)
+		return pd.DataFrame(result_dict)
 
 
-	return final_scores
+def displayResults(result):
+	iter_results = result.groupby(["n_iters"]).aggregate(np.mean)[["positive_scores", "negative_scores", "intactness_scores"]]
+	removed_results = result.groupby(["n_removed_cells"]).aggregate(np.mean)[["positive_scores", "negative_scores", "intactness_scores"]]
+	
+	plt.plot(iter_results["positive_scores"], label="positive")
+	plt.plot(iter_results["negative_scores"], label="negative")
+	plt.plot(iter_results["intactness_scores"], label="intactness")
+	plt.xlabel("Number of iterations")
+	plt.ylabel("Score")
+	plt.legend(loc="upper left")
+	plt.show()
+
+	plt.plot(removed_results["positive_scores"], label="positive")
+	plt.plot(removed_results["negative_scores"], label="negative")
+	plt.plot(removed_results["intactness_scores"], label="intactness")
+	plt.xlabel("Number of removed cells")
+	plt.ylabel("Score")
+	plt.legend(loc="upper left")
+	plt.show()
 
 
 def run_tests(pipeline):
-	MAX_ITER = 20
-	MAX_REMOVE_COUNT = 10
+	MAX_ITER = 20	# the max amount of recursions
+	MAX_REMOVE_COUNT = 10	# the maximum amount of cells to be removed
 
 	test_n_iters = [i+1 for i in range(MAX_ITER)]
 	remove_counts_list = [i+1 for i in range(MAX_REMOVE_COUNT)]
-	test_n_spaceships = 20
-
-	# STORE THIS STUFF IN PANDAS
-	# DISPLAY COOL GRAPHS WITH REMOVE-INTEGRITY, and ITER-INTEGRITY
-	# THEN USE THE NETWORK IN A TREE SEARCH
+	test_n_spaceships = 25
 
 	print(f"### N_SPACESHIPS = {test_n_spaceships} ###")
-	for n_iters in test_n_iters:
-		print(pd.DataFrame(run_recursion(pipeline, remove_counts_list, n_iters, test_n_spaceships)))
-
-
-		#for result in result_counts:
-			#print(f"n_iters = {n_iters}, n_removed_cells = {result[0]}: positive average = {result[1][0]}, negative average = {result[1][1]}, intactness = {result[1][2]}")
+	n_iter_results = [run_recursion_tests(pipeline, remove_counts_list, n_iters, test_n_spaceships) for n_iters in test_n_iters]
+	displayResults(pd.concat(n_iter_results))
 
 
 train, test = getPairSolutions(0.8, 1, 1, "empty")
@@ -127,3 +142,4 @@ for item in pipe_names:
 	pipeline.append(model)
 
 run_tests(pipeline)
+

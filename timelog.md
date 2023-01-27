@@ -377,3 +377,10 @@ WINTER BREAK- BARELY ANYTHING DONE
 
 ### 24 Jan 2023
 * *3 hours* worked on analytics for the model
+
+### 25 Jan 2023
+* *2 hours* Worked on testing the model network
+
+### 26 Jan 2023
+* *2 hours* Finished the analytics graphing
+* *2 hours* Created 2 probability network search methods
