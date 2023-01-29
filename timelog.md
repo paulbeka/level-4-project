@@ -370,7 +370,7 @@ WINTER BREAK- BARELY ANYTHING DONE
 * *1 hour* trained the new network
 
 
-# Week 3 - AFTER BREAK
+## Week 3 - AFTER BREAK
 
 ### 23 Jan 2023
 * *1 hour* Asked questions and general help seeking to try and fix my network problems
@@ -384,3 +384,11 @@ WINTER BREAK- BARELY ANYTHING DONE
 ### 26 Jan 2023
 * *2 hours* Finished the analytics graphing
 * *2 hours* Created 2 probability network search methods
+
+### 27 Jan 2023
+* *2 hours* Finished the stochastic search and met with JW
+
+### 28 Jan 2023
+* *2 hours* Fixed up the dataset loader with suggested changes and trained new model
+
+### 29 Jan 2023

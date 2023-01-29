@@ -51,8 +51,10 @@ def ratioDeconstruct(ships, max_destruction_ratio, n_pairs, flip_other):
 				tempGrid = np.zeros_like(ship)
 				tempGrid[alive[:, 0], alive[:, 1]] = 1
 				if flip_other:
+					# flip an arbitrary number of dead cells
+					n_dead_flips = random.randint(0, i+n_max_deconstruct)
 					dead = np.argwhere(tempGrid == 0)
-					dead_to_flip = dead[[random.randint(0, len(dead)-1) for _ in range(i+1)]]
+					dead_to_flip = dead[[random.randint(0, len(dead)-1) for _ in range(n_dead_flips)]]
 					tempGrid[dead_to_flip[:, 0], dead_to_flip[:, 1]] = 1
 				ship_deconstructed.append(tempGrid)
 				alive = np.argwhere(ship == 1)
@@ -86,7 +88,7 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	elif data_type == "deconstruct":
 		mock_data = deconstructReconstructPairs(ships)
 	elif data_type == "advanced_deconstruct":
-		mock_data = ratioDeconstruct(ships, 0.3, 10, True)
+		mock_data = ratioDeconstruct(ships, 1, 10, True)
 	else:
 		raise Exception("Not a valid data training type: use random, full, or empty.")
 	data = []

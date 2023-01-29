@@ -19,9 +19,6 @@ class Board:
 		self.visited = 0
 		self.x, self.y = x, y
 
-	def __eq__(self, other):
-		return np.array_equal(self.board, other.board)
-
 
 	def getPossibleActions(self):
 		states = []
@@ -32,10 +29,10 @@ class Board:
 
 		candidate_cells = candidate_cells[:Board.N_CONSIDERATIONS] + candidate_cells[-Board.N_CONSIDERATIONS:]
 
-		# FIX THISSSS
 		for candidate in candidate_cells:
 			newGrid = self.board.copy()
-			# newGrid[candidate[0], candidate[1]] += 
+			newGrid[candidate[0], candidate[1]] += probability_matrix[candidate[0], candidate[1]]
+			
 
 		return states
 

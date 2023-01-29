@@ -13,7 +13,7 @@ from dataloaders.probability_grid_dataloader import getPairSolutions
 num_epochs = 3
 batch_size = 1
 learning_rate = 0.0001
-n_errors_per_spaceship = 10
+n_errors_per_spaceship = 5
 
 model =  ProbabilityFinder(batch_size).double()
 criterion = nn.MSELoss()

@@ -1,4 +1,3 @@
-# RENAME THIS FILE TO recursive_analytics
 import numpy as np
 import torch
 import os
@@ -87,7 +86,7 @@ def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
 
 				result_dict["n_iters"].append(n_iters)
 				result_dict["n_removed_cells"].append(n_removed_cells)
-				result_dict["positive_scores"].append(np.mean())
+				result_dict["positive_scores"].append(np.mean(positive_scores))
 				result_dict["negative_scores"].append(np.mean(negative_scores))
 				result_dict["intactness_scores"].append(np.mean(intactness_list))
 
@@ -116,30 +115,31 @@ def displayResults(result):
 
 
 def run_tests(pipeline):
-	MAX_ITER = 20	# the max amount of recursions
-	MAX_REMOVE_COUNT = 10	# the maximum amount of cells to be removed
+	MAX_ITER = 3	# the max amount of recursions
+	MAX_REMOVE_COUNT = 40	# the maximum amount of cells to be removed
 
 	test_n_iters = [i+1 for i in range(MAX_ITER)]
 	remove_counts_list = [i+1 for i in range(MAX_REMOVE_COUNT)]
-	test_n_spaceships = 25
+	test_n_spaceships = 20
 
 	print(f"### N_SPACESHIPS = {test_n_spaceships} ###")
 	n_iter_results = [run_recursion_tests(pipeline, remove_counts_list, n_iters, test_n_spaceships) for n_iters in test_n_iters]
 	displayResults(pd.concat(n_iter_results))
 
 
-train, test = getPairSolutions(0.8, 1, 1, "empty")
+if __name__ == "__main__":
+	train, test = getPairSolutions(0.8, 1, 1, "empty")
 
-## LOADING MODELS
-pipeline = []
-pipe_names = ["3_epoch_10_iter_advanced_deconstruct"]
+	## LOADING MODELS
+	pipeline = []
+	pipe_names = ["3_epoch_rand_addition_advanced_deconstruct"]
 
-for item in pipe_names:
-	model_path = os.path.join(ROOT_PATH, "models", item)
-	model = ProbabilityFinder(1).double()
-	model.load_state_dict(torch.load(model_path))
-	model.eval()
-	pipeline.append(model)
+	for item in pipe_names:
+		model_path = os.path.join(ROOT_PATH, "models", item)
+		model = ProbabilityFinder(1).double()
+		model.load_state_dict(torch.load(model_path))
+		model.eval()
+		pipeline.append(model)
 
-run_tests(pipeline)
+	run_tests(pipeline)
 
