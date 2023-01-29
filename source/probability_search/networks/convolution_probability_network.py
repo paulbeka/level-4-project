@@ -17,12 +17,11 @@ class ProbabilityFinder(nn.Module):
 		self.conv4 = nn.Conv2d(24, 48, 3, padding="same")
 		self.finalConv = nn.Conv2d(48, 1, 1)
 
-		self.scoreFC1 = nn.Linear()
-		self.scoreFC2 = nn.Linear()
-		self.score = nn.Linear()
+		# self.scoreFC1 = nn.Linear(100*100, 100)
+		# self.scoreFC2 = nn.Linear(100, 1)
 
 		self.silu = nn.SiLU()
-		self.relu = nn.ReLU()
+		# self.relu = nn.ReLU()
 		
 
 	def forward(self, x):
@@ -32,7 +31,7 @@ class ProbabilityFinder(nn.Module):
 		x = self.silu(self.conv4(x))		
 		x = self.finalConv(x)
 		
-		score = self.scoreFC1(x)
-		score = self.scoreFC2(score)
+		# score = self.relu(self.scoreFC1(x))
+		# score = self.scoreFC2(score)
 
 		return x

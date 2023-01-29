@@ -2,8 +2,10 @@ import numpy as np
 import sys
 import torch
 import random
+import os
 
-sys.path.insert(1, "C:\\Workspace\\level-4-project\\source")
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(1, PROJECT_ROOT)
 
 from tools.rle_reader import RleReader
 
@@ -67,7 +69,8 @@ def ratioDeconstruct(ships, max_destruction_ratio, n_pairs, flip_other):
 # produce pairs of probability map -> solution to get to spaceship
 def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	rle_reader = RleReader()
-	ships = rle_reader.getFileArray("C:\\Workspace\\level-4-project\\source\\data\\spaceship_identification\\spaceships_extended.txt")
+	filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
+	ships = rle_reader.getFileArray(filePath)
 
 	sizes = []
 	for ship in ships:

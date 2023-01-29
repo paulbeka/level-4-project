@@ -56,8 +56,7 @@ def createTestingShipWithCellsMissing(ship, n_cells_missing):
 
 
 def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
-	testIterator = iter(train)	# use train iterator as there are more values
-
+	shipList = list(train)	# use train iterator as there are more values
 	with torch.no_grad():
 		result_dict = {
 			"n_iters" : [],
@@ -69,7 +68,7 @@ def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
 
 		for n_removed_cells in remove_counts_list:
 			for i in range(n_items):
-				initialState, removed_cells = createTestingShipWithCellsMissing(testIterator.next()[1], n_removed_cells)
+				initialState, removed_cells = createTestingShipWithCellsMissing(random.choice(shipList)[1], n_removed_cells)
 
 				result = itercycle(pipeline, initialState, n_iters)[0].numpy() # remove extra batch dimention used by neural net
 
