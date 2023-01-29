@@ -17,11 +17,12 @@ class ProbabilityFinder(nn.Module):
 		self.conv4 = nn.Conv2d(24, 48, 3, padding="same")
 		self.finalConv = nn.Conv2d(48, 1, 1)
 
-		# self.scoreFC1 = nn.Linear(100*100, 100)
-		# self.scoreFC2 = nn.Linear(100, 1)
+		self.scorePooling = nn.AdaptiveAvgPool2d(100)
+		self.scoreFC1 = nn.Linear(100*100, 100)
+		self.scoreFC2 = nn.Linear(100, 1)
 
 		self.silu = nn.SiLU()
-		# self.relu = nn.ReLU()
+		self.relu = nn.ReLU()
 		
 
 	def forward(self, x):
@@ -30,8 +31,14 @@ class ProbabilityFinder(nn.Module):
 		x = self.silu(self.conv3(x))
 		x = self.silu(self.conv4(x))		
 		x = self.finalConv(x)
-		
-		# score = self.relu(self.scoreFC1(x))
-		# score = self.scoreFC2(score)
+
+		score = self.scorePooling(x)
+		score = score.flatten()
+		score = self.relu(self.scoreFC1(score))
+		score = self.scoreFC2(score)
+
+		x = torch.flatten(x)
+		x = torch.cat((score, x), 0)
+		x = x.unsqueeze(0)
 
 		return x

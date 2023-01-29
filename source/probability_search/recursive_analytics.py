@@ -29,6 +29,7 @@ def itercycle(model_pipeline, initialState, n_iters):
 	for _ in range(n_iters):
 		for model in model_pipeline:
 			modeled_change = model(workState)
+			print(modeled_change.shape)
 
 			# plt.imshow(modeled_change[0], cmap='gray_r', interpolation='nearest')	
 			# plt.colorbar()
@@ -40,7 +41,8 @@ def itercycle(model_pipeline, initialState, n_iters):
 
 
 def createTestingShipWithCellsMissing(ship, n_cells_missing):
-	alive = np.argwhere(ship.numpy() == 1)	
+	print(ship.shape)
+	alive = np.argwhere(ship.numpy() == 1)
 
 	removed_cells = []
 	for _ in range(min(len(alive)-1, n_cells_missing)):
@@ -49,6 +51,7 @@ def createTestingShipWithCellsMissing(ship, n_cells_missing):
 		alive = np.delete(alive, cell_being_removed, axis=0)
 
 	initialState = np.zeros_like(ship)
+	print(initialState.shape)
 	initialState[0, alive[:, 1], alive[:, 2]] = 1
 	initialState = torch.from_numpy(initialState)
 
@@ -131,7 +134,7 @@ if __name__ == "__main__":
 
 	## LOADING MODELS
 	pipeline = []
-	pipe_names = ["3_epoch_rand_addition_advanced_deconstruct"]
+	pipe_names = ["OUTPUT_SEND_THIS_BY_EMAIL"]
 
 	for item in pipe_names:
 		model_path = os.path.join(ROOT_PATH, "models", item)

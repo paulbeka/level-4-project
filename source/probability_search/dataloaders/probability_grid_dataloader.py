@@ -21,7 +21,7 @@ def generateMockData(sizes, n_pairs):
 
 
 def getMatrixScore(original_matrix, matrix):
-	return torch.nn.MSELoss()(original_matrix, matrix)
+	return torch.nn.MSELoss()(torch.from_numpy(original_matrix), torch.from_numpy(matrix)).item()
 
 
 # make a pair for each deconstructed ship part and the probability network assosiated
@@ -95,7 +95,7 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	elif data_type == "deconstruct":
 		mock_data = deconstructReconstructPairs(ships)
 	elif data_type == "advanced_deconstruct":
-		mock_data = ratioDeconstruct(ships, 1, 10, True)
+		mock_data = ratioDeconstruct(ships, 1, 15, True)
 	else:
 		raise Exception("Not a valid data training type: use random, full, or empty.")
 	data = []
@@ -103,8 +103,10 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	for ship, mock in zip(ships, mock_data):
 		for mockItem in mock:
 			solution = ship.copy() - mockItem
-			solution_pair = np.array([solution, getMatrixScore(solution, mockItem)])
-			data.append((mockItem, solution_pair))
+			score = getMatrixScore(solution, mockItem)
+			solution = solution.flatten()
+			solution = np.append(score, solution)
+			data.append((mockItem, solution))
 
 	n_train_samples = int(train_ratio * len(data))
 

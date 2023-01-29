@@ -9,13 +9,23 @@ from networks.convolution_probability_network import ProbabilityFinder
 from dataloaders.probability_grid_dataloader import getPairSolutions
 
 
+if not torch.cuda.is_available():
+	print("GPU IS NOT AVAILABLE AND HAS BEEN IMPROPERLY CONFIGURED.")
+	print("INSTALL THE NVIDIA DRIVER AND RETRY.")
+	print("EXITING.")
+	quit()
+
+
 ### HYPERPARAMETERS ###
-num_epochs = 3
+num_epochs = 20
 batch_size = 1
 learning_rate = 0.0001
-n_errors_per_spaceship = 5
+n_errors_per_spaceship = 15
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model =  ProbabilityFinder(batch_size).double()
+model.to(device)
+
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -65,9 +75,12 @@ with torch.no_grad():
 	save_model = True  # set to true if you wish model to be saved
 	save_name = ""
 	if save_model:
-		save_name = input("Input the name of your NN: ")
+		# save_name = input("Input the name of your NN: ")
+		save_name = "OUTPUT_SEND_THIS_BY_EMAIL"
 
 	SAVE_PATH = os.path.join(os.getcwd(), "models", save_name)
 
 	if save_model:
 		torch.save(model.state_dict(), SAVE_PATH)
+
+	print("EXECUTION OVER.")
