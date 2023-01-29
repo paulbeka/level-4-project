@@ -1,9 +1,9 @@
-import pytorch
+import torch
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-from models.convolution_probability_network import ProbabilityNetwork
+from networks.convolution_probability_network import ProbabilityFinder
 
 
 ROOT_PATH = os.path.abspath(os.getcwd())
@@ -32,7 +32,7 @@ class Board:
 		for candidate in candidate_cells:
 			newGrid = self.board.copy()
 			newGrid[candidate[0], candidate[1]] += probability_matrix[candidate[0], candidate[1]]
-			
+
 
 		return states
 
@@ -75,7 +75,7 @@ def tree_search(max_depth, model, currentState):
 	
 
 MAX_DEPTH = 100
-MODEL_NAME = "3_epoch_10_iter_advanced_deconstruct"
+MODEL_NAME = "3_epoch_rand_addition_advanced_deconstruct"
 
 model_path = os.path.join(ROOT_PATH, "models", MODEL_NAME)
 model = ProbabilityFinder(1).double()
@@ -85,4 +85,4 @@ model.eval()
 initialState = np.zeros((10, 10))
 Board.MAX_GRID = (10, 10) 	# FIX THIS LATER
 
-tree_search(MAX_DEPTH, model)
+tree_search(MAX_DEPTH, model, initialState)

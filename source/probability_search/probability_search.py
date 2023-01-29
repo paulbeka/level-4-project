@@ -14,8 +14,7 @@ ROOT_PATH = os.path.abspath(os.getcwd())
 
 def nonStochasticProbabilityToStructure(probability_matrix):
 	matrix = np.zeros_like(probability_matrix.detach())
-	alive = np.argwhere(probability_matrix[0] > 0.5).reshape(-1, 2)
-	
+	alive = np.argwhere(probability_matrix[0].detach().numpy() > 0.5)
 	if alive.size:
 		matrix[0, alive[:, 0], alive[:, 1]] = 1
 	return torch.from_numpy(matrix)
@@ -57,7 +56,7 @@ model.eval()
 
 # Ship start with missing parts
 train, test = getPairSolutions(0.8, 1, 1, "empty")
-n_removed_cells = 10
+n_removed_cells = 1
 testIterator = iter(train)
 initialState, removed_cells = createTestingShipWithCellsMissing(testIterator.next()[1], n_removed_cells)
 

@@ -20,6 +20,10 @@ def generateMockData(sizes, n_pairs):
 	return mockList
 
 
+def getMatrixScore(original_matrix, matrix):
+	return torch.nn.MSELoss()(original_matrix, matrix)
+
+
 # make a pair for each deconstructed ship part and the probability network assosiated
 # MULTIPLE WAYS TO DO THIS:
 # 1. Remove 1 random cell and train it
@@ -99,7 +103,8 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	for ship, mock in zip(ships, mock_data):
 		for mockItem in mock:
 			solution = ship.copy() - mockItem
-			data.append((mockItem, solution))
+			solution_pair = np.array([solution, getMatrixScore(solution, mockItem)])
+			data.append((mockItem, solution_pair))
 
 	n_train_samples = int(train_ratio * len(data))
 

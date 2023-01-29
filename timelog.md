@@ -392,3 +392,4 @@ WINTER BREAK- BARELY ANYTHING DONE
 * *2 hours* Fixed up the dataset loader with suggested changes and trained new model
 
 ### 29 Jan 2023
+* *3 hours* created setup script, tested on linux, tested new network, added a scoring function
