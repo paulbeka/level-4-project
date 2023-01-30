@@ -97,7 +97,7 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	elif data_type == "deconstruct":
 		mock_data = deconstructReconstructPairs(ships)
 	elif data_type == "advanced_deconstruct":
-		mock_data = ratioDeconstruct(ships, 1, 15, True)
+		mock_data = ratioDeconstruct(ships, 1, 10, True)
 	else:
 		raise Exception("Not a valid data training type: use random, full, or empty.")
 
@@ -111,7 +111,7 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 			data.append((mockItem, solution))
 		print(f"Mock item {i}/{len(ships)} finished.")
 
-	#np.save('mock_data.npy', data, allow_pickle=True)
+	np.save('mock_data.npy', data, allow_pickle=True)
 
 	n_train_samples = int(train_ratio * len(data))
 
