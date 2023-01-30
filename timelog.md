@@ -393,3 +393,9 @@ WINTER BREAK- BARELY ANYTHING DONE
 
 ### 29 Jan 2023
 * *3 hours* created setup script, tested on linux, tested new network, added a scoring function
+* *3 hours* Finished setup script, fixed many issues, changed the dataloading, added dataloader updates
+
+
+## Week 4 - AFTER BREAK
+
+### 20 Jan 2023

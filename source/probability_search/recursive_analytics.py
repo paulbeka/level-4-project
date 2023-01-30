@@ -42,6 +42,8 @@ def itercycle(model_pipeline, initialState, n_iters):
 
 def createTestingShipWithCellsMissing(ship, n_cells_missing):
 	print(ship.shape)
+	# NEED TO GET SHIPS USING TOOL AS UNPACKING MODEL OUTPUT REQUIRES INITIAL INPUT SIZE
+	# SINCE THE OUTPUT IS NOW A 1D VECTOR FIX THIS ASAPPPPPPPP
 	alive = np.argwhere(ship.numpy() == 1)
 
 	removed_cells = []

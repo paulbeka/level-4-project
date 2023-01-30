@@ -47,10 +47,11 @@ def deconstructReconstructPairs(ships):
 # Remove n cells m different times in different locations
 def ratioDeconstruct(ships, max_destruction_ratio, n_pairs, flip_other):
 	data = []
-	for ship in ships:
+	for location, ship in enumerate(ships):
 		alive = np.argwhere(ship == 1)
 		n_max_deconstruct = int(len(alive) * max_destruction_ratio)
 		ship_deconstructed = []
+		print(f"Ship {location}/{len(ships)} deconstructed.")
 		for i in range(min(n_max_deconstruct, len(alive)-1)):
 			for _ in range(n_pairs):
 				alive = np.delete(alive, [random.randint(0, len(alive)-1) for _ in range(i+1)], axis=0)
@@ -67,6 +68,7 @@ def ratioDeconstruct(ships, max_destruction_ratio, n_pairs, flip_other):
 
 		data.append(ship_deconstructed)
 
+	print("Ship deconstruction complete.")
 	return data
 
 
@@ -74,7 +76,7 @@ def ratioDeconstruct(ships, max_destruction_ratio, n_pairs, flip_other):
 def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	rle_reader = RleReader()
 	filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
-	ships = rle_reader.getFileArray(filePath)
+	ships = rle_reader.getFileArray(filePath)[:800] # IMPORTANT: LAST 180 ARE FOR TESTING PURPOSES
 
 	sizes = []
 	for ship in ships:
@@ -98,15 +100,18 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 		mock_data = ratioDeconstruct(ships, 1, 15, True)
 	else:
 		raise Exception("Not a valid data training type: use random, full, or empty.")
-	data = []
 
-	for ship, mock in zip(ships, mock_data):
+	data = []
+	for i, (ship, mock) in enumerate(zip(ships, mock_data)):
 		for mockItem in mock:
 			solution = ship.copy() - mockItem
 			score = getMatrixScore(solution, mockItem)
 			solution = solution.flatten()
 			solution = np.append(score, solution)
 			data.append((mockItem, solution))
+		print(f"Mock item {i}/{len(ships)} finished.")
+
+	#np.save('mock_data.npy', data, allow_pickle=True)
 
 	n_train_samples = int(train_ratio * len(data))
 
@@ -117,3 +122,11 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
 
 	return train_loader, test_loader
+
+
+def loadPairsFromFile(filename):
+	data = np.load(filename, allow_pickle=True)
+
+	train_loader = torch.utils.data.DataLoader(dataset=data, batch_size=1, shuffle=True)
+
+	return train_loader, None
