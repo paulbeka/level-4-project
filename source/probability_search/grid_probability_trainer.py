@@ -35,7 +35,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 ### DATA LOADING ###
 train_loader, test_loader = getPairSolutions(0.8, n_errors_per_spaceship, batch_size, "advanced_deconstruct")  # n_pairs : fake data for every ship
-#train_loader, test_loader = loadPairsFromFile(os.path.join(os.path.abspath(os.getcwd()), "data", "mock_data.npy"))
+#train_loader, test_loader = loadPairsFromFile("mock_data.pkl") #os.path.join(os.path.abspath(os.getcwd()), "data", "mock_data.pkl")
 print("Data loaded.")
 
 

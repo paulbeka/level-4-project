@@ -3,6 +3,7 @@ import sys
 import torch
 import random
 import os
+import pickle
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 sys.path.insert(1, PROJECT_ROOT)
@@ -49,10 +50,10 @@ def ratioDeconstruct(ships, max_destruction_ratio, n_pairs, flip_other):
 	data = []
 	for location, ship in enumerate(ships):
 		alive = np.argwhere(ship == 1)
-		n_max_deconstruct = int(len(alive) * max_destruction_ratio)
+		n_max_deconstruct = min(int(len(alive) * max_destruction_ratio), len(alive)-1)
 		ship_deconstructed = []
 		print(f"Ship {location}/{len(ships)} deconstructed.")
-		for i in range(min(n_max_deconstruct, len(alive)-1)):
+		for i in range(n_max_deconstruct):
 			for _ in range(n_pairs):
 				alive = np.delete(alive, [random.randint(0, len(alive)-1) for _ in range(i+1)], axis=0)
 				tempGrid = np.zeros_like(ship)
@@ -97,7 +98,7 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	elif data_type == "deconstruct":
 		mock_data = deconstructReconstructPairs(ships)
 	elif data_type == "advanced_deconstruct":
-		mock_data = ratioDeconstruct(ships, 1, 10, True)
+		mock_data = ratioDeconstruct(ships, 1, 20, True)
 	else:
 		raise Exception("Not a valid data training type: use random, full, or empty.")
 
@@ -110,8 +111,6 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 			solution = np.append(score, solution)
 			data.append((mockItem, solution))
 		print(f"Mock item {i}/{len(ships)} finished.")
-
-	#np.save('mock_data.npy', data, allow_pickle=True)
 
 	n_train_samples = int(train_ratio * len(data))
 
@@ -126,7 +125,9 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 
 def loadPairsFromFile(filename):
 	data = np.load(filename, allow_pickle=True)
+	with open('mock_data.pkl','rb') as f:
+		x = pickle.load(f)
 
-	train_loader = torch.utils.data.DataLoader(dataset=data, batch_size=1, shuffle=True)
+	train_loader = torch.utils.data.DataLoader(dataset=x, batch_size=1, shuffle=True)
 
 	return train_loader, None
