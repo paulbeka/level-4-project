@@ -98,7 +98,7 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	elif data_type == "deconstruct":
 		mock_data = deconstructReconstructPairs(ships)
 	elif data_type == "advanced_deconstruct":
-		mock_data = ratioDeconstruct(ships, 1, 20, True)
+		mock_data = ratioDeconstruct(ships, 1, 1, True)
 	else:
 		raise Exception("Not a valid data training type: use random, full, or empty.")
 

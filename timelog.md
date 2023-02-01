@@ -398,4 +398,8 @@ WINTER BREAK- BARELY ANYTHING DONE
 
 ## Week 4 - AFTER BREAK
 
-### 20 Jan 2023
+### 30 Jan 2023
+* *3 hours* fixing the network on linux, training it, dataloader updates
+* *1 hour* Writing up methodology for the paper
+
+### 31 Jan 2023

@@ -9,6 +9,14 @@ from networks.convolution_probability_network import ProbabilityFinder
 ROOT_PATH = os.path.abspath(os.getcwd())
 
 
+# turn a flattened output grid into a grid
+def modelOutputToGridAndScore(input_shape, model_output):
+	flattened_grid = model_output[:model_output.shape[0]-1]
+	grid = flattened_grid.reshape(input_shape)
+	score = model_output[-1]
+	return (grid, score)
+
+
 class Board:
 
 	MAX_GRID = (10, 10)
