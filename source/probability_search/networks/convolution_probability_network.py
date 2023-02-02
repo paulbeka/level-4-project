@@ -25,6 +25,7 @@ class ProbabilityFinder(nn.Module):
 		self.relu = nn.ReLU()
 		
 
+	# WHY THE FUCK ARE THE VALUES NEGATIVE?
 	def forward(self, x):
 		x = self.silu(self.conv1(x))
 		x = self.silu(self.conv2(x))

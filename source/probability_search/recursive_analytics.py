@@ -47,11 +47,12 @@ def itercycle(model_pipeline, initialState, n_iters):
 			modeled_change = model(workState)
 			modeled_change, score = modelOutputToGridAndScore(startShape, modeled_change)
 
-			# plt.imshow(modeled_change[0], cmap='gray_r', interpolation='nearest')	
-			# plt.colorbar()
-			# plt.show()
+			plt.imshow(-modeled_change, cmap='gray_r', interpolation='nearest')	
+			plt.colorbar()
+			plt.show()
 
-			workState = addChangeVector(workState, modeled_change)
+			# workState = addChangeVector(workState, modeled_change)
+			workState += modeled_change
 
 	return (workState[0], score)
 
@@ -88,6 +89,11 @@ def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
 		for n_removed_cells in remove_counts_list:
 			for i in range(n_items):
 				initialState, removed_cells = createTestingShipWithCellsMissing(random.choice(ships), n_removed_cells)
+
+				print(removed_cells)
+				plt.imshow(initialState[0], cmap='gray_r', interpolation='nearest')	
+				plt.colorbar()
+				plt.show()
 
 				# result = itercycle(pipeline, initialState, n_iters)[0].numpy() # remove extra batch dimention used by neural net
 				result, score = itercycle(pipeline, initialState, n_iters)

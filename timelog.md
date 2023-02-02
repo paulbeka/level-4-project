@@ -403,3 +403,7 @@ WINTER BREAK- BARELY ANYTHING DONE
 * *1 hour* Writing up methodology for the paper
 
 ### 31 Jan 2023
+* *2 hours* Writing methodology section
+
+### 1 Feb 2023
+* *2 hours* fixing the new network in the recurisive search algorithm

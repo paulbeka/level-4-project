@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import os
+from tqdm import tqdm
 
 # from networks.probability_finder import ProbabilityFinder
 from networks.convolution_probability_network import ProbabilityFinder
@@ -10,24 +11,24 @@ from dataloaders.probability_grid_dataloader import getPairSolutions
 from dataloaders.probability_grid_dataloader import loadPairsFromFile
 
 
-# if not torch.cuda.is_available():
-# 	print("GPU IS NOT AVAILABLE AND HAS BEEN IMPROPERLY CONFIGURED.")
-# 	print("INSTALL THE NVIDIA DRIVER AND RETRY.")
-# 	print("EXITING.")
-# 	quit()
+if not torch.cuda.is_available():
+	print("GPU IS NOT AVAILABLE AND HAS BEEN IMPROPERLY CONFIGURED.")
+	print("INSTALL THE NVIDIA DRIVER AND RETRY.")
+	print("EXITING.")
+	quit()
 
 
 ### HYPERPARAMETERS ###
 num_epochs = 20
 batch_size = 1
-learning_rate = 0.0001
+learning_rate = 0.00005
 n_errors_per_spaceship = 15
 
 model =  ProbabilityFinder(batch_size).double()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# torch.cuda.set_device(device)
-# # model.to(device)
-# model.cuda(device)
+torch.cuda.set_device(device)
+# model.to(device)
+model.cuda(device)
 
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -42,9 +43,10 @@ print("Data loaded.")
 ### NEURAL NET ###
 total_steps = len(train_loader)
 for epoch in range(num_epochs):
-	for i, (configs, labels) in enumerate(train_loader):
+	print(f"Epoch: {epoch+1}/{num_epochs}")
+	for i, (configs, labels) in tqdm(enumerate(train_loader), desc="Training: ", total=len(train_loader)):
 		# load data into GPU
-		# configs, labels = configs.to(device), labels.to(device)
+		configs, labels = configs.to(device), labels.to(device)
 		
 		outputs = model(configs)
 		loss = criterion(outputs, labels)
@@ -53,15 +55,13 @@ for epoch in range(num_epochs):
 		loss.backward()
 		optimizer.step()
 
-		if i % 10000 == 0:
-			print(f"Loss: {loss.item():.9f}")
-			print(f"{i}/{len(train_loader)} datasets done")
+	print(f"Saving epoch {epoch+1}...")
 
-	print(f"Epoch: {epoch+1}/{num_epochs}")
+	torch.save(model.state_dict(), f"outputFile_{epoch+1}")
 
 
 ### TESTING ###
-with torch.no_grad():
+# with torch.no_grad():
 	# correct, samples = 0, 0
 	# test_loss = 0
 	# for configs, labels in test_loader:
@@ -77,16 +77,16 @@ with torch.no_grad():
 	# # print(f"Accuracy: {accuracy:.2f}%")
 	# # print(f"Total loss: {test_loss / len(test_loader)}")
 
-	# SAVE THE MODEL TO A FILE
-	save_model = True  # set to true if you wish model to be saved
-	save_name = ""
-	if save_model:
-		# save_name = input("Input the name of your NN: ")
-		save_name = "OUTPUT_SEND_THIS_BY_EMAIL"
+	# # SAVE THE MODEL TO A FILE
+	# save_model = True  # set to true if you wish model to be saved
+	# save_name = ""
+	# if save_model:
+	# 	# save_name = input("Input the name of your NN: ")
+	# 	save_name = "OUTPUT_SEND_THIS_BY_EMAIL"
 
-	SAVE_PATH = os.path.join(os.getcwd(), "models", save_name)
+	# SAVE_PATH = os.path.join(os.getcwd(), "models", save_name)
 
-	if save_model:
-		torch.save(model.state_dict(), SAVE_PATH)
+	# # if save_model:
+	# # 	torch.save(model.state_dict(), SAVE_PATH)
 
-	print("EXECUTION OVER.")
+print("EXECUTION OVER.")
