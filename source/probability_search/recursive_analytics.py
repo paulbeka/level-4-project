@@ -45,14 +45,14 @@ def itercycle(model_pipeline, initialState, n_iters):
 	for _ in range(n_iters):
 		for model in model_pipeline:
 			modeled_change = model(workState)
-			modeled_change, score = modelOutputToGridAndScore(startShape, modeled_change)
+			# modeled_change, score = modelOutputToGridAndScore(startShape, modeled_change)
 
-			plt.imshow(-modeled_change, cmap='gray_r', interpolation='nearest')	
-			plt.colorbar()
-			plt.show()
+			# plt.imshow(-modeled_change, cmap='gray_r', interpolation='nearest')	
+			# plt.colorbar()
+			# plt.show()
 
-			# workState = addChangeVector(workState, modeled_change)
-			workState += modeled_change
+			workState = addChangeVector(workState, modeled_change)
+			# workState -= modeled_change
 
 	return (workState[0], score)
 
@@ -90,16 +90,16 @@ def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
 			for i in range(n_items):
 				initialState, removed_cells = createTestingShipWithCellsMissing(random.choice(ships), n_removed_cells)
 
-				print(removed_cells)
-				plt.imshow(initialState[0], cmap='gray_r', interpolation='nearest')	
-				plt.colorbar()
-				plt.show()
+				# print(removed_cells)
+				# plt.imshow(initialState[0], cmap='gray_r', interpolation='nearest')	
+				# plt.colorbar()
+				# plt.show()
 
 				# result = itercycle(pipeline, initialState, n_iters)[0].numpy() # remove extra batch dimention used by neural net
 				result, score = itercycle(pipeline, initialState, n_iters)
 
-				result_with_probs = [tuple(x) for x in list(np.argwhere(result > 0))]
-				original_alive_cells = [tuple(x) for x in list(np.argwhere(initialState[0] == 1).reshape(-1, 2))]
+				result_with_probs = [tuple(x) for x in list(np.argwhere(result.numpy() > 0))]
+				original_alive_cells = [tuple(x) for x in list(np.argwhere(initialState[0].numpy() == 1))]
 
 				positive_scores = [result[x[0], x[1]] for x in removed_cells]
 				negative_scores = [result[x[0], x[1]] for x in result_with_probs if not x in original_alive_cells]
@@ -144,12 +144,12 @@ def displayResults(result):
 
 
 def run_tests(pipeline):
-	MAX_ITER = 3	# the max amount of recursions
+	MAX_ITER = 1	# the max amount of recursions
 	MAX_REMOVE_COUNT = 40	# the maximum amount of cells to be removed
 
 	test_n_iters = [i+1 for i in range(MAX_ITER)]
 	remove_counts_list = [i+1 for i in range(MAX_REMOVE_COUNT)]
-	test_n_spaceships = 20
+	test_n_spaceships = 25
 
 	print(f"### N_SPACESHIPS = {test_n_spaceships} ###")
 	n_iter_results = [run_recursion_tests(pipeline, remove_counts_list, n_iters, test_n_spaceships) for n_iters in test_n_iters]
@@ -163,12 +163,12 @@ if __name__ == "__main__":
 
 	## LOADING MODELS
 	pipeline = []
-	pipe_names = ["OUTPUT_SEND_THIS_BY_EMAIL"]
+	pipe_names = ["5x5_included_no_score"]
 
 	for item in pipe_names:
 		model_path = os.path.join(ROOT_PATH, "models", item)
 		model = ProbabilityFinder(1).double()
-		model.load_state_dict(torch.load(model_path))
+		model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 		model.eval()
 		pipeline.append(model)
 
