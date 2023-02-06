@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import sys, os
+import random
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 sys.path.insert(1, PROJECT_ROOT)
@@ -25,11 +26,35 @@ def createTestingShipWithCellsMissing(ship, n_cells_missing):
 
 	initialState[alive[:, 0], alive[:, 1]] = 1
 	initialState = initialState[None, :]
-	initialState = torch.from_numpy(initialState)
 
-	return initialState, removed_cells
+	return initialState[0], removed_cells
 
-def scoreDataloader(n_pairs):
+
+def ratioDeconstructWithAddedRandomCells(ships, max_destruction_ratio, n_pairs):
+	data = []
+	for location, ship in enumerate(ships):
+		alive = np.argwhere(ship == 1)
+		n_max_deconstruct = min(int(len(alive) * max_destruction_ratio), len(alive)-1)
+		print(f"Ship {location}/{len(ships)} deconstructed.")
+		for i in range(n_max_deconstruct):
+			for _ in range(n_pairs):
+				alive = np.delete(alive, [random.randint(0, len(alive)-1) for _ in range(i+1)], axis=0)
+				tempGrid = np.zeros_like(ship)
+				tempGrid[alive[:, 0], alive[:, 1]] = 1
+				# flip an arbitrary number of dead cells
+				n_dead_flips = random.randint(0, i+n_max_deconstruct)
+				dead = np.argwhere(tempGrid == 0)
+				dead_to_flip = dead[[random.randint(0, len(dead)-1) for _ in range(n_dead_flips)]]
+				tempGrid[dead_to_flip[:, 0], dead_to_flip[:, 1]] = 1
+				data.append((tempGrid, getMatrixScore(ship, tempGrid)))
+				alive = np.argwhere(ship == 1)
+
+	print("Ship deconstruction complete.")
+
+	return data
+
+
+def scoreDataloader(n_pairs, mode="ratio_deconstruct"):
 	rle_reader = RleReader()
 	filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)[:800] # IMPORTANT: LAST 180 ARE FOR TESTING PURPOSES
@@ -39,10 +64,17 @@ def scoreDataloader(n_pairs):
 		sizes.append(ship.shape)
 
 	data = []
-	for ship in ships:
-		mockList = [np.random.rand(ship.shape[0], ship.shape[1]) for _ in range(n_pairs)]
-		scores = [(ship, getMatrixScore(ship, mockItem)) for mockItem in mockList]
-		data += scores
+	# for ship in ships:
+	# 	if mode == "random":
+	# 		mockList = [np.random.rand(ship.shape[0], ship.shape[1]) for _ in range(n_pairs)]
+	# 		scores = [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]
+	# 	elif mode == "deconstruct":
+	# 		mockList = [createTestingShipWithCellsMissing(ship, random.randint(0, 100))[0] for _ in range(n_pairs)]
+	# 		scores = [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]	
+	# 	elif mode == "ratio_deconstruct":
+	#		scores = ratioDeconstructWithAddedRandomCells(ships, 0.1, 1)
+
+	data = ratioDeconstructWithAddedRandomCells(ships, 1, 10)
 
 	train_loader = torch.utils.data.DataLoader(dataset=data, batch_size=1, shuffle=True)
 

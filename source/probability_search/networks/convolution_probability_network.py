@@ -9,7 +9,6 @@ class ProbabilityFinder(nn.Module):
 	def __init__(self, batch_size):
 		# stick to 3x3 and 1x1 conv at the end
 		self.batch_size = batch_size
-		super(ProbabilityFinder, self).__init__()
 		self.conv1 = nn.Conv2d(1, 3, 3, padding="same")
 		self.conv2 = nn.Conv2d(3, 12, 3, padding="same")
 		self.conv3 = nn.Conv2d(12, 24, 5, padding="same")
