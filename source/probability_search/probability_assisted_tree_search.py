@@ -5,6 +5,7 @@ import random
 import matplotlib.pyplot as plt
 
 from networks.convolution_probability_network import ProbabilityFinder
+from networks.score_predictor import ScoreFinder
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__)) # root of the source file
 sys.path.insert(1, PROJECT_ROOT)
@@ -36,17 +37,6 @@ def createTestingShipWithCellsMissing(ship, n_cells_missing):
 	return initialState, removed_cells
 
 
-# turn a flattened output grid into a grid
-def modelOutputToGridAndScore(input_shape, model_output):
-	# BAD FIX- FIX IT QUICK
-	if len(model_output.shape) > 1:
-		model_output = model_output[0]
-	flattened_grid = model_output[:model_output.shape[0]-1]
-	grid = flattened_grid.reshape(input_shape)
-	score = model_output[-1]
-	return (grid, score)
-
-
 def transformToSolidStructure(matrix, threshold):
 	alive = np.argwhere(matrix.detach().numpy() > threshold)
 	newGrid = np.zeros_like(matrix.detach().numpy())
@@ -57,13 +47,10 @@ def transformToSolidStructure(matrix, threshold):
 class Board:
 
 	MAX_GRID = (10, 10)
-	N_CONSIDERATIONS = 2
+	N_CONSIDERATIONS = 3
 
-	def __init__(self, board, score):
-		if len(board.shape) < 3:
-			board = board[None, :]	# fix this
+	def __init__(self, board):
 		self.board = board
-		self.score = score
 		self.visited = 0
 		self.boardSize = self.board.shape[1:]
 
@@ -71,28 +58,28 @@ class Board:
 	def getPossibleActions(self):
 		candidateStates = []
 		
-		probability_matrix, _ = modelOutputToGridAndScore(self.boardSize, self.model(self.board))
-
+		probability_matrix = self.model(self.board)[0]
 		candidate_cells = list(np.argwhere(probability_matrix.detach().numpy() != 0))
 		candidate_cells.sort(key=lambda x: probability_matrix[x[0], x[1]])
+		print(candidate_cells)
+		plt.imshow(probability_matrix.detach(), cmap='gray_r', interpolation='nearest')	
+		plt.colorbar()
+		plt.show()
 
 		candidate_cells = candidate_cells[:Board.N_CONSIDERATIONS] + candidate_cells[-Board.N_CONSIDERATIONS:]
-		print(candidate_cells)
 
 		for candidate in candidate_cells:
 			newGrid = self.board.clone()
+			print(candidate)
 			newGrid[0, candidate[0], candidate[1]] = 1 - newGrid[0, candidate[0], candidate[1]] 
 
-			newGrid = transformToSolidStructure(newGrid, THRESHOLD)
-
-			_, newScore = modelOutputToGridAndScore(self.boardSize, self.model(newGrid))
-			candidateStates.append(Board(newGrid, newScore))
+			candidateStates.append(Board(newGrid))
 
 		return candidateStates
 
 
 	def getScore(self):
-		return self.score
+		return self.scoringModel(self.board).item()
 
 
 def nonStochasticProbabilityToStructure(probability_matrix):
@@ -107,12 +94,13 @@ def stochasticProbabilityToStructure(probability_matrix):
 	pass
 
 
-def tree_search(max_depth, model, currentState):
+def tree_search(max_depth, model, score_model, currentState):
 
-	_, currentScore = modelOutputToGridAndScore(currentState.shape[1:], model(currentState)[0])
-	currentState = Board(currentState, currentScore)
+	currentState = Board(currentState)
 	bestState = currentState
+
 	Board.model = model
+	Board.scoringModel = score_model
 	
 	exploredStates = []
 	actions = []
@@ -121,15 +109,16 @@ def tree_search(max_depth, model, currentState):
 		exploredStates.append(currentState)
 		actions = [action for action in currentState.getPossibleActions() if not action in exploredStates]
 		actions.sort(key=lambda x: x.getScore())
-
+		
 		if not actions:
-			currentState = max(exploredStates, key=lambda x: x.getScore() + x.visited)
+			currentState = max(exploredStates, key=lambda x: x.getScore() - x.visited)
 			currentState.visited += 1
 		else:
 			currentState = max(actions, key=lambda x: x.getScore())
 
 		if currentState.getScore() < bestState.getScore():
 			bestState = currentState
+			# MAYBE ADD A SHIP TESTING METHOD
 
 	print(f"Best score: {bestState.getScore()}")
 
@@ -140,25 +129,34 @@ def tree_search(max_depth, model, currentState):
 	return bestState
 	
 
-MAX_DEPTH = 30
-MODEL_NAME = "OUTPUT_SEND_THIS_BY_EMAIL"
+# LOAD THE PROBABILITY AND SCORING MODELS
+MODEL_NAME = "conv_only_5x5_included"
+SCORE_MODEL_NAME = "deconstructScoreOutputFile_3"
 
 model_path = os.path.join(ROOT_PATH, "models", MODEL_NAME)
 model = ProbabilityFinder(1).double()
 model.load_state_dict(torch.load(model_path))
 model.eval()
 
+score_model_path = os.path.join(ROOT_PATH, "models", SCORE_MODEL_NAME)
+score_model = ScoreFinder(1).double()
+score_model.load_state_dict(torch.load(score_model_path))
+score_model.eval()
+
+# LOAD THE SHIPS FOR TESTING
 rle_reader = RleReader()
 filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
 ships = rle_reader.getFileArray(filePath)
 
+MAX_DEPTH = 10
+
 # initialState = np.zeros((1, 10, 10))
-initialState, removed_cells = createTestingShipWithCellsMissing(ships[39], 10)
+initialState, removed_cells = createTestingShipWithCellsMissing(ships[55], 1)
 print(f"Removed cells (y, x): {removed_cells}")
 Board.MAX_GRID = (10, 10) 	# FIX THIS LATER
 
-plt.imshow(initialState[0], cmap='gray_r', interpolation='nearest')	
-plt.colorbar()
-plt.show()
+# plt.imshow(initialState[0], cmap='gray_r', interpolation='nearest')	
+# plt.colorbar()
+# plt.show()
 
-tree_search(MAX_DEPTH, model, initialState)
+tree_search(MAX_DEPTH, model, score_model, initialState)

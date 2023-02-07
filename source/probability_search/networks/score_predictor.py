@@ -14,7 +14,6 @@ class ScoreFinder(nn.Module):
 		self.scoreFC2 = nn.Linear(100, 1)
 
 		self.relu = nn.ReLU()
-		self.silu = nn.SiLU()
 		
 
 	def forward(self, x):

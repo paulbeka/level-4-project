@@ -143,7 +143,7 @@ def run_ship_network_tests():
 
 	## LOADING MODELS
 	pipeline = []
-	pipe_names = ["5x5_included_no_score"]
+	pipe_names = ["conv_only_5x5_included"]
 
 	for item in pipe_names:
 		model_path = os.path.join(ROOT_PATH, "models", item)
@@ -170,7 +170,7 @@ def getMatrixScore(original_matrix, matrix):
 
 def runScoringTests(n_iters):
 
-	model_name = "scoreOutputFile_1"
+	model_name = "deconstructScoreOutputFile_3"
 	model_path = os.path.join(ROOT_PATH, "models", model_name)
 	model = ScoreFinder(1).double()
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
@@ -184,7 +184,7 @@ def runScoringTests(n_iters):
 	}
 
 	for _ in range(n_iters):
-		for i, ship in enumerate(ships):
+		for i, ship in enumerate(ships[800:]):
 			n_cells_missing = random.randint(0, 100)
 			testStructure, _ = createTestingShipWithCellsMissing(ship, n_cells_missing)
 			score = model(testStructure).item()
@@ -216,5 +216,5 @@ if __name__ == "__main__":
 	filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)
 
-	# run_ship_network_tests()
-	runScoringTests(100)	# number input is number of iterations
+	run_ship_network_tests()
+	#runScoringTests(100)	# number input is number of iterations

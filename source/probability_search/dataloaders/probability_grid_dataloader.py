@@ -4,6 +4,7 @@ import torch
 import random
 import os
 import pickle
+import matplotlib.pyplot as plt
 
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -75,7 +76,7 @@ def ratioDeconstruct(ships, max_destruction_ratio, n_pairs, flip_other):
 
 
 # produce pairs of probability map -> solution to get to spaceship
-def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
+def getPairSolutions(train_ratio, n_pairs, batch_size, data_type="advanced_deconstruct"):
 	rle_reader = RleReader()
 	filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)[:800] # IMPORTANT: LAST 180 ARE FOR TESTING PURPOSES
@@ -99,7 +100,7 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	elif data_type == "deconstruct":
 		mock_data = deconstructReconstructPairs(ships)
 	elif data_type == "advanced_deconstruct":
-		mock_data = ratioDeconstruct(ships, 1, 5, True)
+		mock_data = ratioDeconstruct(ships, 1, 20, True)
 	else:
 		raise Exception("Not a valid data training type: use random, full, or empty.")
 
@@ -107,9 +108,6 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type):
 	for i, (ship, mock) in enumerate(zip(ships, mock_data)):
 		for mockItem in mock:
 			solution = ship.copy() - mockItem
-			score = getMatrixScore(solution, mockItem)
-			solution = solution.flatten()
-			solution = np.append(score, solution)
 			data.append((mockItem, solution))
 		print(f"Mock item {i}/{len(ships)} finished.")
 

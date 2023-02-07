@@ -54,7 +54,7 @@ for epoch in range(num_epochs):
 
 	print(f"Saving epoch {epoch+1}...")
 
-	torch.save(model.state_dict(), f"ratioDeconstructScoreOutputFile_{epoch+1}")
+	torch.save(model.state_dict(), f"deconstructScoreOutputFile_{epoch+1}")
 
 
 ### TESTING ###

@@ -54,7 +54,7 @@ def ratioDeconstructWithAddedRandomCells(ships, max_destruction_ratio, n_pairs):
 	return data
 
 
-def scoreDataloader(n_pairs, mode="ratio_deconstruct"):
+def scoreDataloader(n_pairs, mode="deconstruct"):
 	rle_reader = RleReader()
 	filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)[:800] # IMPORTANT: LAST 180 ARE FOR TESTING PURPOSES
@@ -64,17 +64,17 @@ def scoreDataloader(n_pairs, mode="ratio_deconstruct"):
 		sizes.append(ship.shape)
 
 	data = []
-	# for ship in ships:
-	# 	if mode == "random":
-	# 		mockList = [np.random.rand(ship.shape[0], ship.shape[1]) for _ in range(n_pairs)]
-	# 		scores = [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]
-	# 	elif mode == "deconstruct":
-	# 		mockList = [createTestingShipWithCellsMissing(ship, random.randint(0, 100))[0] for _ in range(n_pairs)]
-	# 		scores = [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]	
-	# 	elif mode == "ratio_deconstruct":
-	#		scores = ratioDeconstructWithAddedRandomCells(ships, 0.1, 1)
+	for ship in ships:
+		if mode == "random":
+			mockList = [np.random.rand(ship.shape[0], ship.shape[1]) for _ in range(n_pairs)]
+			scores = [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]
+		elif mode == "deconstruct":
+			mockList = [createTestingShipWithCellsMissing(ship, random.randint(0, 100))[0] for _ in range(n_pairs)]
+			scores = [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]	
 
-	data = ratioDeconstructWithAddedRandomCells(ships, 1, 10)
+		data += scores
+
+	# data = ratioDeconstructWithAddedRandomCells(ships, 1, 10)
 
 	train_loader = torch.utils.data.DataLoader(dataset=data, batch_size=1, shuffle=True)
 

@@ -1,15 +1,20 @@
 import torch
-import os
+import os, sys
 import numpy as np
 import matplotlib.pyplot as plt
 import random
 
 from networks.convolution_probability_network import ProbabilityFinder
 from dataloaders.probability_grid_dataloader import getPairSolutions
-from recursive_analytics import createTestingShipWithCellsMissing
+from analytics import createTestingShipWithCellsMissing
 
 
 ROOT_PATH = os.path.abspath(os.getcwd())
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__)) # root of the source file
+sys.path.insert(1, PROJECT_ROOT)
+
+from tools.rle_reader import RleReader  # in the tools class of source
 
 
 def nonStochasticProbabilityToStructure(probability_matrix):
@@ -32,22 +37,23 @@ def search(max_iter, model, currentState):
 		probability_matrix = model(currentState)
 		currentState += probability_matrix 
 
-		currentState = nonStochasticProbabilityToStructure(currentState)
+		# currentState = nonStochasticProbabilityToStructure(currentState)
 		# currentState = stochasticProbabilityToStructure(currentState)
 
-		# plt.imshow(currentState[0], cmap='gray_r', interpolation='nearest')	
+		# plt.imshow(probability_matrix[0].detach(), cmap='gray_r', interpolation='nearest')	
 		# plt.colorbar()
 		# plt.show()
 
 		# checkSpaceship(currentState)	# IMPLEMENT THE SPACESHIP CHECK
 
-	plt.imshow(currentState[0], cmap='gray_r', interpolation='nearest')	
+	# currentState = nonStochasticProbabilityToStructure(currentState)
+	plt.imshow(currentState[0].detach(), cmap='gray_r', interpolation='nearest')	
 	plt.colorbar()
 	plt.show()
 
 
-MAX_ITER = 1
-MODEL_NAME = "3_epoch_rand_addition_advanced_deconstruct"
+MAX_ITER = 5
+MODEL_NAME = "conv_only_5x5_included"
 
 model_path = os.path.join(ROOT_PATH, "models", MODEL_NAME)
 model = ProbabilityFinder(1).double()
@@ -55,10 +61,17 @@ model.load_state_dict(torch.load(model_path))
 model.eval()
 
 # Ship start with missing parts
-train, test = getPairSolutions(0.8, 1, 1, "empty")
+rle_reader = RleReader()
+filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
+ships = rle_reader.getFileArray(filePath)
+
 n_removed_cells = 1
-testIterator = iter(train)
-initialState, removed_cells = createTestingShipWithCellsMissing(testIterator.next()[1], n_removed_cells)
+initialState, removed_cells = createTestingShipWithCellsMissing(ships[77], n_removed_cells)
+print(removed_cells)
+
+plt.imshow(initialState[0].detach(), cmap='gray_r', interpolation='nearest')	
+plt.colorbar()
+plt.show()
 
 # Random start
 # initial_shape = (10, 19)

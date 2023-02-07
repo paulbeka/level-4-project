@@ -19,7 +19,7 @@ from dataloaders.probability_grid_dataloader import loadPairsFromFile
 
 
 ### HYPERPARAMETERS ###
-num_epochs = 20
+num_epochs = 10
 batch_size = 1
 learning_rate = 0.00005
 n_errors_per_spaceship = 15
