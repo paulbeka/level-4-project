@@ -11,11 +11,11 @@ from dataloaders.probability_grid_dataloader import getPairSolutions
 from dataloaders.probability_grid_dataloader import loadPairsFromFile
 
 
-# if not torch.cuda.is_available():
-# 	print("GPU IS NOT AVAILABLE AND HAS BEEN IMPROPERLY CONFIGURED.")
-# 	print("INSTALL THE NVIDIA DRIVER AND RETRY.")
-# 	print("EXITING.")
-# 	quit()
+if not torch.cuda.is_available():
+	print("GPU IS NOT AVAILABLE AND HAS BEEN IMPROPERLY CONFIGURED.")
+	print("INSTALL THE NVIDIA DRIVER AND RETRY.")
+	print("EXITING.")
+	quit()
 
 
 ### HYPERPARAMETERS ###
@@ -26,9 +26,9 @@ n_errors_per_spaceship = 15
 
 model =  ProbabilityFinder(batch_size).double()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# torch.cuda.set_device(device)
-# # model.to(device)
-# model.cuda(device)
+torch.cuda.set_device(device)
+# model.to(device)
+model.cuda(device)
 
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -46,7 +46,7 @@ for epoch in range(num_epochs):
 	print(f"Epoch: {epoch+1}/{num_epochs}")
 	for i, (configs, labels) in tqdm(enumerate(train_loader), desc="Training: ", total=len(train_loader)):
 		# load data into GPU
-		# configs, labels = configs.to(device), labels.to(device)
+		configs, labels = configs.to(device), labels.to(device)
 		
 		outputs = model(configs)
 		loss = criterion(outputs, labels)
