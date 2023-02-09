@@ -61,16 +61,16 @@ class Board:
 		probability_matrix = self.model(self.board)[0]
 		candidate_cells = list(np.argwhere(probability_matrix.detach().numpy() != 0))
 		candidate_cells.sort(key=lambda x: probability_matrix[x[0], x[1]])
-		print(candidate_cells)
 		plt.imshow(probability_matrix.detach(), cmap='gray_r', interpolation='nearest')	
 		plt.colorbar()
 		plt.show()
 
 		candidate_cells = candidate_cells[:Board.N_CONSIDERATIONS] + candidate_cells[-Board.N_CONSIDERATIONS:]
+		print(candidate_cells)
 
 		for candidate in candidate_cells:
 			newGrid = self.board.clone()
-			print(candidate)
+			# print(candidate)
 			newGrid[0, candidate[0], candidate[1]] = 1 - newGrid[0, candidate[0], candidate[1]] 
 
 			candidateStates.append(Board(newGrid))
@@ -130,12 +130,12 @@ def tree_search(max_depth, model, score_model, currentState):
 	
 
 # LOAD THE PROBABILITY AND SCORING MODELS
-MODEL_NAME = "conv_only_5x5_included"
+MODEL_NAME = "5x5_included_20_pairs_epoch_1"
 SCORE_MODEL_NAME = "deconstructScoreOutputFile_3"
 
 model_path = os.path.join(ROOT_PATH, "models", MODEL_NAME)
 model = ProbabilityFinder(1).double()
-model.load_state_dict(torch.load(model_path))
+model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 model.eval()
 
 score_model_path = os.path.join(ROOT_PATH, "models", SCORE_MODEL_NAME)
@@ -148,10 +148,10 @@ rle_reader = RleReader()
 filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
 ships = rle_reader.getFileArray(filePath)
 
-MAX_DEPTH = 10
+MAX_DEPTH = 2
 
 # initialState = np.zeros((1, 10, 10))
-initialState, removed_cells = createTestingShipWithCellsMissing(ships[55], 1)
+initialState, removed_cells = createTestingShipWithCellsMissing(ships[55], 2)
 print(f"Removed cells (y, x): {removed_cells}")
 Board.MAX_GRID = (10, 10) 	# FIX THIS LATER
 

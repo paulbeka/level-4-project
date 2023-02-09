@@ -35,7 +35,7 @@ def ratioDeconstructWithAddedRandomCells(ships, max_destruction_ratio, n_pairs):
 	for location, ship in enumerate(ships):
 		alive = np.argwhere(ship == 1)
 		n_max_deconstruct = min(int(len(alive) * max_destruction_ratio), len(alive)-1)
-		print(f"Ship {location}/{len(ships)} deconstructed.")
+		print(f"PHASE 2/2: Ship {location}/{len(ships)}")
 		for i in range(n_max_deconstruct):
 			for _ in range(n_pairs):
 				alive = np.delete(alive, [random.randint(0, len(alive)-1) for _ in range(i+1)], axis=0)
@@ -64,17 +64,15 @@ def scoreDataloader(n_pairs, mode="deconstruct"):
 		sizes.append(ship.shape)
 
 	data = []
-	for ship in ships:
-		if mode == "random":
-			mockList = [np.random.rand(ship.shape[0], ship.shape[1]) for _ in range(n_pairs)]
-			scores = [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]
-		elif mode == "deconstruct":
-			mockList = [createTestingShipWithCellsMissing(ship, random.randint(0, 100))[0] for _ in range(n_pairs)]
-			scores = [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]	
+	for i, ship in enumerate(ships):
+		print(f"PHASE 1/2: Ship {i}/{len(ships)}")
+		mockList = [np.random.rand(ship.shape[0], ship.shape[1]) for _ in range(n_pairs)]
+		data += [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]
+		
+		mockList = [createTestingShipWithCellsMissing(ship, random.randint(0, 100))[0] for _ in range(n_pairs)]
+		data += [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]	
 
-		data += scores
-
-	# data = ratioDeconstructWithAddedRandomCells(ships, 1, 10)
+	data += ratioDeconstructWithAddedRandomCells(ships, 1, 20)
 
 	train_loader = torch.utils.data.DataLoader(dataset=data, batch_size=1, shuffle=True)
 

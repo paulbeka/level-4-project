@@ -143,7 +143,7 @@ def run_ship_network_tests():
 
 	## LOADING MODELS
 	pipeline = []
-	pipe_names = ["conv_only_5x5_included"]
+	pipe_names = ["5x5_included_20_pairs_epoch_4"]
 
 	for item in pipe_names:
 		model_path = os.path.join(ROOT_PATH, "models", item)
@@ -152,12 +152,12 @@ def run_ship_network_tests():
 		model.eval()
 		pipeline.append(model)
 
-	MAX_ITER = 1	# the max amount of recursions
+	MAX_ITER = 10	# the max amount of recursions
 	MAX_REMOVE_COUNT = 40	# the maximum amount of cells to be removed
 
 	test_n_iters = [i+1 for i in range(MAX_ITER)]
 	remove_counts_list = [i+1 for i in range(MAX_REMOVE_COUNT)]
-	test_n_spaceships = 25
+	test_n_spaceships = 500
 
 	print(f"### N_SPACESHIPS = {test_n_spaceships} ###")
 	n_iter_results = [run_recursion_tests(pipeline, remove_counts_list, n_iters, test_n_spaceships) for n_iters in test_n_iters]
