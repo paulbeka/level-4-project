@@ -139,6 +139,7 @@ def displayResults(result):
 	plt.show()
 
 
+# TODO: ADD EXTRA CELLS THAT SHOULD NOT BE THERE (USE THE ADVANCED DECONSTRUCT METHOD)
 def run_ship_network_tests():
 
 	## LOADING MODELS
@@ -170,7 +171,7 @@ def getMatrixScore(original_matrix, matrix):
 
 def runScoringTests(n_iters):
 
-	model_name = "deconstructScoreOutputFile_3"
+	model_name = "deconstructScoreOutputFile_1"
 	model_path = os.path.join(ROOT_PATH, "models", model_name)
 	model = ScoreFinder(1).double()
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
@@ -211,10 +212,14 @@ def displayScoringTests(data):
 	plt.show()
 
 
+def analizeModel(model):
+	pass
+
+
 if __name__ == "__main__":
 	rle_reader = RleReader()
 	filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)
 
-	run_ship_network_tests()
-	#runScoringTests(100)	# number input is number of iterations
+	# run_ship_network_tests()
+	runScoringTests(100)	# number input is number of iterations

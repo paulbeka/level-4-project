@@ -33,7 +33,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 
 ### DATA LOADING ###
-train_loader = scoreDataloader(100) #number of fake items per ship
+train_loader = scoreDataloader(200) #number of fake items per ship
 print("Data loaded.")
 
 
@@ -43,7 +43,7 @@ for epoch in range(num_epochs):
 	print(f"Epoch: {epoch+1}/{num_epochs}")
 	for i, (configs, labels) in tqdm(enumerate(train_loader), desc="Training: ", total=len(train_loader)):
 		# load data into GPU
-		# configs, labels = configs.to(device), labels.to(device)
+		configs, labels = configs.to(device), labels.to(device)
 		
 		outputs = model(configs)
 		loss = criterion(outputs, labels)

@@ -128,6 +128,31 @@ def tree_search(max_depth, model, score_model, currentState):
 
 	return bestState
 	
+# algorithmically check if its a ship
+# maybe when you reach a small score or something
+def chechShip():
+	pass
+
+def search():
+
+	inputGrid = np.zeros(size)
+	inputGrid = strategicFill(inputGrid)
+
+	while searching:
+		results = tree_search(inputGrid)
+		ships = checkSpaceships(result)
+
+		if ships:
+			print("Found ships:")
+			for ship in ships:
+				outputShipData(ship)
+
+		inputGrid = optimizeInputGrid(results)
+	# Get an input grid with some cells set
+	# use the tree search and record the best ships
+	# then check if any are spaceships.
+	# if none, change the starting cells and redo
+	pass
 
 # LOAD THE PROBABILITY AND SCORING MODELS
 MODEL_NAME = "5x5_included_20_pairs_epoch_1"
