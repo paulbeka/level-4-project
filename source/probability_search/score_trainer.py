@@ -20,7 +20,7 @@ if not torch.cuda.is_available():
 ### HYPERPARAMETERS ###
 num_epochs = 10
 batch_size = 1
-learning_rate = 0.00005
+learning_rate = 0.0001
 
 model =  ScoreFinder(batch_size).double()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
