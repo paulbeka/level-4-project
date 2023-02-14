@@ -2,7 +2,6 @@ import numpy as np
 import torch
 import os
 import random
-import sys
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -10,14 +9,10 @@ from networks.convolution_probability_network import ProbabilityFinder
 from networks.score_predictor import ScoreFinder
 from dataloaders.probability_grid_dataloader import getPairSolutions
 
-
-PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__)) # root of the source file
-sys.path.insert(1, PROJECT_ROOT)
-
 ROOT_PATH = os.path.abspath(os.getcwd()) # current root of the probability search
 
-
-from tools.rle_reader import RleReader  # in the tools class of source
+from tools.rle_reader import RleReader
+from tools.testing import createTestingShipWithCellsMissing
 
 
 # ensures no values go above 1 or 0 when adding change  SIMPLIFY THE CODE ITS SHIT
@@ -56,24 +51,6 @@ def itercycle(model_pipeline, initialState, n_iters):
 			# workState -= modeled_change
 
 	return (workState[0], score)
-
-
-def createTestingShipWithCellsMissing(ship, n_cells_missing):
-	alive = np.argwhere(ship == 1)
-
-	removed_cells = []
-	for _ in range(min(len(alive)-1, n_cells_missing)):
-		cell_being_removed = random.randint(0, len(alive)-1)
-		removed_cells.append(tuple(alive[cell_being_removed]))
-		alive = np.delete(alive, cell_being_removed, axis=0)
-
-	initialState = np.zeros_like(ship)
-
-	initialState[alive[:, 0], alive[:, 1]] = 1
-	initialState = initialState[None, :]
-	initialState = torch.from_numpy(initialState)
-
-	return initialState, removed_cells
 
 
 def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
@@ -171,7 +148,7 @@ def getMatrixScore(original_matrix, matrix):
 
 def runScoringTests(n_iters):
 
-	model_name = "deconstructScoreOutputFile_1"
+	model_name = "deconstructScoreOutputFile_9"
 	model_path = os.path.join(ROOT_PATH, "models", model_name)
 	model = ScoreFinder(1).double()
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
@@ -218,7 +195,7 @@ def analizeModel(model):
 
 if __name__ == "__main__":
 	rle_reader = RleReader()
-	filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
+	filePath = os.path.join(ROOT_PATH, "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)
 
 	# run_ship_network_tests()

@@ -7,7 +7,7 @@ import pickle
 import matplotlib.pyplot as plt
 
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(1, PROJECT_ROOT)
 
 from tools.rle_reader import RleReader
@@ -27,11 +27,8 @@ def getMatrixScore(original_matrix, matrix):
 	return torch.nn.MSELoss()(torch.from_numpy(original_matrix), torch.from_numpy(matrix)).item()
 
 
-# make a pair for each deconstructed ship part and the probability network assosiated
-# MULTIPLE WAYS TO DO THIS:
-# 1. Remove 1 random cell and train it
-# 2. Remove 1 cell at a time and save every config	<--- WE'RE DOING THIS ONE RIGHT NOW
-# 3. Remove one cell and make solution matrix that specific cell
+
+# Remove 1 cell at a time and save every config	<--- WE'RE DOING THIS ONE RIGHT NOW
 def deconstructReconstructPairs(ships):
 	data = []
 	for ship in ships:
@@ -78,7 +75,7 @@ def ratioDeconstruct(ships, max_destruction_ratio, n_pairs, flip_other):
 # produce pairs of probability map -> solution to get to spaceship
 def getPairSolutions(train_ratio, n_pairs, batch_size, data_type="advanced_deconstruct"):
 	rle_reader = RleReader()
-	filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
+	filePath = os.path.join(PROJECT_ROOT, "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)[:800] # IMPORTANT: LAST 180 ARE FOR TESTING PURPOSES
 
 	sizes = []
@@ -120,13 +117,3 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type="advanced_decon
 	test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
 
 	return train_loader, test_loader
-
-
-def loadPairsFromFile(filename):
-	data = np.load(filename, allow_pickle=True)
-	with open('mock_data.pkl','rb') as f:
-		x = pickle.load(f)
-
-	train_loader = torch.utils.data.DataLoader(dataset=x, batch_size=1, shuffle=True)
-
-	return train_loader, None

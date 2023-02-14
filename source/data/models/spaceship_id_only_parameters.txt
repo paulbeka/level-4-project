@@ -1,1 +1,0 @@
-{"dataloader": [1000, 0.5, true, "C:\\Workspace\\level-4-project\\source\\data\\spaceship_identification", 1, false], "width": 100, "height": 100, "num_epochs": 5, "batch_size": 1}

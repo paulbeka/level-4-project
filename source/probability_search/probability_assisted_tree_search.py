@@ -1,5 +1,5 @@
 import torch
-import os, sys
+import os
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -7,41 +7,11 @@ import matplotlib.pyplot as plt
 from networks.convolution_probability_network import ProbabilityFinder
 from networks.score_predictor import ScoreFinder
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__)) # root of the source file
-sys.path.insert(1, PROJECT_ROOT)
+ROOT_PATH = os.path.abspath(os.getcwd()) # current root of the probability search
 
-ROOT_PATH = os.path.abspath(os.getcwd())
-
-from tools.rle_reader import RleReader  # in the tools class of source
-
-
-THRESHOLD = 0.1  # value to consider a probability value as a cell
-
-
-# for testing purposes
-def createTestingShipWithCellsMissing(ship, n_cells_missing):
-	alive = np.argwhere(ship == 1)
-
-	removed_cells = []
-	for _ in range(min(len(alive)-1, n_cells_missing)):
-		cell_being_removed = random.randint(0, len(alive)-1)
-		removed_cells.append(tuple(alive[cell_being_removed]))
-		alive = np.delete(alive, cell_being_removed, axis=0)
-
-	initialState = np.zeros_like(ship)
-
-	initialState[alive[:, 0], alive[:, 1]] = 1
-	initialState = initialState[None, :]
-	initialState = torch.from_numpy(initialState)
-
-	return initialState, removed_cells
-
-
-def transformToSolidStructure(matrix, threshold):
-	alive = np.argwhere(matrix.detach().numpy() > threshold)
-	newGrid = np.zeros_like(matrix.detach().numpy())
-	newGrid[0, alive[:, 1], alive[:, 2]] = 1
-	return torch.from_numpy(newGrid)
+from tools.rle_reader import RleReader 
+from tools.gol_tools import outputShipData
+from tools.testing import createTestingShipWithCellsMissing
 
 
 class Board:
@@ -89,15 +59,10 @@ def nonStochasticProbabilityToStructure(probability_matrix):
 	return matrix
 
 
-# implement this later
-def stochasticProbabilityToStructure(probability_matrix):
-	pass
-
-
-def tree_search(max_depth, model, score_model, currentState):
+def tree_search(max_depth, model, score_model, currentState, number_of_returns=5):
 
 	currentState = Board(currentState)
-	bestState = currentState
+	bestStates = [currentState]
 
 	Board.model = model
 	Board.scoringModel = score_model
@@ -117,71 +82,57 @@ def tree_search(max_depth, model, score_model, currentState):
 			currentState = max(actions, key=lambda x: x.getScore())
 
 		if currentState.getScore() < bestState.getScore():
-			bestState = currentState
-			# MAYBE ADD A SHIP TESTING METHOD
+			bestStates.append(currentState)
 
-	print(f"Best score: {bestState.getScore()}")
+	return bestStates[len(bestStates)-number_of_returns:]
 
-	plt.imshow(bestState.board[0].detach(), cmap='gray_r', interpolation='nearest')	
-	plt.colorbar()
-	plt.show()
 
-	return bestState
+def strategicFill(inputGrid):
+	# LOAD THE SHIPS FOR TESTING
+	rle_reader = RleReader()
+	filePath = os.path.join(ROOT_PATH, "spaceship_identification", "spaceships_extended.txt")
+	ships = rle_reader.getFileArray(filePath)
+	return createTestingShipWithCellsMissing(ships[84], 10)
 	
-# algorithmically check if its a ship
-# maybe when you reach a small score or something
-def chechShip():
+
+# maybe could take the set of all results and find cells which are included in all of them
+def optimizeInputGrid(inputGrid, results):
 	pass
 
+
 def search():
+
+	# LOAD THE PROBABILITY AND SCORING MODELS
+	MODEL_NAME = "5x5_included_20_pairs_epoch_1"
+	SCORE_MODEL_NAME = "deconstructScoreOutputFile_3"
+
+	model_path = os.path.join(ROOT_PATH, "models", MODEL_NAME)
+	model = ProbabilityFinder(1).double()
+	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+	model.eval()
+
+	score_model_path = os.path.join(ROOT_PATH, "models", SCORE_MODEL_NAME)
+	score_model = ScoreFinder(1).double()
+	score_model.load_state_dict(torch.load(score_model_path))
+	score_model.eval()
+
+	max_depth = 10
+	ship_found = []
 
 	inputGrid = np.zeros(size)
 	inputGrid = strategicFill(inputGrid)
 
 	while searching:
-		results = tree_search(inputGrid)
-		ships = checkSpaceships(result)
+		results = tree_search(max_depth, model, score_model, inputGrid)
 
-		if ships:
-			print("Found ships:")
-			for ship in ships:
-				outputShipData(ship)
+		for result in results:
+			data = outputShipData(result)
+			if data:
+				ship_found.append(data)
+				
 
-		inputGrid = optimizeInputGrid(results)
-	# Get an input grid with some cells set
-	# use the tree search and record the best ships
-	# then check if any are spaceships.
-	# if none, change the starting cells and redo
-	pass
+		inputGrid = optimizeInputGrid(results, results)
 
-# LOAD THE PROBABILITY AND SCORING MODELS
-MODEL_NAME = "5x5_included_20_pairs_epoch_1"
-SCORE_MODEL_NAME = "deconstructScoreOutputFile_3"
 
-model_path = os.path.join(ROOT_PATH, "models", MODEL_NAME)
-model = ProbabilityFinder(1).double()
-model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-model.eval()
-
-score_model_path = os.path.join(ROOT_PATH, "models", SCORE_MODEL_NAME)
-score_model = ScoreFinder(1).double()
-score_model.load_state_dict(torch.load(score_model_path))
-score_model.eval()
-
-# LOAD THE SHIPS FOR TESTING
-rle_reader = RleReader()
-filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
-ships = rle_reader.getFileArray(filePath)
-
-MAX_DEPTH = 2
-
-# initialState = np.zeros((1, 10, 10))
-initialState, removed_cells = createTestingShipWithCellsMissing(ships[55], 2)
-print(f"Removed cells (y, x): {removed_cells}")
-Board.MAX_GRID = (10, 10) 	# FIX THIS LATER
-
-# plt.imshow(initialState[0], cmap='gray_r', interpolation='nearest')	
-# plt.colorbar()
-# plt.show()
-
-tree_search(MAX_DEPTH, model, score_model, initialState)
+if __name__ == "__main__":
+	search()

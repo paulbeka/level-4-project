@@ -3,14 +3,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-
+# CHANGE THIS NETWORK TYPE COMPLETELY
 class ScoreFinder(nn.Module):
 
 	def __init__(self, batch_size):
 		super(ScoreFinder, self).__init__()
 
-		self.scorePooling = nn.AdaptiveAvgPool2d(20)
-		self.scoreFC1 = nn.Linear(20*20, 100)
+		self.scorePooling = nn.AdaptiveAvgPool2d(100)
+		self.scoreFC1 = nn.Linear(100*100, 100)
 		self.scoreFC2 = nn.Linear(100, 10)
 		self.scoreFC3 = nn.Linear(10, 1)
 

@@ -10,11 +10,11 @@ from networks.score_predictor import ScoreFinder
 from dataloaders.score_dataloader import scoreDataloader
 
 
-if not torch.cuda.is_available():
-	print("GPU IS NOT AVAILABLE AND HAS BEEN IMPROPERLY CONFIGURED.")
-	print("INSTALL THE NVIDIA DRIVER AND RETRY.")
-	print("EXITING.")
-	quit()
+# if not torch.cuda.is_available():
+# 	print("GPU IS NOT AVAILABLE AND HAS BEEN IMPROPERLY CONFIGURED.")
+# 	print("INSTALL THE NVIDIA DRIVER AND RETRY.")
+# 	print("EXITING.")
+# 	quit()
 
 
 ### HYPERPARAMETERS ###
@@ -24,9 +24,9 @@ learning_rate = 0.0001
 
 model =  ScoreFinder(batch_size).double()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-torch.cuda.set_device(device)
-# model.to(device)
-model.cuda(device)
+# torch.cuda.set_device(device)
+# # model.to(device)
+# model.cuda(device)
 
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)

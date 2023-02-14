@@ -1,10 +1,9 @@
 import numpy as np
 import torch
-import sys, os
+import os
 import random
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-sys.path.insert(1, PROJECT_ROOT)
+ROOT_PATH = os.path.abspath(os.getcwd()) # current root of the probability search
 
 from tools.rle_reader import RleReader
 
@@ -56,7 +55,7 @@ def ratioDeconstructWithAddedRandomCells(ships, max_destruction_ratio, n_pairs):
 
 def scoreDataloader(n_pairs, mode="deconstruct"):
 	rle_reader = RleReader()
-	filePath = os.path.join(PROJECT_ROOT, "data", "spaceship_identification", "spaceships_extended.txt")
+	filePath = os.path.join(ROOT_PATH, "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)[:800] # IMPORTANT: LAST 180 ARE FOR TESTING PURPOSES
 	
 	sizes = []
