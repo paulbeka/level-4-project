@@ -31,9 +31,6 @@ class Board:
 		probability_matrix = self.model(self.board)[0]
 		candidate_cells = list(np.argwhere(probability_matrix.detach().numpy() != 0))
 		candidate_cells.sort(key=lambda x: probability_matrix[x[0], x[1]])
-		plt.imshow(probability_matrix.detach(), cmap='gray_r', interpolation='nearest')	
-		plt.colorbar()
-		plt.show()
 
 		candidate_cells = candidate_cells[:Board.N_CONSIDERATIONS] + candidate_cells[-Board.N_CONSIDERATIONS:]
 		print(candidate_cells)
@@ -63,6 +60,7 @@ def tree_search(max_depth, model, score_model, currentState, number_of_returns=5
 
 	currentState = Board(currentState)
 	bestStates = [currentState]
+	bestScore = 1
 
 	Board.model = model
 	Board.scoringModel = score_model
@@ -81,7 +79,8 @@ def tree_search(max_depth, model, score_model, currentState, number_of_returns=5
 		else:
 			currentState = max(actions, key=lambda x: x.getScore())
 
-		if currentState.getScore() < bestState.getScore():
+		if currentState.getScore() < bestScore:
+			bestScore = currentState.getScore()
 			bestStates.append(currentState)
 
 	return bestStates[len(bestStates)-number_of_returns:]
@@ -92,7 +91,7 @@ def strategicFill(inputGrid):
 	rle_reader = RleReader()
 	filePath = os.path.join(ROOT_PATH, "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)
-	return createTestingShipWithCellsMissing(ships[84], 10)
+	return createTestingShipWithCellsMissing(ships[84], 10)[0]
 	
 
 # maybe could take the set of all results and find cells which are included in all of them
@@ -103,8 +102,8 @@ def optimizeInputGrid(inputGrid, results):
 def search():
 
 	# LOAD THE PROBABILITY AND SCORING MODELS
-	MODEL_NAME = "5x5_included_20_pairs_epoch_1"
-	SCORE_MODEL_NAME = "deconstructScoreOutputFile_3"
+	MODEL_NAME = "5x5_included_20_pairs_epoch_4"
+	SCORE_MODEL_NAME = "deconstructScoreOutputFile_1"
 
 	model_path = os.path.join(ROOT_PATH, "models", MODEL_NAME)
 	model = ProbabilityFinder(1).double()
@@ -119,14 +118,16 @@ def search():
 	max_depth = 10
 	ship_found = []
 
+	size = (20, 20)
 	inputGrid = np.zeros(size)
 	inputGrid = strategicFill(inputGrid)
 
+	searching = True
 	while searching:
 		results = tree_search(max_depth, model, score_model, inputGrid)
 
 		for result in results:
-			data = outputShipData(result)
+			data = outputShipData(np.array(result.board))
 			if data:
 				ship_found.append(data)
 				
