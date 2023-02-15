@@ -33,11 +33,9 @@ class Board:
 		candidate_cells.sort(key=lambda x: probability_matrix[x[0], x[1]])
 
 		candidate_cells = candidate_cells[:Board.N_CONSIDERATIONS] + candidate_cells[-Board.N_CONSIDERATIONS:]
-		print(candidate_cells)
 
 		for candidate in candidate_cells:
 			newGrid = self.board.clone()
-			# print(candidate)
 			newGrid[0, candidate[0], candidate[1]] = 1 - newGrid[0, candidate[0], candidate[1]] 
 
 			candidateStates.append(Board(newGrid))
@@ -47,13 +45,6 @@ class Board:
 
 	def getScore(self):
 		return self.scoringModel(self.board).item()
-
-
-def nonStochasticProbabilityToStructure(probability_matrix):
-	matrix = np.zeros_like(probability_matrix)
-	alive = np.argwhere(probability_matrix > 0.5)
-	matrix[alive[:, 0], alive[:, 1]] = 1
-	return matrix
 
 
 def tree_search(max_depth, model, score_model, currentState, number_of_returns=5):
@@ -91,12 +82,14 @@ def strategicFill(inputGrid):
 	rle_reader = RleReader()
 	filePath = os.path.join(ROOT_PATH, "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)
-	return createTestingShipWithCellsMissing(ships[84], 10)[0]
+	testShip, removed = createTestingShipWithCellsMissing(ships[80], 1)
+	print(removed)
+	return testShip
 	
 
 # maybe could take the set of all results and find cells which are included in all of them
 def optimizeInputGrid(inputGrid, results):
-	pass
+	return inputGrid
 
 
 def search():
@@ -115,24 +108,25 @@ def search():
 	score_model.load_state_dict(torch.load(score_model_path))
 	score_model.eval()
 
-	max_depth = 10
+	max_depth = 100
 	ship_found = []
 
 	size = (20, 20)
 	inputGrid = np.zeros(size)
 	inputGrid = strategicFill(inputGrid)
 
-	searching = True
-	while searching:
+	n_iters = 10
+	for i in range(n_iters):
 		results = tree_search(max_depth, model, score_model, inputGrid)
 
 		for result in results:
 			data = outputShipData(np.array(result.board))
 			if data:
+				print(data["rle"])
 				ship_found.append(data)
 				
-
-		inputGrid = optimizeInputGrid(results, results)
+		inputGrid = optimizeInputGrid(inputGrid, results)
+		print(f"Iteration {i+1}/{n_iters}")
 
 
 if __name__ == "__main__":

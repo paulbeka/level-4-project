@@ -20,7 +20,7 @@ class Game:
 				rule1=[2, 3], 
 				rule2=[3], 
 				randomStart=False, 
-				show_display=True):
+				show_display=False):
 
 		pygame.init()
 
@@ -181,17 +181,6 @@ class Game:
 		x = self.getNextState()
 		self.x_size, self.y_size = temp
 		return x
-
-
-	# find the pattern identity of an object
-	def patternIdentity(self, pattern):
-		modifiedPattern = pattern.copy()
-		if pattern.shape[1] != 2:
-			modifiedPattern = np.argwhere(pattern == 1)
-		reference = (min(modifiedPattern[:,0]), min(modifiedPattern[:,1]))
-		modifiedPattern[:, 0] -= reference[0]
-		modifiedPattern[:, 1] -= reference[1]
-		return modifiedPattern
 
 
 	### RENDERING MISC ITEMS ###
