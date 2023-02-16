@@ -12,7 +12,7 @@
 %==============================================================================
 %% METADATA
 \title{This will be the title one day}
-\author{Paul E. B. Bekaert}
+\author{Paul Bekaert}
 \date{September 14, 2018}
 
 \maketitle
@@ -39,7 +39,7 @@
 % Please note that you are under no obligation to sign 
 % this declaration, but doing so would help future students.
 %
-\def\consentname {Paul E. B. Bekaert} % your full name
+\def\consentname {Paul Bekaert} % your full name
 \def\consentdate {7 October 2022} % the date you agree
 %
 \educationalconsent
@@ -80,8 +80,6 @@
 % reset page numbering. Don't remove this!
 \pagenumbering{arabic} 
 
-Why should the reader care about what are you doing and what are you actually doing?
-
 \section{Motivation}
 
 The game of life has often been seen as a toy project. It is idealistic in its representation, as it is fully observable, episodic and deterministic. However, its simple rules give rise to complex structures that are not easy to find. Those structures can be large, and looking for them is unfeasible with the current methods. In general, conventional graph search methods adapted to the task are are used, but they are slow and require large amounts of memory \cite{list_of_search_algorithms}, and as mentioned, they cannot find objects that are too large. There is, as of yet, no efficient way to search for these structures, and the question remains if there is a way to do it.
@@ -90,18 +88,20 @@ The concept of using deep learning to find structures in cellular automata has n
 
 \section{Aims}
 
-In this paper, we will be trying to find interesting structures in the game of life. Our particular interest will be in oscillating objects that move a set amount of space, so-called 'Spaceships'. The main goal will be to test and see if neural networks can speed up the search, and how different deep learning techniques fare against each other and other conventional search methods. The expectation is that the network will greatly decrease the time it takes to find novel structures, or recognise structures that are classified as spaceships.
+In this paper, we will be trying to find interesting structures in the game of life. Our particular interest will be in oscillating objects that move a set amount of space, so-called 'Spaceships'. The main goal will be to test and see if neural networks can speed up the search, and how different deep learning techniques fare against each other and other conventional search methods. The expectation is that the network will greatly decrease the time it takes to find novel structures or structures already classified as spaceships.
+
+[MAYBE TALK ABOUT AIMS WITH GOL AND DEEP LEARNING]
 
 
 %==================================================================================================================================
 \chapter{Background}
-What did other people do, and how is it relevant to what you want to do?
+
 \section{The game of life}
 % ========
 
 \subsection{Rules}
 
-"The Game of Life" is a zero-player game invented by John Conway in 1969? which describes a cellular automata (CA) with a set of rules. The board is made out of a grid $n\times m$ is created, with each square being a cell. A cell is either dead or alive, represented as a $1$ or a $0$ respectively. The rules of the game can be defined in different ways, but the one John Conway proposed is the most well known. The neighbourhood of the cell is defined as Moore's neighbourhood, which is the 8 cells adjacent to the cell, diagonally and orthogonally. It can also be thought of as a $3\times 3$ matrix where the subject cell is placed in the middle. The number of neighbours the cell has is the number of cells alive that are present in the cell's Moore neighbourhood, $n$. We can then define the rules of the CA described in Life:
+"The Game of Life" is a zero-player game invented by John Conway in 1970 which describes a cellular automata (CA) with a set of rules. A cellular automata is a board is made out of a grid size $n\times m$ , with each square being a cell. A cell is either dead or alive, represented as a $1$ or a $0$ respectively. The rules of the game can be defined in different ways, but the one John Conway proposed is the most well known. The neighbourhood of the cell is defined as Moore's neighbourhood, which is the 8 cells adjacent to the cell, diagonally and orthogonally. It can also be thought of as a $3\times 3$ matrix where the subject cell is placed in the middle. The number of neighbours the cell has is the number of cells alive that are present in the cell's Moore neighbourhood, $n$. We can then define the rules of the CA described in Life:
 
 \begin{itemize}
     \item A dead cell turns into a living cell if $n \geq 3$
@@ -119,11 +119,6 @@ A state at $t+1$ is entirely dependant on the current state at $t$ and is calcul
 \includegraphics[width=0.9\linewidth, height=6cm]{dissertation/images/moores_law.png} 
 \caption{Moore's Neighbourhood}
 \label{fig:subim1}
-\end{subfigure}
-\begin{subfigure}{0.5\textwidth}
-\includegraphics[width=0.9\linewidth, height=6cm]{dissertation/images/boxplot_finger_distance.pdf}
-\caption{Another one}
-\label{fig:subim2}
 \end{subfigure}
 
 \caption{Examples of Moore's neighbourhood}
@@ -147,246 +142,178 @@ The speed of a spaceship is determined in terms of the speed of light of GoL, $c
 A further way to classify spaceships is by their type. 
 % should you explain this?
 
-Examples of spaceships:
+Examples of spaceships [ADD MORE EXAMPLES]:
 
+\begin{figure}[h]
+\includegraphics[width=0.9\linewidth, height=6cm]{dissertation/images/glider.png} 
+\caption{The glider}
+\label{fig:subim1}
+\end{figure}
 
 % ========
 \section{Existing Search Methods}
 
-\subsection{Brute Force Search of Spaceships}
+There are not many papers on the subject, but one notable paper is "Searching for Spaceships" \cite{searching_for_spaceships}, which uses an algorithm "gfind", using a mix of breadth first search and depth first iterative deepening. The search takes place row-by-row, and uses a pre-calculated hash table of cell configurations to remove impossible rows from the search, narrowing down the graph. This method only works for small periods, as larger ones run out of memory quite quickly. It also only finds orthogonal spaceships, and they must be symmetrical along one of its axis. It was used to find some common spaceships, and did improve on speed, but did have its limitations.
 
-Brute force search for the game of life is wildly inefficient. The problem, as with most brute force algorithms, is that there are too many possibilities to check, and therefore a comprehensive search is impossible with current processing power. In a given $n \times m$ grid, there are $2^{n \times m}$ possible combinations. For example, a glider, which takes at least a $3x3$ grid to be represented, would be found by searching $2^{9}$ grids. Brute force becomes unfeasible after approximately $n > 6, m > 6$. These algorithms tend not to have much use, but have found a comprehensive list of all still-lives, oscillators, and spaceships within a small rectangle.
- 
-\subsection{Graph Search}
+Another well known algorithm to find spaceships or oscillators is "lifesrc" created by David Bell, uses a depth first backtracking search. The grid is first set up with a few 'known' cells, set by the user. The rest of the cells are classed as 'unknown'. When the algorithm starts running, a decision is made on whether a cell should be alive or not, and the program will check forward and backward if there are any oscillating patterns of period $p$ set by the user. If nothing is found, the search continues, using the decided cell. If it is found later on that a cell placement in a particular cell is impossible, or that there are no oscillators in a particular configuration, then the algorithm will backtrack to the latest cell it decided on randomly. This is essentially a depth first search, however it discards certain sub-trees by eliminating ones that do not follow the Life rules (for example, checking if every cell is alive in a $4 \times 4$ grid would be redundant, since almost all cells in that grid would die in the next iteration). 
 
-One notable paper is "Searching for Spaceships" \cite{searching_for_spaceships}, which uses an algorithm "gfind", using a mix of breadth first search and depth first iterative deepening. The search takes place row-by-row, and uses a pre-calculated hash table of cell configurations to remove impossible rows from the search, narrowing down the graph. This method only works for small periods, as larger ones run out of memory quite quickly. It also only finds orthogonal spaceships, and they must be symmetrical along one of its axis. It was used to find some common spaceships, and did improve on speed, but did have its limitations.
-
-Another well known algorithm to find spaceships or oscillators is "lifesrc" created by David Bell, uses a depth first backtracking search. The grid is first set up with a few 'known' cells, set by the user. The rest of the cells are classed as 'unknown'. When the algorithm starts running, a decision is made on whether a cell should be alive or not, and the program will check forward and backward if there are any oscillating patterns of period $p$ set by the user. If nothing is found, the search continues, using the decided cell. If it is found later on that a cell placement in a particular cell is impossible, or that there are no oscillators in a particular configuration, then the algorithm will backtrack to the latest cell it decided on randomly. This is essentially a depth first search, however it discards certain sub-trees by eliminating ones that do not follow the Life rules (for example, checking if every cell is alive would be redundant, since there would be no oscillators in that configuration). This algorithm is efficient and was used to find a lot of the different life spaceships or oscillators.
+The most efficient algorithm used to find spaceships today is dubbed the 'ikpx2' algorithm, which was created by Adam P. Goucher. It was inspired by gfind, which searches De Bruijn graphs representing the different parts of a spaceship. However, ikpx reduces the spaceship search problem into a set of SAT constraints, which can then be used on an SAT solver. The solver used in question is the "iglucose" \cite{sat_2018} SAT solver and sped up the search considerably, as a lot of research has gone into accelerating SAT solvers. A notable find by the ikpx2 algorith was the 'knightship': the first oblique spaceship found, or in other words, a spaceships that does not move diagonally nor orthogonally.
 
 \section{Deep Learning with the GoL in General}
 
-There are a few research papers written on neural networks and the game of life,
-paper about forward learning GoL
-paper about population density
+There are a few research papers written on neural networks and the game of life, with one notable one being about forward planning in the GoL \cite{game_of_life_dl_is_hard}. In this paper, they try to predict the future structure of a starting configuration. They used several 1x1 and 3x3 convolutional layers in their network, activated by ReLU functions. Although the model was able to perfectly predict the next iteration of the game, the further the model tries to predict, the worse the result. The problem hypothesised by Springer is the 'lottery ticket problem', in which the starting configuration of the model is what would allow it to converge to a correct solution. [MAKE SURE THIS IS CORRECT AND REPHRASE]
 
-Apart from research done, there are many hobbyists working on combining deep learning with GoL. One of them is James McGuigan, who trained a neural network to learn the game of life after one iteration. He also worked on reversing the game of life, trying to find a previous configuration using a current board state. Another notable use of deep learning and the game of life is by NeatAI, who used genetic algorithms in the game of life \cite{neatai_gol}. He used a $c$ function that calculates the overall 'complexity' of the current structures in the grid. For example, a grid with random cells is not very interesting, but one that has a couple of gliders and oscillators with high periods may be of more interest. To design his $c£$ function, he took inspiration from a paper by \cite{algorithmic_specified_complexity}, which describes a process of encoding interesting objects in the game of life. It uses features of an object such as shift, repeating period, intersection between 2 or more objects, to define the properties of such an object, These properties are then bit-encoded to form a number that specifies the complexity of the object. To find the complexity of a particular state on a board, the sum of the object complexities is taken.
+Apart from research done, there are many hobbyists working on combining deep learning with GoL. One of them is James McGuigan, who trained a neural network to learn the game of life after one iteration. He has also worked on reversing the game of life, trying to find a previous configuration using a current board state. Another notable use of deep learning and the game of life is by NeatAI, who used genetic algorithms in the game of life \cite{neatai_gol}. He used a $c$ function that calculates the overall 'complexity' of the current structures in the grid. For example, a grid with random cells is not very interesting, but one that has a couple of gliders and oscillators with high periods may be of more interest. To design his $c£$ function, he took inspiration from a paper by \cite{algorithmic_specified_complexity}, which describes a process of encoding interesting objects in the game of life. It uses features of an object such as shift, repeating period, intersection between 2 or more objects, to define the properties of such an object, These properties are then bit-encoded to form a number that specifies the complexity of the object. To find the complexity of a particular state on a board, the sum of the object complexities is taken.
 
 NeatAI took this $c$ function and applied it to a neural network which determined whether or not a cell should be alive given the input parameters $x$, $y$, population density, and bias. He then used genetic neural networks to improve his model to maximize the $c$ function. The net improved by making optimal start configurations for the model to evolve into. This is an interesting concept, as if the $c$ function were to be changed to be maximised by how far a pattern has reached from the origin, it could potentially be used to find new spaceships for example.
 
 %==================================================================================================================================
 
-\chapter{Analysis/Requirements}
-What is the problem that you want to solve, and how did you arrive at it?
-\section{Guidance}
-Make it clear how you derived the constrained form of your problem via a clear and logical process. 
+\chapter{Analysis}
+
+\section{Different ways to find spaceships}
+
+The problem we're trying to solve is to find spaceships. These are, as explained above, structures that repeat inside of a game of life grid, but also move a certain amount of space. This is a widely known toy problem, however it is an NP-hard problem, which means brute force is out of the question. In a given $n \times m$ grid, there are $2^{n \times m}$ possible combinations. For example, a glider, which takes at least a $3x3$ grid to be represented, would be found by searching $2^{9}$ grids. Brute force becomes unfeasible after approximately $n > 6, m > 6$. This algorithm tends not to have much use, but it has found a comprehensive list of all still-lives, oscillators, and spaceships within a small rectangle.
+
+A better approach is representing the board as a graph. By representing each cell as a path- a path where the cell is either alive or a path where the cell is dead- a tree search method can be used. This is the method used in most algorithms today, by trying to optimize which cell should be placed next. Some combinations of cells should not be placed together as the result would be incompatible with a spaceship, and therefore the algorithm can eliminate entire sub-trees from the search space.
+
+In Searching for Spaceships \cite{searching_for_spaceships}, a de Bruijn graph is used to represent the cells. The algorithm only works on one side of the ship, and assumes the other to be symmetrical. A ship is then constructed by applying the GoL rules to rows of the ship, and placing the formed cell in front of the ship in the direction it will move. To visualize this, imagine the grid follows the ship as it is moving, so that the ship looks like it is simply oscillating. A future oscillation can therefore be predicted by taking the evolution of the spaceship for every row of 3, and applying it $p$ (the speed of the ship) cells above the evolution, as it would reach that point p next iteration. This approach has one major drawback- any spaceship that is not a "long" spaceship will not be detected. The search space also does not include non-symmetrical spaceships, of which there are many.
+
+% should this be in the background section?
+\section{Similar Problems and how they are Solved}
+
+MAYBE TALK ABOUT CHESS OR SOMETHING HERE
+
+\section{The Main Assumption}
+Neural networks are good at detecting general patterns which can be hard to detect as humans. There has been a lot of debate in the GoL community about an underlying pattern to spaceships. There have been methods by the community which use "spaceship engineering" - combining multiple identified sub-parts of spaceships to make a new moving ship. However, there has yet to be a formalized equation or pattern found to help fast-track the search of such ships. To use a neural network for this problem, the approach taken in this paper revolves around the assumption that spaceships have an underlying pattern which is detectable to a neural network. Although there are not many spaceships, data expansion methods are used to gather more data, and convolutional techniques are used to train the network.
+% maybe add stuff about the scoring algorithm here?
+
+\section{The Solution in this Paper}
+
 
 %==================================================================================================================================
 \chapter{Design}
 How is this problem to be approached, without reference to specific implementation details? 
-\section{Guidance}
-Design should cover the abstract design in such a way that someone else might be able to do what you did, but with a different language or library or tool.
+
+\section{The Networks}
+There are two main networks that this algorithm will use to guide the search:
+\begin{itemize}
+    \item The probability network: used to find which cells should be modified
+    \item The scoring network: used as a heuristic function
+\end{itemize}
+The probability network uses a fully convolutional network without pooling layers. The network follows two $3 \times 3$ convolutions, with out channels of 3 and 12. This is followed by a $1 \times 1$ convolution with an out channel of 24, and finally two $5 \times 5$ layers with out channels 48 and 96. The final convolution is a dimensional reduction, reducing the out channels to 1. Each convolutional layer except the last uses a swish activation function/ Additionally, padding is used to keep the input size the same as the output size.
+
+The network takes as input a configuration of cells with values ranging from 0 to 1. The 
+
+- talk about the scoring network
+
+\section{Data used to train the network}
+- What spaceship sizes used
+- Expansion of the data
+- Deconstruction of data
+- Modifying data to predict the change in probability
+- Scoring data and random configuration
+
+
+\section{The Algorithm}
+
+- talk about joining everything together
+
+The algorithm is a standard tree search, but uses two neural networks to help accelerate it. The first network is trained to predict the probability change that a cell should be present given a structure. This will then be used in a tree search algorithm, with branches generated given the highest changes in probability. The second network is trained to predict the mean square error of a given configuration. This is to be used as a heuristic for the A* algorithm.
+
+The probability prediction network receives as input a grid of arbitrary size with probability values between 0 and 1. The network will then predict a change in probability grid. The highest changes in probability (positive or negative) are then applied to a new grid. these grids then become the branches of a node. Using the scoring network, the grid with the lowest score is then chosen to be the next node. This is effectively an A* search technique.
+
 
 %==================================================================================================================================
 \chapter{Implementation}
-What did you do to implement this idea, and what technical achievements did you make?
-\section{Guidance}
-You can't talk about everything. Cover the high level first, then cover important, relevant or impressive details.
 
+ALSO TALK ABOUT PROTOTYPES AND WHY THEY DIDN'T WORK, A PAGE FOR ALL OF THE FAILED ATTEMPTS COMBINED
 
+TALK ABOUT HOW TO IMPLEMENT THE DESIGN: PYTORCH, PIPELINE, ETC (15-18 pages, bulk of the report)
+
+2 main approaches tried:
+- Trying to determine a spaceship or not
+    - and hence, switching a cell will tell you if it improves the probability of the grid being a spaceship or not
+    - This did not work, as a change in 1 cell was not enough to train
+    - Training networks tried includes: Using a CNN, 100x100 static, removing n cells and training the network, showing spaceships compared to random data.
+- Using a probability grid to determine the most probable cells to place now 
+    - Training method: used a CNN with the same output as input. 
+    - The model will take an input of cell probabilities, and output a change of probabilties.
+    - Different datasets trained on: full 1s with solution being what cells to remove, full 0s with solution being spaceship itself, random noise with solution being change to make it into spaceship, and deconstructing the ship cell by cell and training on every iteration.
 
 \section{General points}
-
 These points apply to the whole dissertation, not just this chapter.
 
 
+\section{Software Engineering Practices}
 
-\subsection{Figures}
-\emph{Always} refer to figures included, like Figure \ref{fig:relu}, in the body of the text. Include full, explanatory captions and make sure the figures look good on the page.
-You may include multiple figures in one float, as in Figure \ref{fig:synthetic}, using \texttt{subcaption}, which is enabled in the template.
-
-
-
-% Figures are important. Use them well.
-\begin{figure}
-    \centering
-    \includegraphics[width=0.5\linewidth]{images/relu.pdf}    
-
-    \caption{In figure captions, explain what the reader is looking at: ``A schematic of the rectifying linear unit, where $a$ is the output amplitude,
-    $d$ is a configurable dead-zone, and $Z_j$ is the input signal'', as well as why the reader is looking at this: 
-    ``It is notable that there is no activation \emph{at all} below 0, which explains our initial results.'' 
-    \textbf{Use vector image formats (.pdf) where possible}. Size figures appropriately, and do not make them over-large or too small to read.
-    }
-
-    % use the notation fig:name to cross reference a figure
-    \label{fig:relu} 
-\end{figure}
+- calendar tracking
+- waterfall
+- github repo
+- weights and biases
+To keep up with all the work, I logged the hours. I also used a waterfall development technique, where I completed the work one step at a time. 
 
 
-\begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{images/synthetic.png}
-        \caption{Synthetic image, black on white.}
-        \label{fig:syn1}
-    \end{subfigure}
-    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
-      %(or a blank line to force the subfigure onto a new line)
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{images/synthetic_2.png}
-        \caption{Synthetic image, white on black.}
-        \label{fig:syn2}
-    \end{subfigure}
-    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
-    %(or a blank line to force the subfigure onto a new line)    
-    \caption{Synthetic test images for edge detection algorithms. \subref{fig:syn1} shows various gray levels that require an adaptive algorithm. \subref{fig:syn2}
-    shows more challenging edge detection tests that have crossing lines. Fusing these into full segments typically requires algorithms like the Hough transform.
-    This is an example of using subfigures, with \texttt{subref}s in the caption.
-    }\label{fig:synthetic}
-\end{figure}
+\section {Unsuccessful Attempts}
 
-\clearpage
+\subsection{Ship Likelihood}
+My first try to solve this problem revolved over giving structures a "score" as to how close they are to being a spaceship. The idea was that if I could teach a network what is a ship or not, and it could output the likelihood of the structure being a spaceship. 
 
-\subsection{Equations}
+I used several convolutions and pooling, followed by a adaptive convolutional layer which I then fed to a fully connected network. This would then produce a probability of the structure being a spaceship.
 
-Equations should be typeset correctly and precisely. Make sure you get parenthesis sizing correct, and punctuate equations correctly 
-(the comma is important and goes \textit{inside} the equation block). Explain any symbols used clearly if not defined earlier. 
+I hypothesise this technique did not work for several reasons: The pooling lost information about the structure, the fully connected network was not able to properly converge, and the output was a softmax which was unreliable. Furthermore, the ships were compared with noisy data. Ships often had a lot of whitespace around them which made them easy to identify, and no solid features could be used.
 
-For example, we might define:
-\begin{equation}
-    \hat{f}(\xi) = \frac{1}{2}\left[ \int_{-\infty}^{\infty} f(x) e^{2\pi i x \xi} \right],
-\end{equation}    
-where $\hat{f}(\xi)$ is the Fourier transform of the time domain signal $f(x)$.
+I fed this neural network to a tree search which worked by flipping cells off and on and checking if the probability of the structure being a spaceship increased. This did not work very well, already because the network did not produce good results, but also because the fully connected layer meant that changing a single cell did not change the final output much.
 
-\subsection{Algorithms}
-Algorithms can be set using \texttt{algorithm2e}, as in Algorithm \ref{alg:metropolis}.
+\section{Challenges faced}
 
-% NOTE: line ends are denoted by \; in algorithm2e
-\begin{algorithm}
-    \DontPrintSemicolon
-    \KwData{$f_X(x)$, a probability density function returing the density at $x$.\; $\sigma$ a standard deviation specifying the spread of the proposal distribution.\;
-    $x_0$, an initial starting condition.}
-    \KwResult{$s=[x_1, x_2, \dots, x_n]$, $n$ samples approximately drawn from a distribution with PDF $f_X(x)$.}
-    \Begin{
-        $s \longleftarrow []$\;
-        $p \longleftarrow f_X(x)$\;
-        $i \longleftarrow 0$\;
-        \While{$i < n$}
-        {
-            $x^\prime \longleftarrow \mathcal{N}(x, \sigma^2)$\;
-            $p^\prime \longleftarrow f_X(x^\prime)$\;
-            $a \longleftarrow \frac{p^\prime}{p}$\;
-            $r \longleftarrow U(0,1)$\;
-            \If{$r<a$}
-            {
-                $x \longleftarrow x^\prime$\;
-                $p \longleftarrow f_X(x)$\;
-                $i \longleftarrow i+1$\;
-                append $x$ to $s$\;
-            }
-        }
-    }
-    
-\caption{The Metropolis-Hastings MCMC algorithm for drawing samples from arbitrary probability distributions, 
-specialised for normal proposal distributions $q(x^\prime|x) = \mathcal{N}(x, \sigma^2)$. The symmetry of the normal distribution means the acceptance rule takes the simplified form.}\label{alg:metropolis}
-\end{algorithm}
+TALK ABOUT HOW YOU TRIED DIFFERENT APPROACHES OF WORKING, THE SIZE OF THE NETWORK AND HOW YOU HAD TO RUN IT ON A DIFFERENT COMPUTER, AND GENERAL FUCKERY THAT HAPPENED DURING THE PROJECT
 
-\subsection{Tables}
+\section{Probability Search}
 
-If you need to include tables, like Table \ref{tab:operators}, use a tool like https://www.tablesgenerator.com/ to generate the table as it is
-extremely tedious otherwise. 
+\subsection{Choice of Technologies}
 
-\begin{table}[]
-    \caption{The standard table of operators in Python, along with their functional equivalents from the \texttt{operator} package. Note that table
-    captions go above the table, not below. Do not add additional rules/lines to tables. }\label{tab:operators}
-    %\tt 
-    \rowcolors{2}{}{gray!3}
-    \begin{tabular}{@{}lll@{}}
-    %\toprule
-    \textbf{Operation}    & \textbf{Syntax}                & \textbf{Function}                            \\ %\midrule % optional rule for header
-    Addition              & \texttt{a + b}                          & \texttt{add(a, b)}                                    \\
-    Concatenation         & \texttt{seq1 + seq2}                    & \texttt{concat(seq1, seq2)}                           \\
-    Containment Test      & \texttt{obj in seq}                     & \texttt{contains(seq, obj)}                           \\
-    Division              & \texttt{a / b}                          & \texttt{div(a, b) }  \\
-    Division              & \texttt{a / b}                          & \texttt{truediv(a, b) } \\
-    Division              & \texttt{a // b}                         & \texttt{floordiv(a, b)}                               \\
-    Bitwise And           & \texttt{a \& b}                         & \texttt{and\_(a, b)}                                  \\
-    Bitwise Exclusive Or  & \texttt{a \textasciicircum b}           & \texttt{xor(a, b)}                                    \\
-    Bitwise Inversion     & \texttt{$\sim$a}                        & \texttt{invert(a)}                                    \\
-    Bitwise Or            & \texttt{a | b}                          & \texttt{or\_(a, b)}                                   \\
-    Exponentiation        & \texttt{a ** b}                         & \texttt{pow(a, b)}                                    \\
-    Identity              & \texttt{a is b}                         & \texttt{is\_(a, b)}                                   \\
-    Identity              & \texttt{a is not b}                     & \texttt{is\_not(a, b)}                                \\
-    Indexed Assignment    & \texttt{obj{[}k{]} = v}                 & \texttt{setitem(obj, k, v)}                           \\
-    Indexed Deletion      & \texttt{del obj{[}k{]}}                 & \texttt{delitem(obj, k)}                              \\
-    Indexing              & \texttt{obj{[}k{]}}                     & \texttt{getitem(obj, k)}                              \\
-    Left Shift            & \texttt{a \textless{}\textless b}       & \texttt{lshift(a, b)}                                 \\
-    Modulo                & \texttt{a \% b}                         & \texttt{mod(a, b)}                                    \\
-    Multiplication        & \texttt{a * b}                          & \texttt{mul(a, b)}                                    \\
-    Negation (Arithmetic) & \texttt{- a}                            & \texttt{neg(a)}                                       \\
-    Negation (Logical)    & \texttt{not a}                          & \texttt{not\_(a)}                                     \\
-    Positive              & \texttt{+ a}                            & \texttt{pos(a)}                                       \\
-    Right Shift           & \texttt{a \textgreater{}\textgreater b} & \texttt{rshift(a, b)}                                 \\
-    Sequence Repetition   & \texttt{seq * i}                        & \texttt{repeat(seq, i)}                               \\
-    Slice Assignment      & \texttt{seq{[}i:j{]} = values}          & \texttt{setitem(seq, slice(i, j), values)}            \\
-    Slice Deletion        & \texttt{del seq{[}i:j{]}}               & \texttt{delitem(seq, slice(i, j))}                    \\
-    Slicing               & \texttt{seq{[}i:j{]}}                   & \texttt{getitem(seq, slice(i, j))}                    \\
-    String Formatting     & \texttt{s \% obj}                       & \texttt{mod(s, obj)}                                  \\
-    Subtraction           & \texttt{a - b}                          & \texttt{sub(a, b)}                                    \\
-    Truth Test            & \texttt{obj}                            & \texttt{truth(obj)}                                   \\
-    Ordering              & \texttt{a \textless b}                  & \texttt{lt(a, b)}                                     \\
-    Ordering              & \texttt{a \textless{}= b}               & \texttt{le(a, b)}                                     \\
-    % \bottomrule
-    \end{tabular}
-    \end{table}
-\subsection{Code}
+Since the idea of the project was to use neural networks to accelerate spaceship search, I needed something like Pytorch for the deep learning.
+- Pytorch
+- github?
+- matplotlib?
+- numpy/pandas??
+,
 
-Avoid putting large blocks of code in the report (more than a page in one block, for example). Use syntax highlighting if possible, as in Listing \ref{lst:callahan}.
+\subsection{Architecture of the network}
 
-\begin{lstlisting}[language=python, float, caption={The algorithm for packing the $3\times 3$ outer-totalistic binary CA successor rule into a 
-    $16\times 16\times 16\times 16$ 4 bit lookup table, running an equivalent, notionally 16-state $2\times 2$ CA.}, label=lst:callahan]
-    def create_callahan_table(rule="b3s23"):
-        """Generate the lookup table for the cells."""        
-        s_table = np.zeros((16, 16, 16, 16), dtype=np.uint8)
-        birth, survive = parse_rule(rule)
+The implementation which gave me the most results was as mentioned above, several convolutions (without a pooling layer), and a fully connected network for the probability score. This was done using PyTorch. The layers consisted of [MAKE A DIAGRAM OUT OF THIS]:
+\begin{itemize}
+  \item A first convolution with a 3x3 matrix using a swift activation function
+  \item A second convolution with a 3x3 matrix using a swift activation function
+  \item A third convolution with a 3x3 matrix using a swift activation function
+  \item A fourth convolution with a 3x3 matrix using a swift activation function
+  \item A final convolution merging the kernels into one (grid probability output here)
+  \item An adaptive pooling of this probability grid into a 100 x 100 tensor 
+  \item A fully connected 100 x 100 layer that took the output of the pooling to a 100 tensor layer, using a relu function
+  \item Lastly, a linear layer which outputted the 'score' of the prediction
+\end{itemize}
 
-        # generate all 16 bit strings
-        for iv in range(65536):
-            bv = [(iv >> z) & 1 for z in range(16)]
-            a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p = bv
 
-            # compute next state of the inner 2x2
-            nw = apply_rule(f, a, b, c, e, g, i, j, k)
-            ne = apply_rule(g, b, c, d, f, h, j, k, l)
-            sw = apply_rule(j, e, f, g, i, k, m, n, o)
-            se = apply_rule(k, f, g, h, j, l, n, o, p)
+\subsection{Graph search}
 
-            # compute the index of this 4x4
-            nw_code = a | (b << 1) | (e << 2) | (f << 3)
-            ne_code = c | (d << 1) | (g << 2) | (h << 3)
-            sw_code = i | (j << 1) | (m << 2) | (n << 3)
-            se_code = k | (l << 1) | (o << 2) | (p << 3)
+The graph search was relatively simple and is based off of A*. The search starts with a few "set" cells. This initial grid is fed to the model. The model then returns a probability grid with the change of probabilities. The top change in probabilities are taken, and the cell values are switched. All these swtiched cells are put through the model again, and the 
 
-            # compute the state for the 2x2
-            next_code = nw | (ne << 1) | (sw << 2) | (se << 3)
 
-            # get the 4x4 index, and write into the table
-            s_table[nw_code, ne_code, sw_code, se_code] = next_code
-
-        return s_table
-
-\end{lstlisting}
 
 %==================================================================================================================================
 \chapter{Evaluation} 
 How good is your solution? How well did you solve the general problem, and what evidence do you have to support that?
 
+        Answer them with precise evidence (graphs, numbers, statistical
+        analysis, qualitative analysis).
+        Used an average improvement of the different cells, ie, cells that were supposed to be there should have a higher probabiltiy score change; those that were not supposed to be there should have a small change in score (negative), etc. Graphed this for number of iterations along with the number of cells removed and such.
+        I also tested the scoring algorithm, to see if it can model the loss function correctly.
 \section{Guidance}
 \begin{itemize}
     \item
         Ask specific questions that address the general problem.
     \item
-        Answer them with precise evidence (graphs, numbers, statistical
-        analysis, qualitative analysis).
     \item
         Be fair and be scientific.
     \item
