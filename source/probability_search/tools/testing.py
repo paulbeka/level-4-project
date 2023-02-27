@@ -19,3 +19,10 @@ def createTestingShipWithCellsMissing(ship, n_cells_missing):
 	initialState = torch.from_numpy(initialState)
 
 	return initialState, removed_cells
+
+
+def locationDifferencesBetweenTwoMatrixies(original, comparison):
+	difference = original - comparison
+	extra = [tuple(x) for x in np.argwhere(difference < 0)]
+	missing = [tuple(x) for x in np.argwhere(difference > 0)]
+	return extra, missing

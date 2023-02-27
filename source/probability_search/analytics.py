@@ -148,7 +148,7 @@ def getMatrixScore(original_matrix, matrix):
 
 def runScoringTests(n_iters):
 
-	model_name = "deconstructScoreOutputFile_1"
+	model_name = "deconstructScoreOutputFile_2"
 	model_path = os.path.join(ROOT_PATH, "models", model_name)
 	model = ScoreFinder(1).double()
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
@@ -200,3 +200,11 @@ if __name__ == "__main__":
 
 	# run_ship_network_tests()
 	runScoringTests(100)	# number input is number of iterations
+
+
+# Some ideas:
+#  - iterations until converging to a spaceship
+#  - Comparing the other algorithms may not work
+#  - the current metrics with the average improvemnt
+#  - The "closeness" to a spaceship
+#  - More ideas with JW in a recording

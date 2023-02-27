@@ -9,20 +9,22 @@ class ScoreFinder(nn.Module):
 	def __init__(self, batch_size):
 		super(ScoreFinder, self).__init__()
 
-		self.scorePooling = nn.AdaptiveAvgPool2d(100)
-		self.scoreFC1 = nn.Linear(100*100, 100)
-		self.scoreFC2 = nn.Linear(100, 10)
-		self.scoreFC3 = nn.Linear(10, 1)
+		# use conv
+		self.conv1 = nn.Conv2d(1, 3, 3, padding="same")
+		self.conv2 = nn.Conv2d(1, 3, 3, padding="same")
+
+		self.scorePooling = nn.AdaptiveAvgPool2d(15)
+		self.scoreFC1 = nn.Linear(15*15, 1)
 
 		self.relu = nn.ReLU()
-		
+		self.silu = nn.SiLU()
+
 
 	def forward(self, x):
 
+		score = self.silu(self.conv1(x))
 		score = self.scorePooling(x)
 		score = score.flatten()
 		score = self.relu(self.scoreFC1(score))
-		score = self.relu(self.scoreFC2(score))
-		score = self.scoreFC3(score)
 
 		return score
