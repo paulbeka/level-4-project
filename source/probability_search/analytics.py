@@ -12,10 +12,12 @@ from dataloaders.probability_grid_dataloader import getPairSolutions
 ROOT_PATH = os.path.abspath(os.getcwd()) # current root of the probability search
 
 from tools.rle_reader import RleReader
-from tools.testing import createTestingShipWithCellsMissing
+from tools.testing import createTestingShipWithCellsMissing, locationDifferencesBetweenTwoMatrixies
+from probability_assisted_tree_search import search
 
 
-# ensures no values go above 1 or 0 when adding change  SIMPLIFY THE CODE ITS SHIT
+### NEURAL NETWORK CELL PREDICTION TESTING ###
+# ensures no values go above 1 or 0 when adding change  SIMPLIFY THE CODE ITS BAD
 def addChangeVector(change, target):
 	result = (change + target).numpy()[0]
 	remove_ones = np.argwhere(result > 1)
@@ -26,14 +28,6 @@ def addChangeVector(change, target):
 	return torch.from_numpy(result) 
 
 
-# turn a flattened output grid into a grid
-def modelOutputToGridAndScore(input_shape, model_output):
-	flattened_grid = model_output[0, :model_output.shape[1]-1]
-	grid = flattened_grid.reshape(input_shape)
-	score = model_output[0, -1].item()
-	return (grid[0], score)
-
-
 def itercycle(model_pipeline, initialState, n_iters):
 	workState = initialState.detach().clone()
 	startShape = workState.shape
@@ -41,14 +35,8 @@ def itercycle(model_pipeline, initialState, n_iters):
 	for _ in range(n_iters):
 		for model in model_pipeline:
 			modeled_change = model(workState)
-			# modeled_change, score = modelOutputToGridAndScore(startShape, modeled_change)
-
-			# plt.imshow(-modeled_change, cmap='gray_r', interpolation='nearest')	
-			# plt.colorbar()
-			# plt.show()
 
 			workState = addChangeVector(workState, modeled_change)
-			# workState -= modeled_change
 
 	return (workState[0], score)
 
@@ -142,6 +130,7 @@ def run_ship_network_tests():
 	displayResults(pd.concat(n_iter_results))
 
 
+### NEURAL NETWORK SCORE TESTING ###
 def getMatrixScore(original_matrix, matrix):
 	return torch.nn.MSELoss()(torch.from_numpy(original_matrix), torch.from_numpy(matrix)).item()
 
@@ -173,10 +162,8 @@ def runScoringTests(n_iters):
 			scores["trainedShip"].append(i > 800)
 			scores["n_cells_missing"].append(n_cells_missing)
 
-	displayScoringTests(pd.DataFrame(scores))
+	data = pd.DataFrame(scores)
 
-
-def displayScoringTests(data):
 	cellsMissing = data.groupby("n_cells_missing").aggregate(np.mean)
 	trainedShip = data.groupby("trainedShip").aggregate(np.mean)
 	print(trainedShip)
@@ -189,8 +176,55 @@ def displayScoringTests(data):
 	plt.show()
 
 
-def analizeModel(model):
-	pass
+### SEARCH METHOD TESTING ###
+def shipAfterSearchAnalysis(results, original_matrix):
+	result_dict = {
+		"mse_score" : [],
+		"cells_missing" : [],
+		"extra_cells" : [],
+	}
+	for result in results:
+		result_dict["mse_score"].append(getMatrixScore(original_matrix, result))
+		extra, missing = locationDifferencesBetweenTwoMatrixies(original_matrix, result)
+		result_dict["cells_missing"].append(len(missing))
+		result_dict["extra_cells"].append(len(extra))
+	return result_dict
+
+
+# Test the number of cells can be removed for search to work
+def analyzeSearchMethodConvergence():
+
+	n_ships = 3
+	n_iter_list = [3, 5, 10]
+	max_depth_list = [50, 100, 200, 300]
+	n_cells_removed_list = [1, 3, 5, 10]
+	ship_testing_list = random.choices(ships, k=n_ships)
+
+	results_dict = {
+		"n_iter" : [],
+		"max_depth" : [],
+		"n_cells_removed" : [],
+		"mse_score" : [],
+		"cells_missing" : [],
+		"extra_cells" : [],
+	}
+
+	for n_iter in n_iter_list:
+		for max_depth in max_depth_list:
+			for ship in ship_testing_list:
+				for n_cells_removed in n_cells_removed:
+					damagedSpaceship, removed = createTestingShipWithCellsMissing(ship, n_cells_removed)
+					results = search(n_iter=n_iter, max_depth=max_depth, initialState=damagedSpaceship)
+					data = shipAfterSearchAnalysis(results, removed)
+					result_dict["n_iter"] += [n_iter] * len(results)
+					result_dict["max_depth"] += [max_depth] * len(results)
+					result_dict["n_cells_removed"] += [n_cells_removed] * len(results)
+					result_dict["mse_score"] += data["mse_score"]
+					result_dict["cells_missing"] += data["cells_missing"]
+					result_dict["extra_cells"] += data["extra_cells"]
+
+	# now display these nice statistics
+
 
 
 if __name__ == "__main__":
@@ -199,7 +233,8 @@ if __name__ == "__main__":
 	ships = rle_reader.getFileArray(filePath)
 
 	# run_ship_network_tests()
-	runScoringTests(100)	# number input is number of iterations
+	# runScoringTests(100)	# number input is number of iterations
+	analyzeSearchMethodConvergence()
 
 
 # Some ideas:

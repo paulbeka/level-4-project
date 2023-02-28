@@ -37,23 +37,10 @@ class Board:
 
 		candidate_cells = candidate_cells[:Board.N_CONSIDERATIONS] + candidate_cells[-Board.N_CONSIDERATIONS:]
 		for candidate in candidate_cells:
-
-			# if tuple(candidate) in debug_list:
-			# 	print(f"Candidate: {candidate}")
-
 			newGrid = self.board.clone()
 			newGrid[0, candidate[0], candidate[1]] = 1 - newGrid[0, candidate[0], candidate[1]] 
 
 			candidateStates.append(Board(newGrid))
-
-		# TESTING ONLY
-		if type(debug_ship) != None:
-			x, y = locationDifferencesBetweenTwoMatrixies(debug_ship, max(candidateStates, key=lambda x: x.getScore()).board.numpy()[0])
-			print(f"Missing cells: {y}")
-			print(f"Extra cells: {x}")
-		# if tuple(chosen) in debug_list:
-		#	chosen = candidate_cells[candidateStates.index(max(candidateStates, key=lambda x: x.getScore()))]
-		# 	print(f"Picked: {tuple(chosen)}")
 
 		return candidateStates
 
@@ -109,7 +96,7 @@ def optimizeInputGrid(inputGrid, results):
 	return torch.from_numpy(commonCellsOnlyGrid.astype(np.double))
 
 
-def search():
+def search(initialInput=None, n_iters=10, size=(20, 20), max_depth=100, testing_data={}):
 
 	# LOAD THE PROBABILITY AND SCORING MODELS
 	MODEL_NAME = "5x5_included_20_pairs_epoch_4"
@@ -125,21 +112,21 @@ def search():
 	score_model.load_state_dict(torch.load(score_model_path))
 	score_model.eval()
 
-	max_depth = 1000
 	ship_found = []
 
-	size = (20, 20)
-	inputGrid = np.zeros(size)
-	inputGrid, removed = strategicFill(inputGrid)
+	inputGrid = initialInput  # use the user supplied input
+	if inputGrid == None:
+		inputGrid, removed = strategicFill(inputGrid) #no user supplied input- strategic fill
 
-	n_iters = 10
+	if testing_data:
+		inputGrid = testing_data["initialInput"] # use input from testing data
+
 	for i in range(n_iters):
-		# TESTING ONLY
-		rle_reader = RleReader()
-		filePath = os.path.join(ROOT_PATH, "spaceship_identification", "spaceships_extended.txt")
-		ships = rle_reader.getFileArray(filePath)
-
-		results = tree_search(max_depth, model, score_model, inputGrid, debug_list=removed, debug_ship=ships[80])
+		if testing_data:
+			# is this feature necessary?
+			results = tree_search(max_depth, model, score_model, inputGrid, debug_list=testing_data["removed"], debug_ship=testing_data["og_ship"])
+		else:
+			results = tree_search(max_depth, model, score_model, inputGrid)
 
 		for result in results:
 			data = outputShipData(np.array(result.board))
