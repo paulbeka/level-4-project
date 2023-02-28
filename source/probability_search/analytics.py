@@ -184,6 +184,7 @@ def shipAfterSearchAnalysis(results, original_matrix):
 		"extra_cells" : [],
 	}
 	for result in results:
+		result = np.array(result.board[0]) # fetch the matrix assosiated with the fetched state
 		result_dict["mse_score"].append(getMatrixScore(original_matrix, result))
 		extra, missing = locationDifferencesBetweenTwoMatrixies(original_matrix, result)
 		result_dict["cells_missing"].append(len(missing))
@@ -195,7 +196,7 @@ def shipAfterSearchAnalysis(results, original_matrix):
 def analyzeSearchMethodConvergence():
 
 	n_ships = 3
-	n_iter_list = [3, 5, 10]
+	n_iter_list = [1]
 	max_depth_list = [50, 100, 200, 300]
 	n_cells_removed_list = [1, 3, 5, 10]
 	ship_testing_list = random.choices(ships, k=n_ships)
@@ -212,19 +213,38 @@ def analyzeSearchMethodConvergence():
 	for n_iter in n_iter_list:
 		for max_depth in max_depth_list:
 			for ship in ship_testing_list:
-				for n_cells_removed in n_cells_removed:
+				for n_cells_removed in n_cells_removed_list:
 					damagedSpaceship, removed = createTestingShipWithCellsMissing(ship, n_cells_removed)
-					results = search(n_iter=n_iter, max_depth=max_depth, initialState=damagedSpaceship)
-					data = shipAfterSearchAnalysis(results, removed)
-					result_dict["n_iter"] += [n_iter] * len(results)
-					result_dict["max_depth"] += [max_depth] * len(results)
-					result_dict["n_cells_removed"] += [n_cells_removed] * len(results)
-					result_dict["mse_score"] += data["mse_score"]
-					result_dict["cells_missing"] += data["cells_missing"]
-					result_dict["extra_cells"] += data["extra_cells"]
+					results = search(n_iters=n_iter, max_depth=max_depth, initialInput=damagedSpaceship)
+					data = shipAfterSearchAnalysis(results, ship)
+					results_dict["n_iter"] += [n_iter] * len(results)
+					results_dict["max_depth"] += [max_depth] * len(results)
+					results_dict["n_cells_removed"] += [n_cells_removed] * len(results)
+					results_dict["mse_score"] += data["mse_score"]
+					results_dict["cells_missing"] += data["cells_missing"]
+					results_dict["extra_cells"] += data["extra_cells"]
 
-	# now display these nice statistics
+	results_pd = pd.DataFrame(results_dict)
+	max_depth_grouped = results_pd.groupby(["max_depth"]).aggregate(np.mean)
+	n_cells_removed_grouped = results_pd.groupby(["n_cells_removed"]).aggregate(np.mean)
 
+	plt.plot(max_depth_grouped["mse_score"], label="MSE Score")
+	plt.plot(max_depth_grouped["cells_missing"], label="# cells missing")
+	plt.plot(max_depth_grouped["extra_cells"], label="# cells extra")
+	plt.xlabel("Max depth")
+	plt.ylabel("Score")
+	plt.legend(loc="upper left")
+	plt.show()
+	plt.savefig("max_depth")
+
+	plt.plot(n_cells_removed_grouped["mse_score"], label="MSE Score")
+	plt.plot(n_cells_removed_grouped["cells_missing"], label="# cells missing")
+	plt.plot(n_cells_removed_grouped["extra_cells"], label="# cells extra")
+	plt.xlabel("# cells removed")
+	plt.ylabel("# of cells")
+	plt.legend(loc="upper left")
+	plt.show()
+	plt.savefig("n_cells_removed")
 
 
 if __name__ == "__main__":

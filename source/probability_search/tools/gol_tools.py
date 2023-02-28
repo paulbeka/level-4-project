@@ -95,6 +95,8 @@ def gridToRle(grid):
 
 # Turns a normalizes pattern into RLE code
 def normalizedPatternToRle(pattern):
+	if len(pattern) < 1:
+		return ""
 	dims = [max(pattern[:, 0])+1, max(pattern[:, 1])+1]
 	grid = np.zeros((dims[0], dims[1]))
 	grid[pattern[:, 0], pattern[:, 1]] = True
@@ -104,8 +106,9 @@ def normalizedPatternToRle(pattern):
 # find the pattern identity of an object
 def patternIdentity(pattern):
 	modifiedPattern = pattern.copy()
-	if pattern.shape[1] != 2:
-		modifiedPattern = np.argwhere(pattern == 1)
+	modifiedPattern = np.argwhere(pattern == 1)
+	if len(modifiedPattern) < 1:
+		return modifiedPattern
 	reference = (min(modifiedPattern[:,0]), min(modifiedPattern[:,1]))
 	modifiedPattern[:, 0] -= reference[0]
 	modifiedPattern[:, 1] -= reference[1]

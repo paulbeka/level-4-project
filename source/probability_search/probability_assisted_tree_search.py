@@ -115,11 +115,13 @@ def search(initialInput=None, n_iters=10, size=(20, 20), max_depth=100, testing_
 	ship_found = []
 
 	inputGrid = initialInput  # use the user supplied input
-	if inputGrid == None:
+	if isinstance(inputGrid, type(None)):
 		inputGrid, removed = strategicFill(inputGrid) #no user supplied input- strategic fill
 
 	if testing_data:
 		inputGrid = testing_data["initialInput"] # use input from testing data
+
+	all_results = []
 
 	for i in range(n_iters):
 		if testing_data:
@@ -134,9 +136,11 @@ def search(initialInput=None, n_iters=10, size=(20, 20), max_depth=100, testing_
 				print(data["rle"])
 				ship_found.append(data)
 				
+		all_results += results
 		inputGrid = optimizeInputGrid(inputGrid, results)
 		print(f"Iteration {i+1}/{n_iters}")
 
+	return all_results
 
 if __name__ == "__main__":
 	search()
