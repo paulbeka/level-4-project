@@ -30,15 +30,15 @@ def addChangeVector(change, target):
 
 def itercycle(model_pipeline, initialState, n_iters):
 	workState = initialState.detach().clone()
-	startShape = workState.shape
-	score = 0
 	for _ in range(n_iters):
 		for model in model_pipeline:
 			modeled_change = model(workState)
 
 			workState = addChangeVector(workState, modeled_change)
 
-	return (workState[0], score)
+	print(workState)
+
+	return workState[0]	# workState[0] as it comes with a batch dimention
 
 
 def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
@@ -49,15 +49,13 @@ def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
 			"positive_scores" : [],
 			"negative_scores" : [],
 			"intactness_scores" : [],
-			"score" : []
 		}
 
 		for n_removed_cells in remove_counts_list:
 			for i in range(n_items):
 				initialState, removed_cells = createTestingShipWithCellsMissing(random.choice(ships), n_removed_cells)
 
-				# result = itercycle(pipeline, initialState, n_iters)[0].numpy() # remove extra batch dimention used by neural net
-				result, score = itercycle(pipeline, initialState, n_iters)
+				result = itercycle(pipeline, initialState, n_iters)
 
 				result_with_probs = [tuple(x) for x in list(np.argwhere(result.numpy() > 0))]
 				original_alive_cells = [tuple(x) for x in list(np.argwhere(initialState[0].numpy() == 1))]
@@ -76,19 +74,17 @@ def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
 				result_dict["positive_scores"].append(np.mean(positive_scores))
 				result_dict["negative_scores"].append(np.mean(negative_scores))
 				result_dict["intactness_scores"].append(np.mean(intactness_list))
-				result_dict["score"].append(score)
 
 		return pd.DataFrame(result_dict)
 
 
 def displayResults(result):
-	iter_results = result.groupby(["n_iters"]).aggregate(np.mean)[["positive_scores", "negative_scores", "intactness_scores", "score"]]
-	removed_results = result.groupby(["n_removed_cells"]).aggregate(np.mean)[["positive_scores", "negative_scores", "intactness_scores", "score"]]
+	iter_results = result.groupby(["n_iters"]).aggregate(np.mean)[["positive_scores", "negative_scores", "intactness_scores"]]
+	removed_results = result.groupby(["n_removed_cells"]).aggregate(np.mean)[["positive_scores", "negative_scores", "intactness_scores"]]
 	
 	plt.plot(iter_results["positive_scores"], label="positive")
 	plt.plot(iter_results["negative_scores"], label="negative")
 	plt.plot(iter_results["intactness_scores"], label="intactness")
-	plt.plot(iter_results["score"], label="score")
 	plt.xlabel("Number of iterations")
 	plt.ylabel("Score")
 	plt.legend(loc="upper left")
@@ -97,7 +93,6 @@ def displayResults(result):
 	plt.plot(removed_results["positive_scores"], label="positive")
 	plt.plot(removed_results["negative_scores"], label="negative")
 	plt.plot(removed_results["intactness_scores"], label="intactness")
-	plt.plot(removed_results["score"], label="score")
 	plt.xlabel("Number of removed cells")
 	plt.ylabel("Score")
 	plt.legend(loc="upper left")
@@ -182,6 +177,7 @@ def shipAfterSearchAnalysis(results, original_matrix):
 		"mse_score" : [],
 		"cells_missing" : [],
 		"extra_cells" : [],
+		"found_ship" : [],
 	}
 	for result in results:
 		result = np.array(result.board[0]) # fetch the matrix assosiated with the fetched state
@@ -189,15 +185,16 @@ def shipAfterSearchAnalysis(results, original_matrix):
 		extra, missing = locationDifferencesBetweenTwoMatrixies(original_matrix, result)
 		result_dict["cells_missing"].append(len(missing))
 		result_dict["extra_cells"].append(len(extra))
+		result_dict["found_ship"].append(data["extra_cells"] == 0 and data["cells_missing"] == 0)
 	return result_dict
 
 
 # Test the number of cells can be removed for search to work
 def analyzeSearchMethodConvergence():
 
-	n_ships = 3
+	n_ships = 5
 	n_iter_list = [1]
-	max_depth_list = [50, 100, 200, 300]
+	max_depth_list = [1, 50, 100]
 	n_cells_removed_list = [1, 3, 5, 10]
 	ship_testing_list = random.choices(ships, k=n_ships)
 
@@ -208,6 +205,7 @@ def analyzeSearchMethodConvergence():
 		"mse_score" : [],
 		"cells_missing" : [],
 		"extra_cells" : [],
+		"found_ship" : [],
 	}
 
 	for n_iter in n_iter_list:
@@ -223,14 +221,16 @@ def analyzeSearchMethodConvergence():
 					results_dict["mse_score"] += data["mse_score"]
 					results_dict["cells_missing"] += data["cells_missing"]
 					results_dict["extra_cells"] += data["extra_cells"]
+					results_dict["found_ship"] += data["found_ship"]
 
 	results_pd = pd.DataFrame(results_dict)
 	max_depth_grouped = results_pd.groupby(["max_depth"]).aggregate(np.mean)
 	n_cells_removed_grouped = results_pd.groupby(["n_cells_removed"]).aggregate(np.mean)
+	print(f"# spaceships found: {len(results_pd[results_pd["found_ship"] == True])}")
 
 	plt.plot(max_depth_grouped["mse_score"], label="MSE Score")
-	plt.plot(max_depth_grouped["cells_missing"], label="# cells missing")
-	plt.plot(max_depth_grouped["extra_cells"], label="# cells extra")
+	# plt.plot(max_depth_grouped["cells_missing"], label="# cells missing")
+	# plt.plot(max_depth_grouped["extra_cells"], label="# cells extra")
 	plt.xlabel("Max depth")
 	plt.ylabel("Score")
 	plt.legend(loc="upper left")
@@ -238,8 +238,8 @@ def analyzeSearchMethodConvergence():
 	plt.savefig("max_depth")
 
 	plt.plot(n_cells_removed_grouped["mse_score"], label="MSE Score")
-	plt.plot(n_cells_removed_grouped["cells_missing"], label="# cells missing")
-	plt.plot(n_cells_removed_grouped["extra_cells"], label="# cells extra")
+	# plt.plot(n_cells_removed_grouped["cells_missing"], label="# cells missing")
+	# plt.plot(n_cells_removed_grouped["extra_cells"], label="# cells extra")
 	plt.xlabel("# cells removed")
 	plt.ylabel("# of cells")
 	plt.legend(loc="upper left")

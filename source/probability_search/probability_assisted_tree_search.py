@@ -29,6 +29,10 @@ class Board:
 
 
 	def getPossibleActions(self, debug_list=[], debug_ship=None):
+		return self.iterativeChangeMethod()
+
+
+	def candidateAndScoringMethod(self):
 		candidateStates = []
 		
 		probability_matrix = self.model(self.board)[0]
@@ -45,8 +49,42 @@ class Board:
 		return candidateStates
 
 
+	def greedyMethod(self):
+		probability_matrix = self.model(self.board)[0]
+		candidate_cells = list(np.argwhere(probability_matrix.detach().numpy() != 0))
+		candidate = max(candidate_cells, key=lambda x: abs(probability_matrix[x[0], x[1]].item()))
+		newGrid = self.board.clone()
+		newGrid[0, candidate[0], candidate[1]] = 1 - newGrid[0, candidate[0], candidate[1]]
+		return [Board(newGrid)]
+
+
+	def iterativeChangeMethod(self):
+		newGrid = modelChangeIteratively(self.model, self.board.clone(), 3)
+		return [Board(newGrid)]
+
 	def getScore(self):
 		return self.scoringModel(self.board).item()
+
+
+# returns a model change matrix
+def modelChangeIteratively(model, initialState, n_iters):
+	workState = initialState.detach()
+	for _ in range(n_iters):
+		modeled_change = model(workState).detach()
+		result = (workState + modeled_change).numpy()[0]
+		remove_ones = np.argwhere(result > 1)
+		result[remove_ones[:, 0], remove_ones[:, 1]] = 1
+		remove_zeros = np.argwhere(result < 0)
+		result[remove_zeros[:, 0], remove_zeros[:, 1]] = 0
+		result = result[None, :]
+		workState = torch.from_numpy(result)
+
+	aboveHalf = np.argwhere(result > 0.5)
+	result[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
+	belowHalf = np.argwhere(result < 0.5)
+	result[aboveHalf[:, 0], aboveHalf[:, 1]] = 0
+
+	return torch.from_numpy(result)
 
 
 def tree_search(max_depth, model, score_model, currentState, number_of_returns=5, debug_list=[], debug_ship=None):
