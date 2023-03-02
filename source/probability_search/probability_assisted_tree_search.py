@@ -79,9 +79,10 @@ def modelChangeIteratively(model, initialState, n_iters):
 		result = result[None, :]
 		workState = torch.from_numpy(result)
 
-	aboveHalf = np.argwhere(result > 0.5)
+	threshold = np.mean(result) # normalize to find the threshold
+	aboveHalf = np.argwhere(result > threshold)
 	result[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
-	belowHalf = np.argwhere(result < 0.5)
+	belowHalf = np.argwhere(result <= threshold)
 	result[aboveHalf[:, 0], aboveHalf[:, 1]] = 0
 
 	return torch.from_numpy(result)
