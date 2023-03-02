@@ -59,7 +59,7 @@ class Board:
 
 
 	def iterativeChangeMethod(self):
-		newGrid = modelChangeIteratively(self.model, self.board.clone(), 3)
+		newGrid = modelChangeIteratively(self.model, self.board.clone(), 1)
 		return [Board(newGrid)]
 
 	def getScore(self):
@@ -83,7 +83,7 @@ def modelChangeIteratively(model, initialState, n_iters):
 	aboveHalf = np.argwhere(result > threshold)
 	result[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
 	belowHalf = np.argwhere(result <= threshold)
-	result[aboveHalf[:, 0], aboveHalf[:, 1]] = 0
+	result[belowHalf[:, 0], belowHalf[:, 1]] = 0
 
 	return torch.from_numpy(result)
 

@@ -22,6 +22,10 @@ def createTestingShipWithCellsMissing(ship, n_cells_missing):
 
 
 def locationDifferencesBetweenTwoMatrixies(original, comparison):
+	# print("############## ORIGINAL ##############")
+	# print(original)
+	# print("############## NEW ##############")
+	# print(comparison)
 	difference = original - comparison
 	extra = [tuple(x) for x in np.argwhere(difference < 0)]
 	missing = [tuple(x) for x in np.argwhere(difference > 0)]

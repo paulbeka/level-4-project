@@ -61,18 +61,9 @@ def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
 				result_with_probs = [tuple(x) for x in list(np.argwhere(result.numpy() > 0))]
 				original_alive_cells = [tuple(x) for x in list(np.argwhere(initialState[0].numpy() == 1))]
 
-				positive_scores = [result[x[0], x[1]] for x in removed_cells]
-				negative_scores = [result[x[0], x[1]] for x in result_with_probs if not x in original_alive_cells]
-				intactness_list = [result[x[0], x[1]] for x in result_with_probs if x in original_alive_cells]
-
-				# get the final matrix
-				result = result.numpy()
-				threshold = np.mean(result)
-				aboveHalf = np.argwhere(result > threshold)
-				result[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
-				belowHalf = np.argwhere(result <= threshold)
-				result[aboveHalf[:, 0], aboveHalf[:, 1]] = 0
-				extra, missing = locationDifferencesBetweenTwoMatrixies(test_ship, result)
+				positive_scores = [result[x[0], x[1]].item() for x in removed_cells]
+				negative_scores = [result[x[0], x[1]].item() for x in result_with_probs if not x in original_alive_cells]
+				intactness_list = [result[x[0], x[1]].item() for x in result_with_probs if x in original_alive_cells]
 
 				# prevent mean on empty slice
 				if not positive_scores:	positive_scores = [0]
@@ -84,6 +75,15 @@ def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
 				result_dict["positive_scores"].append(np.mean(positive_scores))
 				result_dict["negative_scores"].append(np.mean(negative_scores))
 				result_dict["intactness_scores"].append(np.mean(intactness_list))
+
+				result = result.numpy()
+				newMatrix = np.zeros_like(result)
+				threshold = np.mean(result)
+				aboveHalf = np.argwhere(result > threshold)
+				newMatrix[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
+				belowHalf = np.argwhere(result < threshold)
+				newMatrix[belowHalf[:, 0], belowHalf[:, 1]] = 0
+				extra, missing = locationDifferencesBetweenTwoMatrixies(test_ship, newMatrix)
 				result_dict["n_cells_missing_after_recursion"].append(len(missing))
 				result_dict["n_cells_extra_after_recursion"].append(len(extra))
 
@@ -142,8 +142,8 @@ def run_ship_network_tests():
 		model.eval()
 		pipeline.append(model)
 
-	MAX_ITER = 10	# the max amount of recursions
-	MAX_REMOVE_COUNT = 40	# the maximum amount of cells to be removed
+	MAX_ITER = 1	# the max amount of recursions
+	MAX_REMOVE_COUNT = 20	# the maximum amount of cells to be removed
 
 	test_n_iters = [i+1 for i in range(MAX_ITER)]
 	remove_counts_list = [i+1 for i in range(MAX_REMOVE_COUNT)]
@@ -264,7 +264,15 @@ def analyzeSearchMethodConvergence():
 	plt.ylabel("Score")
 	plt.legend(loc="upper left")
 	plt.show()
-	plt.savefig("max_depth")
+	plt.savefig("mse_score_max_depth")
+
+	plt.plot(max_depth_grouped["cells_missing"], label="# cells missing")
+	plt.plot(max_depth_grouped["extra_cells"], label="# cells extra")
+	plt.xlabel("Max depth")
+	plt.ylabel("# cells")
+	plt.legend(loc="upper left")
+	plt.show()
+	plt.savefig("number_of_cells_max_depth")
 
 	plt.plot(n_cells_removed_grouped["mse_score"], label="MSE Score")
 	# plt.plot(n_cells_removed_grouped["cells_missing"], label="# cells missing")
@@ -273,7 +281,15 @@ def analyzeSearchMethodConvergence():
 	plt.ylabel("# of cells")
 	plt.legend(loc="upper left")
 	plt.show()
-	plt.savefig("n_cells_removed")
+	plt.savefig("mse_score_n_cells_removed")
+
+	plt.plot(n_cells_removed_grouped["cells_missing"], label="# cells missing")
+	plt.plot(n_cells_removed_grouped["extra_cells"], label="# cells extra")
+	plt.xlabel("# cells removed")
+	plt.ylabel("# of cells")
+	plt.legend(loc="upper left")
+	plt.show()
+	plt.savefig("number_of_cells_n_cells_removed")
 
 
 if __name__ == "__main__":
@@ -282,13 +298,11 @@ if __name__ == "__main__":
 	ships = rle_reader.getFileArray(filePath)
 
 	run_ship_network_tests()
-	# runScoringTests(100)	# number input is number of iterations
+	# runScoringTests(100)
 	# analyzeSearchMethodConvergence()
 
 
-# Some ideas:
-#  - iterations until converging to a spaceship
-#  - Comparing the other algorithms may not work
-#  - the current metrics with the average improvemnt
-#  - The "closeness" to a spaceship
-#  - More ideas with JW in a recording
+# Current analytics available:
+# - Network tests:
+# --> Number of cells missing/extra for number of iterations
+# --> x`
