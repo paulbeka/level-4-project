@@ -29,7 +29,7 @@ class Board:
 
 
 	def getPossibleActions(self, debug_list=[], debug_ship=None):
-		return self.iterativeChangeMethod()
+		return self.candidateAndScoringMethod()
 
 
 	def candidateAndScoringMethod(self):
@@ -49,6 +49,7 @@ class Board:
 		return candidateStates
 
 
+	# this is shit - fix it maybe?
 	def greedyMethod(self):
 		probability_matrix = self.model(self.board)[0]
 		candidate_cells = list(np.argwhere(probability_matrix.detach().numpy() != 0))

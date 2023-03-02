@@ -71,7 +71,7 @@ def scoreDataloader(n_pairs, mode="deconstruct"):
 		mockList = [createTestingShipWithCellsMissing(ship, random.randint(0, 100))[0] for _ in range(n_pairs)]
 		data += [(mockItem, getMatrixScore(ship, mockItem)) for mockItem in mockList]	
 
-	data += ratioDeconstructWithAddedRandomCells(ships, 1, 20)
+	data += ratioDeconstructWithAddedRandomCells(ships, 1, 25)
 
 	train_loader = torch.utils.data.DataLoader(dataset=data, batch_size=1, shuffle=True)
 

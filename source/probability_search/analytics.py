@@ -214,7 +214,7 @@ def shipAfterSearchAnalysis(results, original_matrix):
 		extra, missing = locationDifferencesBetweenTwoMatrixies(original_matrix, result)
 		result_dict["cells_missing"].append(len(missing))
 		result_dict["extra_cells"].append(len(extra))
-		result_dict["found_ship"].append(len(extra) == 0 and len(missing) == 0)
+		result_dict["found_ship"].append(len(extra) == 0 and len(missing) == 0) 
 	return result_dict
 
 
@@ -250,7 +250,7 @@ def analyzeSearchMethodConvergence():
 					results_dict["mse_score"] += data["mse_score"]
 					results_dict["cells_missing"] += data["cells_missing"]
 					results_dict["extra_cells"] += data["extra_cells"]
-					results_dict["found_ship"] += data["found_ship"]
+					results_dict["found_ship"] += data["found_ship"] 
 
 	results_pd = pd.DataFrame(results_dict)
 	max_depth_grouped = results_pd.groupby(["max_depth"]).aggregate(np.mean)
@@ -297,12 +297,12 @@ if __name__ == "__main__":
 	filePath = os.path.join(ROOT_PATH, "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)
 
-	run_ship_network_tests()
+	# run_ship_network_tests()
 	# runScoringTests(100)
-	# analyzeSearchMethodConvergence()
+	analyzeSearchMethodConvergence() # speed this up
 
 
 # Current analytics available:
 # - Network tests:
 # --> Number of cells missing/extra for number of iterations
-# --> x`
+# --> 
