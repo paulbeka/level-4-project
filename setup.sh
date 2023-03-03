@@ -20,4 +20,5 @@ pip3 list
 
 echo "DEPENDANCIES INSTALLED - IF TORCH ERROR CONTACT PAUL"
 echo "STARTING NEURAL NETWORK TRAINING - ERROR BEYOND THIS POINT IS PROBABLY GPU RELATED"
-python3 source/probability_search/grid_probability_trainer.py
+cd source/probability_search
+python3 score_trainer.py

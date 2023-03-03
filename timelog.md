@@ -407,3 +407,75 @@ WINTER BREAK- BARELY ANYTHING DONE
 
 ### 1 Feb 2023
 * *2 hours* fixing the new network in the recurisive search algorithm
+
+### 2 Feb 2023
+* *2 hours* fixing the new network in the recurisive search algorithm
+
+### 3 Feb 2023
+* *4 hours* Testing the network and realizing it sucks
+
+### 4 Feb 2023
+* *3 hours* Remaking an old version of the network and re-training
+
+### 5 Feb 2023
+* *3 hours* Created a new scoring network instead of incoperating it into the main network
+
+
+## Week 5 - AFTER BREAK
+
+### 6 Feb 2023
+* *3 hours* Worked on getting the new scoring network working and training/testing it
+* *1 hour* Wrote some parts of the paper
+
+### 7 Feb 2023
+* *3 hours* Worked on testing new network and trying out different configurations
+
+### 8 Feb 2023
+* *3 hours* Worked on testing the new network- some progress
+
+### 9 Feb 2023
+* *2 hours* finished new network, implemented it on the tree search
+
+### 10 Feb 2023
+* *3 hours* Wrote dissertation, meeting with JW, fixed scoring function
+
+### 11 Feb 2023
+* *1 hour* finalized scoring network and started training it 
+
+### 12 Feb 2023
+* *0 hours*
+
+
+## Week 6 - AFTER BREAK
+
+### 13 Feb 2023
+* *2 hours* Dissertation work and tested scoring algorithm
+
+### 14 Feb 2023
+* *3 hours* Dissertation writing and refactoring of code + advancing tree search
+
+### 15 Feb 2023
+* *2 hours* Worked on making a spaceship identifier
+
+### 16 Feb 2023
+* *1 hour* made presentation for JW and email
+
+## 17 Feb 2023
+
+FILL THIS UP WITH STUFF
+
+## 26 Feb 2023
+* *2 hours* Worked on testing the search algorithms
+
+## 27 Feb 2023
+* *2 hours* tried to fix the spaceship finding algorithm
+
+## 28 Feb 2023
+* *2 hours* Working on analytics program
+
+## 1 Mar 2023
+* *5 hours* Worked on the analytics algorithm and implemented a greedy approach
+
+## 2 Mar 2023
+* *2 hours* Writing dissertation
+* *3 hours* fixing issues with the search algorithm
