@@ -3,7 +3,7 @@ import torch
 import os
 import random
 
-ROOT_PATH = os.path.abspath(os.getcwd()) # current root of the probability search
+
 
 from tools.rle_reader import RleReader
 

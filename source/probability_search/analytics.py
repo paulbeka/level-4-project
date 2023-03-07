@@ -51,41 +51,51 @@ def run_recursion_tests(pipeline, remove_counts_list, n_iters, n_items):
 			"n_cells_extra_after_recursion" : []
 		}
 
-		for n_removed_cells in remove_counts_list:
-			for i in range(n_items):
-				test_ship = random.choice(ships)
-				initialState, removed_cells = createTestingShipWithCellsMissing(test_ship, n_removed_cells)
+		for n_cells_extra in extra_count_list:
+			for n_removed_cells in remove_counts_list:
+				for i in range(n_items):
+					test_ship = random.choice(ships)
 
-				result = itercycle(pipeline, initialState, n_iters)
+					# INSTEAD, ADD RANDOM NOISE DECONSTRUCT
+					# initialState, removed_cells = createTestingShipWithCellsMissing(test_ship, n_removed_cells)
+					initialState, removed_cells, extra_cells = mockRatioDeconstruct(test_ship, n_removed_cells, n_cells_extra)
 
-				result_with_probs = [tuple(x) for x in list(np.argwhere(result.numpy() > 0))]
-				original_alive_cells = [tuple(x) for x in list(np.argwhere(initialState[0].numpy() == 1))]
+					result = itercycle(pipeline, initialState, n_iters)
 
-				positive_scores = [result[x[0], x[1]].item() for x in removed_cells]
-				negative_scores = [result[x[0], x[1]].item() for x in result_with_probs if not x in original_alive_cells]
-				intactness_list = [result[x[0], x[1]].item() for x in result_with_probs if x in original_alive_cells]
+					# take the absolute in order to also represent negative changes
+					result_with_probs = [tuple(x) for x in list(np.argwhere(abs(result.numpy()) > 0))]
+					original_alive_cells = [tuple(x) for x in list(np.argwhere(initialState[0].numpy() == 1))]
 
-				# prevent mean on empty slice
-				if not positive_scores:	positive_scores = [0]
-				if not negative_scores:	negative_scores = [0]
-				if not intactness_list:	intactness_list = [0]
+					positive_scores = [result[x[0], x[1]].item() for x in removed_cells]
+					negative_scores = [result[x[0], x[1]].item() for x in result_with_probs if not x in original_alive_cells]
+					intactness_list = [result[x[0], x[1]].item() for x in result_with_probs if x in original_alive_cells]
+					cohesion_score = [result[x[0], x[1]].item() for x in result_with_probs if x in extra_cells]
 
-				result_dict["n_iters"].append(n_iters)
-				result_dict["n_removed_cells"].append(n_removed_cells)
-				result_dict["positive_scores"].append(np.mean(positive_scores))
-				result_dict["negative_scores"].append(np.mean(negative_scores))
-				result_dict["intactness_scores"].append(np.mean(intactness_list))
+					# prevent mean on empty list
+					if not positive_scores:	positive_scores = [0]
+					if not negative_scores:	negative_scores = [0]
+					if not intactness_list:	intactness_list = [0]
+					if not cohesion_score: cohesion_score = [0]
 
-				result = result.numpy()
-				newMatrix = np.zeros_like(result)
-				threshold = np.mean(result)
-				aboveHalf = np.argwhere(result > threshold)
-				newMatrix[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
-				belowHalf = np.argwhere(result < threshold)
-				newMatrix[belowHalf[:, 0], belowHalf[:, 1]] = 0
-				extra, missing = locationDifferencesBetweenTwoMatrixies(test_ship, newMatrix)
-				result_dict["n_cells_missing_after_recursion"].append(len(missing))
-				result_dict["n_cells_extra_after_recursion"].append(len(extra))
+					# TODO: ADD SOME SORT OF COHESION SCORE
+					# YOU CAN START ADDING THE RESLULTS SOON AS THEY PROBS WONT CHANGE
+					result_dict["n_iters"].append(n_iters)
+					result_dict["n_removed_cells"].append(n_removed_cells)
+					result_dict["positive_scores"].append(np.mean(positive_scores))
+					result_dict["negative_scores"].append(np.mean(negative_scores))
+					result_dict["intactness_scores"].append(np.mean(intactness_list))
+
+					result = result.numpy()
+					newMatrix = np.zeros_like(result)
+					threshold = np.mean(result)
+					aboveHalf = np.argwhere(result > threshold)
+					newMatrix[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
+					belowHalf = np.argwhere(result < threshold)
+					newMatrix[belowHalf[:, 0], belowHalf[:, 1]] = 0
+
+					extra, missing = locationDifferencesBetweenTwoMatrixies(test_ship, newMatrix)
+					result_dict["n_cells_missing_after_recursion"].append(len(missing))
+					result_dict["n_cells_extra_after_recursion"].append(len(extra))
 
 		return pd.DataFrame(result_dict)
 
@@ -161,7 +171,7 @@ def getMatrixScore(original_matrix, matrix):
 
 def runScoringTests(n_iters):
 
-	model_name = "deconstructScoreOutputFile_2"
+	model_name = "brandnewScoringNetworkEpoch_10"
 	model_path = os.path.join(ROOT_PATH, "models", model_name)
 	model = ScoreFinder(1).double()
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
@@ -174,30 +184,46 @@ def runScoringTests(n_iters):
 		"n_cells_missing" : []
 	}
 
+	n_max_cells_missing = 20
+	n_cells_missing_list = [i for i in range(n_max_cells_missing)]
 	for _ in range(n_iters):
-		for i, ship in enumerate(ships[800:]):
-			n_cells_missing = random.randint(0, 100)
-			testStructure, _ = createTestingShipWithCellsMissing(ship, n_cells_missing)
-			score = model(testStructure).item()
-			actualScore = getMatrixScore(testStructure.detach().numpy()[0], ship)
+		for i, ship in enumerate(ships):
+			for n_cells_missing in n_cells_missing_list:
+				testStructure, _ = createTestingShipWithCellsMissing(ship, n_cells_missing)
+				score = model(testStructure).item()
+				# SEE IF THE RESULTS DIFFER IF THIS IS SWITCHED AROUND - THEY SHOULDNT NORMALLY I THINK
+				actualScore = getMatrixScore(testStructure.detach().numpy()[0], ship)
 
-			scores["score"].append(score)
-			scores["actualScore"].append(actualScore)
-			scores["trainedShip"].append(i > 800)
-			scores["n_cells_missing"].append(n_cells_missing)
+				scores["score"].append(score)
+				scores["actualScore"].append(actualScore)
+				scores["trainedShip"].append(i > 800)
+				scores["n_cells_missing"].append(n_cells_missing)
 
 	data = pd.DataFrame(scores)
 
-	cellsMissing = data.groupby("n_cells_missing").aggregate(np.mean)
+	cellsMissingTrained = data[data["trainedShip"] == True].groupby("n_cells_missing").aggregate(np.mean)
+	cellsMissingUntrained = data[data["trainedShip"] == False].groupby("n_cells_missing").aggregate(np.mean)
 	trainedShip = data.groupby("trainedShip").aggregate(np.mean)
 	print(trainedShip)
 
-	plt.plot(cellsMissing["score"], label="Predicted Score")
-	plt.plot(cellsMissing["actualScore"], label="Actual Score")
+	plt.plot(cellsMissingTrained["score"], label="Predicted Score")
+	plt.plot(cellsMissingTrained["actualScore"], label="Actual Score")
 	plt.xlabel("Number of removed cells")
 	plt.ylabel("Score")
 	plt.legend(loc="upper left")
+	plt.title("Trained ships cells missing to score")
+	plt.savefig("cells_missing_to_score_trained")
 	plt.show()
+
+	plt.plot(cellsMissingUntrained["score"], label="Predicted Score")
+	plt.plot(cellsMissingUntrained["actualScore"], label="Actual Score")
+	plt.xlabel("Number of removed cells")
+	plt.ylabel("Score")
+	plt.legend(loc="upper left")
+	plt.title("Cells missing to score")
+	plt.savefig("cells_missing_to_score_test")
+	plt.show()
+
 
 
 ### SEARCH METHOD TESTING ###
@@ -214,17 +240,17 @@ def shipAfterSearchAnalysis(results, original_matrix):
 		extra, missing = locationDifferencesBetweenTwoMatrixies(original_matrix, result)
 		result_dict["cells_missing"].append(len(missing))
 		result_dict["extra_cells"].append(len(extra))
-		result_dict["found_ship"].append(len(extra) == 0 and len(missing) == 0) 
+		result_dict["found_ship"].append(int(len(extra) == 0 and len(missing) == 0)) 
 	return result_dict
 
 
 # Test the number of cells can be removed for search to work
 def analyzeSearchMethodConvergence():
-
-	n_ships = 5
-	n_iter_list = [1]
-	max_depth_list = [1, 50, 100]
-	n_cells_removed_list = [1, 3, 5, 10]
+	# basically, i want to know if less max_depth but more iterations will make this algorithm better
+	n_ships = 10
+	n_iter_list = [1, 2, 3, 4]
+	max_depth_list = [50, 100, 200]
+	n_cells_removed_list = [1, 2, 3, 4, 5]
 	ship_testing_list = random.choices(ships, k=n_ships)
 
 	results_dict = {
@@ -253,49 +279,67 @@ def analyzeSearchMethodConvergence():
 					results_dict["found_ship"] += data["found_ship"] 
 
 	results_pd = pd.DataFrame(results_dict)
+	iter_grouped = results_pd.groupby(["n_iter"]).aggregate(np.mean)
 	max_depth_grouped = results_pd.groupby(["max_depth"]).aggregate(np.mean)
 	n_cells_removed_grouped = results_pd.groupby(["n_cells_removed"]).aggregate(np.mean)
 	print(f"Number spaceships found: {len(results_pd[results_pd['found_ship'] == True])}")
 
+	plt.plot(iter_grouped["cells_missing"], label="# cells missing")
+	plt.plot(iter_grouped["extra_cells"], label="# cells extra")
+	plt.xlabel("# Cells removed")
+	plt.ylabel("# cells ")
+	plt.legend(loc="upper left")
+	plt.savefig("number_of_cells_n_iter")
+	plt.show()
+
 	plt.plot(max_depth_grouped["mse_score"], label="MSE Score")
-	# plt.plot(max_depth_grouped["cells_missing"], label="# cells missing")
-	# plt.plot(max_depth_grouped["extra_cells"], label="# cells extra")
 	plt.xlabel("Max depth")
 	plt.ylabel("Score")
 	plt.legend(loc="upper left")
-	plt.show()
 	plt.savefig("mse_score_max_depth")
+	plt.show()
 
 	plt.plot(max_depth_grouped["cells_missing"], label="# cells missing")
 	plt.plot(max_depth_grouped["extra_cells"], label="# cells extra")
 	plt.xlabel("Max depth")
 	plt.ylabel("# cells")
 	plt.legend(loc="upper left")
-	plt.show()
 	plt.savefig("number_of_cells_max_depth")
+	plt.show()
 
 	plt.plot(n_cells_removed_grouped["mse_score"], label="MSE Score")
-	# plt.plot(n_cells_removed_grouped["cells_missing"], label="# cells missing")
-	# plt.plot(n_cells_removed_grouped["extra_cells"], label="# cells extra")
 	plt.xlabel("# cells removed")
 	plt.ylabel("# of cells")
 	plt.legend(loc="upper left")
-	plt.show()
 	plt.savefig("mse_score_n_cells_removed")
+	plt.show()
 
 	plt.plot(n_cells_removed_grouped["cells_missing"], label="# cells missing")
 	plt.plot(n_cells_removed_grouped["extra_cells"], label="# cells extra")
 	plt.xlabel("# cells removed")
 	plt.ylabel("# of cells")
 	plt.legend(loc="upper left")
-	plt.show()
 	plt.savefig("number_of_cells_n_cells_removed")
+	plt.show()
+
+	total_iterations = n_ships * len(n_iter_list) * len(max_depth_list) * len(n_cells_removed_list)
+	prob_reconstruction_aggregation = results_pd.groupby(["n_cells_removed"]).aggregate(np.sum)
+	plt.plot(prob_reconstruction_aggregation["found_ship"] / total_iterations)
+	plt.xlabel("# cells removed")
+	plt.ylabel("Probability of reconstruction")
+	plt.savefig("probability_of_reconstruction_against_damage")
+	plt.show()
 
 
 if __name__ == "__main__":
 	rle_reader = RleReader()
 	filePath = os.path.join(ROOT_PATH, "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)
+
+	# if doing some training data testing:
+	ships = ships[:800]
+	# testing data:
+	# ships = ships[800:]
 
 	# run_ship_network_tests()
 	# runScoringTests(100)

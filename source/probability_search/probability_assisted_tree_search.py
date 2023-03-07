@@ -17,7 +17,8 @@ from tools.testing import createTestingShipWithCellsMissing, locationDifferences
 class Board:
 
 	MAX_GRID = (10, 10)
-	N_CONSIDERATIONS = 1
+	N_CONSIDERATIONS = 3
+	THRESHOLD_MAGNITUDE = 0.18  # use this threshold to limit the candidate number of states
 
 	def __init__(self, board):
 		self.board = board
@@ -37,12 +38,22 @@ class Board:
 		
 		probability_matrix = self.model(self.board)[0]
 		candidate_cells = list(np.argwhere(probability_matrix.detach().numpy() != 0))
-		candidate_cells.sort(key=lambda x: probability_matrix[x[0], x[1]])
 
-		candidate_cells = candidate_cells[:Board.N_CONSIDERATIONS] + candidate_cells[-Board.N_CONSIDERATIONS:]
-		for candidate in candidate_cells:
+		candidates = []
+		for i in range(self.N_CONSIDERATIONS):
+			candidates.append(max(candidate_cells, key=lambda x: abs(probability_matrix[x[0], x[1]])))
+
+		for candidate in candidates:
+			if abs(probability_matrix[candidate[0], candidate[1]].item()) < self.THRESHOLD_MAGNITUDE:
+				continue
+
+			# REVISE THIS TO SEE IF ITERMETHOD MAY WORK BETTER NOW
+			# SHOULD I CHANGE THE N_CANDIDATES NUMBER?
 			newGrid = self.board.clone()
-			newGrid[0, candidate[0], candidate[1]] = 1 - newGrid[0, candidate[0], candidate[1]] 
+			if probability_matrix[candidate[0], candidate[1]] > 0:
+				newGrid[0, candidate[0], candidate[1]] = 1
+			else:
+				newGrid[0, candidate[0], candidate[1]] = 0
 
 			candidateStates.append(Board(newGrid))
 
@@ -64,7 +75,7 @@ class Board:
 		return [Board(newGrid)]
 
 	def getScore(self):
-		return self.scoringModel(self.board).item()
+		return self.scoringModel(self.board).item() - self.visited
 
 
 # returns a model change matrix
@@ -80,11 +91,13 @@ def modelChangeIteratively(model, initialState, n_iters):
 		result = result[None, :]
 		workState = torch.from_numpy(result)
 
-	threshold = np.mean(result) # normalize to find the threshold
+	# TODO: TRY VARYING THE THRESHOLD VALUE TO FIND THE BEST FIT
+	threshold = 0.18 
+	newMatrix = np.zeros_like(result)
 	aboveHalf = np.argwhere(result > threshold)
-	result[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
+	newMatrix[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
 	belowHalf = np.argwhere(result <= threshold)
-	result[belowHalf[:, 0], belowHalf[:, 1]] = 0
+	newMatrix[belowHalf[:, 0], belowHalf[:, 1]] = 0
 
 	return torch.from_numpy(result)
 
@@ -106,7 +119,7 @@ def tree_search(max_depth, model, score_model, currentState, number_of_returns=5
 		actions = [action for action in currentState.getPossibleActions(debug_list=debug_list, debug_ship=debug_ship) if not action in exploredStates]
 
 		if not actions:
-			currentState = max(exploredStates, key=lambda x: x.getScore() - x.visited)
+			currentState = max(exploredStates, key=lambda x: x.getScore())
 			currentState.visited += 1
 		else:
 			currentState = max(actions, key=lambda x: x.getScore())
@@ -140,7 +153,7 @@ def search(initialInput=None, n_iters=10, size=(20, 20), max_depth=100, testing_
 
 	# LOAD THE PROBABILITY AND SCORING MODELS
 	MODEL_NAME = "5x5_included_20_pairs_epoch_4"
-	SCORE_MODEL_NAME = "deconstructScoreOutputFile_2"
+	SCORE_MODEL_NAME = "brandnewScoringNetworkEpoch_10"
 
 	model_path = os.path.join(ROOT_PATH, "models", MODEL_NAME)
 	model = ProbabilityFinder(1).double()
@@ -149,7 +162,7 @@ def search(initialInput=None, n_iters=10, size=(20, 20), max_depth=100, testing_
 
 	score_model_path = os.path.join(ROOT_PATH, "models", SCORE_MODEL_NAME)
 	score_model = ScoreFinder(1).double()
-	score_model.load_state_dict(torch.load(score_model_path))
+	score_model.load_state_dict(torch.load(score_model_path, map_location=torch.device('cpu')))
 	score_model.eval()
 
 	ship_found = []
@@ -163,20 +176,25 @@ def search(initialInput=None, n_iters=10, size=(20, 20), max_depth=100, testing_
 
 	all_results = []
 
+	# IDEA: CHANGE THE MAX DEPTH AS A FUNCTION OF NUMBER OF ITERATIONS
 	for i in range(n_iters):
 		if testing_data:
 			# is this feature necessary?
 			results = tree_search(max_depth, model, score_model, inputGrid, debug_list=testing_data["removed"], debug_ship=testing_data["og_ship"])
 		else:
-			results = tree_search(max_depth, model, score_model, inputGrid)
+			# results = tree_search(max_depth, model, score_model, inputGrid)
+			# max_depth as a function of iterations:
+			results = tree_search(int(max_depth * (1 + (i*0.1))), model, score_model, inputGrid)
 
+
+		all_results += results
 		for result in results:
 			data = outputShipData(np.array(result.board))
 			if data:
 				print(data["rle"])
 				ship_found.append(data)
+				return all_results
 				
-		all_results += results
 		inputGrid = optimizeInputGrid(inputGrid, results)
 		print(f"Iteration {i+1}/{n_iters}")
 
