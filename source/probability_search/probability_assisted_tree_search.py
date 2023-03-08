@@ -47,8 +47,10 @@ class Board:
 			if abs(probability_matrix[candidate[0], candidate[1]].item()) < self.THRESHOLD_MAGNITUDE:
 				continue
 
-			# REVISE THIS TO SEE IF ITERMETHOD MAY WORK BETTER NOW
 			# SHOULD I CHANGE THE N_CANDIDATES NUMBER?
+			# MAYBE GROUP THIS INTO 2 GROUPS: ONE GROUP TAKES THE MOST NEGATIVE NUMBERS (AND REMOVE)
+			# AND THE SECOND GROUP TAKES THE MOST POSITIVE NUMBERS AND ADDS
+			# COMBINE THE TWO INTO SEPERATE TREE BRANCHES AND GET THE MAXIMUM SCORING ONE
 			newGrid = self.board.clone()
 			if probability_matrix[candidate[0], candidate[1]] > 0:
 				newGrid[0, candidate[0], candidate[1]] = 1
@@ -80,6 +82,23 @@ class Board:
 
 # returns a model change matrix
 def modelChangeIteratively(model, initialState, n_iters):
+
+	# result = result.numpy()
+	# newMatrix = initialState[0].numpy().copy()
+	# # the cells that were missing
+	# add_cells = np.argwhere(result > 0.15)
+	# if len(add_cells):					
+	# 	newMatrix[add_cells[:, 0], add_cells[:, 1]] = 1
+
+	# # the cells that were already there
+	# add_cells = np.argwhere((result < -0.1) & (result > -0.3))
+	# if len(add_cells):			
+	# 	newMatrix[add_cells[:, 0], add_cells[:, 1]] = 1
+
+	# remove_cells = np.argwhere(result < -0.7)
+	# if len(remove_cells):
+	# 	newMatrix[remove_cells[:, 0], remove_cells[:, 1]] = 0
+
 	workState = initialState.detach()
 	for _ in range(n_iters):
 		modeled_change = model(workState).detach()
@@ -91,13 +110,10 @@ def modelChangeIteratively(model, initialState, n_iters):
 		result = result[None, :]
 		workState = torch.from_numpy(result)
 
-	# TODO: TRY VARYING THE THRESHOLD VALUE TO FIND THE BEST FIT
 	threshold = 0.18 
 	newMatrix = np.zeros_like(result)
 	aboveHalf = np.argwhere(result > threshold)
 	newMatrix[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
-	belowHalf = np.argwhere(result <= threshold)
-	newMatrix[belowHalf[:, 0], belowHalf[:, 1]] = 0
 
 	return torch.from_numpy(result)
 

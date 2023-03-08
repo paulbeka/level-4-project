@@ -21,11 +21,25 @@ def createTestingShipWithCellsMissing(ship, n_cells_missing):
 	return initialState, removed_cells
 
 
+def createTestingShipWithCellsAdded(ship, n_cells_added):
+	dead = np.argwhere(ship == 0)
+
+	added_cells = []
+	for _ in range(min(len(dead)-1, n_cells_added)):
+		cell_being_added = random.randint(0, len(dead)-1)
+		added_cells.append(tuple(dead[cell_being_added]))
+		dead = np.delete(dead, cell_being_added, axis=0)
+
+	initialState = np.ones_like(ship)
+
+	initialState[dead[:, 0], dead[:, 1]] = 0
+	initialState = initialState[None, :]
+	initialState = torch.from_numpy(initialState)
+
+	return initialState, added_cells
+
+
 def locationDifferencesBetweenTwoMatrixies(original, comparison):
-	# print("############## ORIGINAL ##############")
-	# print(original)
-	# print("############## NEW ##############")
-	# print(comparison)
 	difference = original - comparison
 	extra = [tuple(x) for x in np.argwhere(difference < 0)]
 	missing = [tuple(x) for x in np.argwhere(difference > 0)]
@@ -42,10 +56,11 @@ def mockRatioDeconstruct(ship, n_cells_missing, n_cells_extra):
 
 	tempGrid = np.zeros_like(ship)
 	tempGrid[alive[:, 0], alive[:, 1]] = 1
-	
+
 	dead = np.argwhere(tempGrid == 0)
 	dead_to_flip = dead[[random.randint(0, len(dead)-1) for _ in range(n_cells_extra)]]
 	tempGrid[dead_to_flip[:, 0], dead_to_flip[:, 1]] = 1
+	tempGrid = tempGrid[None, :]	# add extra batch dimention MIGHT BE WORTH IMPLMENTING THAT ONLY WHEN NEEDED
 
 	# returns the new object, the cells which were deleted, and the cells flipped which are not part of the ship
-	return tempGrid, cells_missing, dead_to_flip
+	return torch.from_numpy(tempGrid), cells_missing, dead_to_flip
