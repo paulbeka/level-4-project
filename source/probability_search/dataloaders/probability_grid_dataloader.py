@@ -77,7 +77,6 @@ def getPairSolutions(train_ratio, n_pairs, batch_size, data_type="advanced_decon
 	rle_reader = RleReader()
 	filePath = os.path.join(PROJECT_ROOT, "spaceship_identification", "spaceships_extended.txt")
 	ships = rle_reader.getFileArray(filePath)[:800] # IMPORTANT: LAST 180 ARE FOR TESTING PURPOSES
-
 	sizes = []
 	for ship in ships:
 		sizes.append(ship.shape)

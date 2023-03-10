@@ -18,86 +18,56 @@ class Board:
 
 	MAX_GRID = (10, 10)
 	N_CONSIDERATIONS = 3
-	THRESHOLD_MAGNITUDE = 0.18  # use this threshold to limit the candidate number of states
 
-	def __init__(self, board):
+	def __init__(self, board, level):
 		self.board = board
 		self.visited = 0
+		self.level = level
 		self.boardSize = self.board.shape[1:]
 
 	def __eq__(self, other):
 		return np.array_equal(self.board, other.board)
 
 
-	def getPossibleActions(self, debug_list=[], debug_ship=None):
-		return self.candidateAndScoringMethod()
+	def getPossibleActions(self):
+		return self.candidateAndScoringMethod(iteration)
 
 
 	def candidateAndScoringMethod(self):
 		candidateStates = []
+		# MIGHT NEED TO CHANGE THESE VALUES IN ORDER TO ELIMINATE A GOOD AMOUNT OF CELLS- TO ALLOW TREE SEARCH TO RUN
+		# MAYBE COULD MAKE THEM DYNAMIC: AS THE SEARCH CONTINUES, MAKE THEM MORE EXTREME TO ENCOURAGE SEARCH
+		# OF OTHER BRANCHES IN THE SEARCHED LIST [CHECK THIS]
+		positive_threshold = 0.15 + (self.level * 0.1)
+		negative_threshold = -0.6 + (self.level * 0.1)
 		
 		probability_matrix = self.model(self.board)[0]
 		candidate_cells = list(np.argwhere(probability_matrix.detach().numpy() != 0))
 
 		candidates = []
 		for i in range(self.N_CONSIDERATIONS):
-			candidates.append(max(candidate_cells, key=lambda x: abs(probability_matrix[x[0], x[1]])))
+			positive_additions = [candidate for candidate in candidate_cells if probability_matrix[candidate[0], candidate[1]] > positive_threshold]
+			negative_additions = [candidate for candidate in candidate_cells if probability_matrix[candidate[0], candidate[1]] < negative_threshold]
+
+			if len(positive_additions):
+				candidates.append(max(positive_additions, key=lambda x: abs(probability_matrix[x[0], x[1]])))
+			if len(negative_additions):
+				candidates.append(max(negative_additions, key=lambda x: abs(probability_matrix[x[0], x[1]])))
 
 		for candidate in candidates:
-			if abs(probability_matrix[candidate[0], candidate[1]].item()) < self.THRESHOLD_MAGNITUDE:
-				continue
-
-			# SHOULD I CHANGE THE N_CANDIDATES NUMBER?
-			# MAYBE GROUP THIS INTO 2 GROUPS: ONE GROUP TAKES THE MOST NEGATIVE NUMBERS (AND REMOVE)
-			# AND THE SECOND GROUP TAKES THE MOST POSITIVE NUMBERS AND ADDS
-			# COMBINE THE TWO INTO SEPERATE TREE BRANCHES AND GET THE MAXIMUM SCORING ONE
 			newGrid = self.board.clone()
 			if probability_matrix[candidate[0], candidate[1]] > 0:
 				newGrid[0, candidate[0], candidate[1]] = 1
 			else:
 				newGrid[0, candidate[0], candidate[1]] = 0
 
-			candidateStates.append(Board(newGrid))
+			candidateStates.append(Board(newGrid, self.level + 1))
 
 		return candidateStates
 
 
-	# this is shit - fix it maybe?
-	def greedyMethod(self):
-		probability_matrix = self.model(self.board)[0]
-		candidate_cells = list(np.argwhere(probability_matrix.detach().numpy() != 0))
-		candidate = max(candidate_cells, key=lambda x: abs(probability_matrix[x[0], x[1]].item()))
-		newGrid = self.board.clone()
-		newGrid[0, candidate[0], candidate[1]] = 1 - newGrid[0, candidate[0], candidate[1]]
-		return [Board(newGrid)]
-
-
-	def iterativeChangeMethod(self):
-		newGrid = modelChangeIteratively(self.model, self.board.clone(), 1)
-		return [Board(newGrid)]
-
-	def getScore(self):
-		return self.scoringModel(self.board).item() - self.visited
-
-
 # returns a model change matrix
 def modelChangeIteratively(model, initialState, n_iters):
-
-	# result = result.numpy()
-	# newMatrix = initialState[0].numpy().copy()
-	# # the cells that were missing
-	# add_cells = np.argwhere(result > 0.15)
-	# if len(add_cells):					
-	# 	newMatrix[add_cells[:, 0], add_cells[:, 1]] = 1
-
-	# # the cells that were already there
-	# add_cells = np.argwhere((result < -0.1) & (result > -0.3))
-	# if len(add_cells):			
-	# 	newMatrix[add_cells[:, 0], add_cells[:, 1]] = 1
-
-	# remove_cells = np.argwhere(result < -0.7)
-	# if len(remove_cells):
-	# 	newMatrix[remove_cells[:, 0], remove_cells[:, 1]] = 0
 
 	workState = initialState.detach()
 	for _ in range(n_iters):
@@ -118,9 +88,9 @@ def modelChangeIteratively(model, initialState, n_iters):
 	return torch.from_numpy(result)
 
 
-def tree_search(max_depth, model, score_model, currentState, number_of_returns=5, debug_list=[], debug_ship=None):
+def tree_search(max_depth, model, score_model, currentState, number_of_returns=10):
 
-	currentState = Board(currentState)
+	currentState = Board(currentState, 0)
 	bestStates = [currentState]
 	bestScore = 1
 
@@ -130,9 +100,9 @@ def tree_search(max_depth, model, score_model, currentState, number_of_returns=5
 	exploredStates = []
 	actions = []
 
-	for _ in range(max_depth):
+	for i in range(max_depth):
 		exploredStates.append(currentState)
-		actions = [action for action in currentState.getPossibleActions(debug_list=debug_list, debug_ship=debug_ship) if not action in exploredStates]
+		actions = [action for action in currentState.getPossibleActions(i) if not action in exploredStates]
 
 		if not actions:
 			currentState = max(exploredStates, key=lambda x: x.getScore())

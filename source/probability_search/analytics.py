@@ -132,6 +132,7 @@ def displayResults(result):
 	plt.plot(iter_results["cohesion_scores"], label="cohesion")
 	plt.xlabel("Number of iterations")
 	plt.ylabel("Score")
+	plt.title("Number of iterations to score")
 	plt.legend(loc="upper left")
 	plt.show()
 	plt.savefig("iterations_score_proabability_analysis")
@@ -140,6 +141,7 @@ def displayResults(result):
 	plt.plot(iter_results["n_cells_extra_after_recursion"], label="# Cells extra")
 	plt.xlabel("Number of iterations")
 	plt.ylabel("Number of cells")
+	plt.title("Number of iterations to cells missing/extra after search")
 	plt.legend(loc="upper left")
 	plt.savefig("iterations_n_cells_extra_missing_probability_analysis")
 	plt.show()
@@ -150,6 +152,7 @@ def displayResults(result):
 	plt.plot(removed_results["cohesion_scores"], label="cohesion")
 	plt.xlabel("Number of removed cells")
 	plt.ylabel("Score")
+	plt.title("Number of removed cells to score")
 	plt.legend(loc="upper left")
 	plt.savefig("n_removed_cells_score_probability_analysis")
 	plt.show()
@@ -159,6 +162,7 @@ def displayResults(result):
 	plt.xlabel("Number of cells removed from spaceship")
 	plt.ylabel("Number of removed cells")
 	plt.legend(loc="upper left")
+	plt.title("Number of removed cells to cells missing/extra")
 	plt.savefig("cells_removed_n_cells_extra_missing_probability_analysis")
 	plt.show()
 
@@ -169,6 +173,7 @@ def displayResults(result):
 	plt.xlabel("Number of added cells")
 	plt.ylabel("Score")
 	plt.legend(loc="upper left")
+	plt.title("Number of added cells to score")
 	plt.savefig("n_added_cells_score_probability_analysis")
 	plt.show()
 
@@ -177,6 +182,7 @@ def displayResults(result):
 	plt.xlabel("Number of cells removed from spaceship")
 	plt.ylabel("Number of added cells")
 	plt.legend(loc="upper left")
+	plt.title("Number of added cells to cells missing/extra")
 	plt.savefig("cells_added_n_cells_extra_missing_probability_analysis")
 	plt.show()
 
@@ -184,6 +190,7 @@ def displayResults(result):
 	plt.plot(added_results["avg_scores_of_missing_cells"], label="Missing cells avg score")
 	plt.xlabel("Number of cells removed from spaceship")
 	plt.ylabel("Change of probability (score)")
+	plt.title("Number of added cells to score of missing/extra cells")
 	plt.legend(loc="upper left")
 	plt.savefig("cells_added_n_cells_extra_missing_probability_score_analysis")
 	plt.show()
@@ -237,15 +244,16 @@ def runScoringTests(n_iters):
 		"n_cells_missing" : []
 	}
 
-	n_max_cells_missing = 20
-	n_cells_missing_list = [i for i in range(n_max_cells_missing)]
+	n_max_cells_missing = 50
+	n_cells_missing_list = [i+1 for i in range(n_max_cells_missing)]
 	for _ in range(n_iters):
 		for i, ship in enumerate(ships):
 			for n_cells_missing in n_cells_missing_list:
 				testStructure, _ = createTestingShipWithCellsMissing(ship, n_cells_missing)
 				score = model(testStructure).item()
 				# SEE IF THE RESULTS DIFFER IF THIS IS SWITCHED AROUND - THEY SHOULDNT NORMALLY I THINK
-				actualScore = getMatrixScore(testStructure.detach().numpy()[0], ship)
+				# actualScore = getMatrixScore(testStructure.detach().numpy()[0], ship)
+				actualScore = getMatrixScore(ship, testStructure.detach().numpy()[0])
 
 				scores["score"].append(score)
 				scores["actualScore"].append(actualScore)
@@ -303,9 +311,9 @@ def shipAfterSearchAnalysis(results, original_matrix):
 def analyzeSearchMethodConvergence():
 	# basically, i want to know if less max_depth but more iterations will make this algorithm better
 	n_ships = 10
-	n_iter_list = [1, 2, 3, 4]
-	max_depth_list = [10, 20, 30]
-	n_cells_removed_list = [1, 2, 3, 4, 5]
+	n_iter_list = [3]
+	max_depth_list = [30]
+	n_cells_removed_list = [i+1 for i in range(20)]
 	ship_testing_list = random.choices(ships, k=n_ships)
 
 	results_dict = {
@@ -322,9 +330,9 @@ def analyzeSearchMethodConvergence():
 		for max_depth in max_depth_list:
 			for ship in ship_testing_list:
 				for n_cells_removed in n_cells_removed_list:
-					# damagedSpaceship, removed = createTestingShipWithCellsMissing(ship, n_cells_removed)
+					damagedSpaceship, removed = createTestingShipWithCellsMissing(ship, n_cells_removed)
 					# FIX THIS METHOD TO ADAPT TO BOTH REMOVED AND ADDED SPACESHIP TESTING
-					damagedSpaceship, removed = createTestingShipWithCellsAdded(ship, n_cells_removed)
+					# damagedSpaceship, removed = createTestingShipWithCellsAdded(ship, n_cells_removed)
 					results = search(n_iters=n_iter, max_depth=max_depth, initialInput=damagedSpaceship)
 					data = shipAfterSearchAnalysis(results, ship)
 					results_dict["n_iter"] += [n_iter] * len(results)
@@ -394,13 +402,15 @@ if __name__ == "__main__":
 	ships = rle_reader.getFileArray(filePath)
 
 	# if doing some training data testing:
-	ships = ships[:800]
+	# ships = ships[:800]
+	# ships = ships[800:]
+
 	# testing data:
 	# ships = ships[800:]
 
 	# run_ship_network_tests()
-	# runScoringTests(100)
-	analyzeSearchMethodConvergence() # speed this up
+	runScoringTests(100)
+	# analyzeSearchMethodConvergence() # speed this up
 
 
 # Current analytics available:
