@@ -1,6 +1,11 @@
 import numpy as np
 import torch
+import os
 import random
+from rle_reader import RleReader
+from gol_tools import outputShipData
+
+ROOT_PATH = os.path.abspath(os.pardir) # current root of the probability search
 
 
 def createTestingShipWithCellsMissing(ship, n_cells_missing):
@@ -64,3 +69,20 @@ def mockRatioDeconstruct(ship, n_cells_missing, n_cells_extra):
 
 	# returns the new object, the cells which were deleted, and the cells flipped which are not part of the ship
 	return torch.from_numpy(tempGrid), cells_missing, dead_to_flip
+
+
+def checkSpaceshipFinderAlgorithm():
+	rle_reader = RleReader()
+	filePath = os.path.join(ROOT_PATH, "spaceship_identification", "spaceships_extended.txt")
+	ships = rle_reader.getFileArray(filePath)
+	for i, ship in enumerate(ships):
+		ship = ship[None, :]
+
+		if outputShipData(ship):
+			print(f"Ship {i} : OK.")
+		else:
+			print(f"[ERROR] Ship {i} failed.")
+
+
+if __name__ == "__main__":
+	checkSpaceshipFinderAlgorithm()

@@ -1,11 +1,11 @@
 import numpy as np
-from .game_of_life import Game
-from .rle_reader import RleReader
+from game_of_life import Game
+from rle_reader import RleReader
 
 
 # return if it is a ship, the speed, period, etc...
 def outputShipData(pattern):
-	searchSize = 32
+	searchSize = 128
 	patternSize = pattern.shape[1:]
 	expandedSizes = (patternSize[0] + searchSize, patternSize[1] + searchSize) # make space for spaceship movement
 	originalRle = normalizedPatternToRle(patternIdentity(pattern[0]))
@@ -30,12 +30,13 @@ def outputShipData(pattern):
 			distance_y = abs(max(originalAlive[:, 1]) - max(newAlive[:, 1]) + searchSize //2)
 			distance = (distance_x, distance_y)
 
-			return {
-				"period" : i,
-				"distance_moved" : distance,
-				"pattern" : pattern[0],
-				"rle" : originalRle
-			}
+			if distance:
+				return {
+					"period" : i,
+					"distance_moved" : distance,
+					"pattern" : pattern[0],
+					"rle" : originalRle
+				}
 
 	return {}
 
