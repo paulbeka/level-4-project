@@ -2,8 +2,8 @@ import numpy as np
 import torch
 import os
 import random
-from rle_reader import RleReader
-from gol_tools import outputShipData
+from .rle_reader import RleReader
+from .gol_tools import outputShipData
 
 ROOT_PATH = os.path.abspath(os.pardir) # current root of the probability search
 

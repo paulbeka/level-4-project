@@ -4,6 +4,7 @@ import os
 import random
 import matplotlib.pyplot as plt
 import pandas as pd
+from tqdm import tqdm
 
 from networks.convolution_probability_network import ProbabilityFinder
 from networks.score_predictor import ScoreFinder
@@ -311,10 +312,10 @@ def shipAfterSearchAnalysis(results, original_matrix):
 def analyzeSearchMethodConvergence():
 	# basically, i want to know if less max_depth but more iterations will make this algorithm better
 	n_ships = 10
-	n_iter_list = [3]
-	max_depth_list = [30]
+	n_iter_list = [5]
+	max_depth_list = [100]
 	n_cells_removed_list = [i+1 for i in range(20)]
-	ship_testing_list = random.choices(ships, k=n_ships)
+	ship_testing_list = random.sample(ships, k=n_ships)
 
 	results_dict = {
 		"n_iter" : [],
@@ -326,14 +327,20 @@ def analyzeSearchMethodConvergence():
 		"found_ship" : [],
 	}
 
+	total = len(n_iter_list) * len(max_depth_list) * n_ships * len(n_cells_removed_list)
+	pbar = tqdm(desc="Analysing search algorithm: ", total=total)
 	for n_iter in n_iter_list:
 		for max_depth in max_depth_list:
 			for ship in ship_testing_list:
 				for n_cells_removed in n_cells_removed_list:
 					damagedSpaceship, removed = createTestingShipWithCellsMissing(ship, n_cells_removed)
-					# FIX THIS METHOD TO ADAPT TO BOTH REMOVED AND ADDED SPACESHIP TESTING
-					# damagedSpaceship, removed = createTestingShipWithCellsAdded(ship, n_cells_removed)
-					results = search(n_iters=n_iter, max_depth=max_depth, initialInput=damagedSpaceship)
+					results = search(
+						n_iters=n_iter, 
+						max_depth=max_depth, 
+						initialInput=damagedSpaceship.clone(), 
+						testing_data={
+							"ship" : ship,
+						})
 					data = shipAfterSearchAnalysis(results, ship)
 					results_dict["n_iter"] += [n_iter] * len(results)
 					results_dict["max_depth"] += [max_depth] * len(results)
@@ -342,6 +349,10 @@ def analyzeSearchMethodConvergence():
 					results_dict["cells_missing"] += data["cells_missing"]
 					results_dict["extra_cells"] += data["extra_cells"]
 					results_dict["found_ship"] += data["found_ship"] 
+
+					pbar.update(1)
+
+	pbar.close() # delete the progress bar
 
 	results_pd = pd.DataFrame(results_dict)
 	iter_grouped = results_pd.groupby(["n_iter"]).aggregate(np.mean)
@@ -402,15 +413,15 @@ if __name__ == "__main__":
 	ships = rle_reader.getFileArray(filePath)
 
 	# if doing some training data testing:
-	# ships = ships[:800]
+	ships = ships[:800]
 	# ships = ships[800:]
 
 	# testing data:
 	# ships = ships[800:]
 
 	# run_ship_network_tests()
-	runScoringTests(100)
-	# analyzeSearchMethodConvergence() # speed this up
+	# runScoringTests(100)
+	analyzeSearchMethodConvergence()
 
 
 # Current analytics available:

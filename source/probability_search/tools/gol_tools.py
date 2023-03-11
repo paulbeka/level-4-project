@@ -1,6 +1,6 @@
 import numpy as np
-from game_of_life import Game
-from rle_reader import RleReader
+from .game_of_life import Game
+from .rle_reader import RleReader
 
 
 # return if it is a ship, the speed, period, etc...

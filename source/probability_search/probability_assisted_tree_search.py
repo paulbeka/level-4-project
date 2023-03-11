@@ -10,7 +10,7 @@ from networks.score_predictor import ScoreFinder
 ROOT_PATH = os.path.abspath(os.getcwd()) # current root of the probability search
 
 from tools.rle_reader import RleReader 
-from tools.gol_tools import outputShipData
+from tools.gol_tools import outputShipData, normalizedPatternToRle, patternIdentity
 from tools.testing import createTestingShipWithCellsMissing, locationDifferencesBetweenTwoMatrixies
 
 
@@ -30,7 +30,7 @@ class Board:
 
 
 	def getPossibleActions(self):
-		return self.candidateAndScoringMethod(iteration)
+		return self.candidateAndScoringMethod()
 
 
 	def candidateAndScoringMethod(self):
@@ -38,21 +38,27 @@ class Board:
 		# MIGHT NEED TO CHANGE THESE VALUES IN ORDER TO ELIMINATE A GOOD AMOUNT OF CELLS- TO ALLOW TREE SEARCH TO RUN
 		# MAYBE COULD MAKE THEM DYNAMIC: AS THE SEARCH CONTINUES, MAKE THEM MORE EXTREME TO ENCOURAGE SEARCH
 		# OF OTHER BRANCHES IN THE SEARCHED LIST [CHECK THIS]
-		positive_threshold = 0.15 + (self.level * 0.1)
-		negative_threshold = -0.6 + (self.level * 0.1)
+		positive_threshold = 0.3 #+ (self.level * 0.1)
+		negative_threshold = -0.8# + (self.level * 0.1)
 		
 		probability_matrix = self.model(self.board)[0]
-		candidate_cells = list(np.argwhere(probability_matrix.detach().numpy() != 0))
+		candidate_cells = list(np.argwhere(abs(probability_matrix.detach().numpy()) > positive_threshold))
 
 		candidates = []
-		for i in range(self.N_CONSIDERATIONS):
-			positive_additions = [candidate for candidate in candidate_cells if probability_matrix[candidate[0], candidate[1]] > positive_threshold]
-			negative_additions = [candidate for candidate in candidate_cells if probability_matrix[candidate[0], candidate[1]] < negative_threshold]
+		positive_additions = [tuple(candidate) for candidate in candidate_cells if probability_matrix[candidate[0], candidate[1]] > positive_threshold]
+		negative_additions = [tuple(candidate) for candidate in candidate_cells if probability_matrix[candidate[0], candidate[1]] < negative_threshold]
 
+		for i in range(self.N_CONSIDERATIONS):
+			
 			if len(positive_additions):
+				max_item = max(positive_additions, key=lambda x: abs(probability_matrix[x[0], x[1]]))
 				candidates.append(max(positive_additions, key=lambda x: abs(probability_matrix[x[0], x[1]])))
+				positive_additions.remove(max_item)
+
 			if len(negative_additions):
-				candidates.append(max(negative_additions, key=lambda x: abs(probability_matrix[x[0], x[1]])))
+				max_item = max(negative_additions, key=lambda x: abs(probability_matrix[x[0], x[1]]))
+				candidates.append(max_item)
+				negative_additions.remove(max_item)
 
 		for candidate in candidates:
 			newGrid = self.board.clone()
@@ -65,27 +71,9 @@ class Board:
 
 		return candidateStates
 
-
-# returns a model change matrix
-def modelChangeIteratively(model, initialState, n_iters):
-
-	workState = initialState.detach()
-	for _ in range(n_iters):
-		modeled_change = model(workState).detach()
-		result = (workState + modeled_change).numpy()[0]
-		remove_ones = np.argwhere(result > 1)
-		result[remove_ones[:, 0], remove_ones[:, 1]] = 1
-		remove_zeros = np.argwhere(result < 0)
-		result[remove_zeros[:, 0], remove_zeros[:, 1]] = 0
-		result = result[None, :]
-		workState = torch.from_numpy(result)
-
-	threshold = 0.18 
-	newMatrix = np.zeros_like(result)
-	aboveHalf = np.argwhere(result > threshold)
-	newMatrix[aboveHalf[:, 0], aboveHalf[:, 1]] = 1
-
-	return torch.from_numpy(result)
+	# MAYBE CHANGE THIS SCORING FUNCTION AND VISITED MODIFIER
+	def getScore(self):
+		return self.scoringModel(self.board).item() - self.visited
 
 
 def tree_search(max_depth, model, score_model, currentState, number_of_returns=10):
@@ -102,7 +90,7 @@ def tree_search(max_depth, model, score_model, currentState, number_of_returns=1
 
 	for i in range(max_depth):
 		exploredStates.append(currentState)
-		actions = [action for action in currentState.getPossibleActions(i) if not action in exploredStates]
+		actions = [action for action in currentState.getPossibleActions() if not action in exploredStates]
 
 		if not actions:
 			currentState = max(exploredStates, key=lambda x: x.getScore())
@@ -157,24 +145,25 @@ def search(initialInput=None, n_iters=10, size=(20, 20), max_depth=100, testing_
 	if isinstance(inputGrid, type(None)):
 		inputGrid, removed = strategicFill(inputGrid) #no user supplied input- strategic fill
 
-	if testing_data:
-		inputGrid = testing_data["initialInput"] # use input from testing data
-
 	all_results = []
 
-	# IDEA: CHANGE THE MAX DEPTH AS A FUNCTION OF NUMBER OF ITERATIONS
-	for i in range(n_iters):
-		if testing_data:
-			# is this feature necessary?
-			results = tree_search(max_depth, model, score_model, inputGrid, debug_list=testing_data["removed"], debug_ship=testing_data["og_ship"])
-		else:
-			# results = tree_search(max_depth, model, score_model, inputGrid)
-			# max_depth as a function of iterations:
-			results = tree_search(int(max_depth * (1 + (i*0.1))), model, score_model, inputGrid)
+	if testing_data:
+		originalRle = normalizedPatternToRle(patternIdentity(np.array(testing_data["ship"])))
 
+	for i in range(n_iters):
+
+		# results = tree_search(max_depth, model, score_model, inputGrid)
+		# max_depth as a function of iterations:
+		results = tree_search(int(max_depth * (1 + (i*0.1))), model, score_model, inputGrid)
 
 		all_results += results
 		for result in results:
+			if testing_data:
+				if normalizedPatternToRle(patternIdentity(np.array(result.board[0]))) == originalRle:
+					# print(originalRle)
+					return all_results
+				continue
+
 			data = outputShipData(np.array(result.board))
 			if data:
 				print(data["rle"])
@@ -182,7 +171,7 @@ def search(initialInput=None, n_iters=10, size=(20, 20), max_depth=100, testing_
 				return all_results
 				
 		inputGrid = optimizeInputGrid(inputGrid, results)
-		print(f"Iteration {i+1}/{n_iters}")
+		# print(f"Iteration {i+1}/{n_iters}")
 
 	return all_results
 
