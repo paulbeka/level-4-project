@@ -311,7 +311,7 @@ def shipAfterSearchAnalysis(results, original_matrix):
 # Test the number of cells can be removed for search to work
 def analyzeSearchMethodConvergence():
 	# basically, i want to know if less max_depth but more iterations will make this algorithm better
-	n_ships = 10
+	n_ships = 30	
 	n_iter_list = [5]
 	max_depth_list = [100]
 	n_cells_removed_list = [i+1 for i in range(20)]
