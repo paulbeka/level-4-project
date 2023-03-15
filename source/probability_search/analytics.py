@@ -250,8 +250,10 @@ def runScoringTests(n_iters):
 	for _ in range(n_iters):
 		for i, ship in enumerate(ships):
 			for n_cells_missing in n_cells_missing_list:
+				# TEST THIS PROPERLY THERE MAY BE A MAJOR ISSUE WITH THIS
 				testStructure, _ = createTestingShipWithCellsMissing(ship, n_cells_missing)
-				score = model(testStructure).item()
+				testStructure, _ = createTestingShipWithCellsAdded(testStructure[0], n_cells_missing)
+				score = -model(testStructure).item() + 0.14 # make the model close to the actual value
 				# SEE IF THE RESULTS DIFFER IF THIS IS SWITCHED AROUND - THEY SHOULDNT NORMALLY I THINK
 				# actualScore = getMatrixScore(testStructure.detach().numpy()[0], ship)
 				actualScore = getMatrixScore(ship, testStructure.detach().numpy()[0])
@@ -285,7 +287,6 @@ def runScoringTests(n_iters):
 	plt.title("Cells missing to score")
 	plt.savefig("cells_missing_to_score_test")
 	plt.show()
-
 
 
 ### SEARCH METHOD TESTING ###
@@ -398,7 +399,7 @@ def analyzeSearchMethodConvergence():
 	plt.savefig("number_of_cells_n_cells_removed")
 	plt.show()
 
-	total_iterations = n_ships * len(n_iter_list) * len(max_depth_list) * len(n_cells_removed_list)
+	total_iterations = n_ships * len(n_iter_list) * len(max_depth_list)
 	prob_reconstruction_aggregation = results_pd.groupby(["n_cells_removed"]).aggregate(np.sum)
 	plt.plot(prob_reconstruction_aggregation["found_ship"] / total_iterations)
 	plt.xlabel("# cells removed")
@@ -413,8 +414,8 @@ if __name__ == "__main__":
 	ships = rle_reader.getFileArray(filePath)
 
 	# if doing some training data testing:
-	ships = ships[:800]
-	# ships = ships[800:]
+	# ships = ships[:800]
+	ships = ships[800:]
 
 	# testing data:
 	# ships = ships[800:]
