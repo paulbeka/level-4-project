@@ -460,22 +460,60 @@ WINTER BREAK- BARELY ANYTHING DONE
 ### 16 Feb 2023
 * *1 hour* made presentation for JW and email
 
-## 17 Feb 2023
+### 17 Feb 2023
 
-FILL THIS UP WITH STUFF
+### 18 Feb 2023
+
+### 19 Feb 2023
+
+
+## Week 7 - AFTER BREAK
+
+### 20 Feb 2023
+### 21 Feb 2023
+### 22 Feb 2023
+### 23 Feb 2023
+### 24 Feb 2023
+### 25 Feb 2023
 
 ## 26 Feb 2023
 * *2 hours* Worked on testing the search algorithms
 
-## 27 Feb 2023
+
+## Week 8 - AFTER BREAK
+
+### 27 Feb 2023
 * *2 hours* tried to fix the spaceship finding algorithm
 
-## 28 Feb 2023
+### 28 Feb 2023
 * *2 hours* Working on analytics program
 
-## 1 Mar 2023
+### 1 Mar 2023
 * *5 hours* Worked on the analytics algorithm and implemented a greedy approach
 
-## 2 Mar 2023
+### 2 Mar 2023
 * *2 hours* Writing dissertation
 * *3 hours* fixing issues with the search algorithm
+
+### 3 Mar 2022
+* *2 hours* Met JW and worked on analytics function
+
+### 4 Mar 2022
+* *4 hours* Worked on improving results of algorithm and on dissertation
+
+### 5 Mar 2022
+* *4 hours* Wrote dissertation, fixed some bugs of the search method
+
+
+## Week 9 - AFTER BREAK
+
+### 6 Mar 2022
+* *5 hours* Kept bug fixing, writing dissertation, making diagrams
+
+### 7 Mar 2022
+
+### 8 Mar 2022
+
+### 9 Mar 2022
+
+### 10 Mar 2022

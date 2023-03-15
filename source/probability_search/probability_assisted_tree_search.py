@@ -126,8 +126,8 @@ def optimizeInputGrid(inputGrid, results):
 def search(initialInput=None, n_iters=10, size=(20, 20), max_depth=100, testing_data={}):
 
 	# LOAD THE PROBABILITY AND SCORING MODELS
-	MODEL_NAME = "5x5_included_20_pairs_epoch_4"
-	SCORE_MODEL_NAME = "brandnewScoringNetworkEpoch_10"
+	MODEL_NAME = "probability_change_network"
+	SCORE_MODEL_NAME = "scoring_network"
 
 	model_path = os.path.join(ROOT_PATH, "models", MODEL_NAME)
 	model = ProbabilityFinder(1).double()
