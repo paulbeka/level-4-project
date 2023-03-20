@@ -407,6 +407,13 @@ def analyzeSearchMethodConvergence():
 	plt.savefig("probability_of_reconstruction_against_damage")
 	plt.show()
 
+	n_iter_sum = results_pd.groupby(["n_iter"]).aggregate(np.sum)
+	plt.plot(n_iter_sum["found_ship"])
+	plt.xlabel("# of iterations")
+	plt.ylabel("# of ships found")
+	plt.savefig("n_iters_to_reconstruct")
+	plt.show()
+
 
 if __name__ == "__main__":
 	rle_reader = RleReader()
