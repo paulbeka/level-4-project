@@ -399,7 +399,7 @@ def analyzeSearchMethodConvergence():
 	plt.savefig("number_of_cells_n_cells_removed")
 	plt.show()
 
-	total_iterations = n_ships * len(n_iter_list) * len(max_depth_list)
+	total_iterations = n_ships * reduce((lambda x, y: x * y), n_iter_list) * len(max_depth_list)
 	prob_reconstruction_aggregation = results_pd.groupby(["n_cells_removed"]).aggregate(np.sum)
 	plt.plot(prob_reconstruction_aggregation["found_ship"] / total_iterations)
 	plt.xlabel("# cells removed")
@@ -421,8 +421,8 @@ if __name__ == "__main__":
 	ships = rle_reader.getFileArray(filePath)
 
 	# if doing some training data testing:
-	# ships = ships[:800]
-	ships = ships[800:]
+	ships = ships[:800]
+	# ships = ships[800:]
 
 	# testing data:
 	# ships = ships[800:]

@@ -166,14 +166,16 @@ def search(initialInput=None, n_iters=10, size=(20, 20), max_depth=100, testing_
 
 			data = outputShipData(np.array(result.board))
 			if data:
+				print("FOUND SHIP: ")
 				print(data["rle"])
 				ship_found.append(data)
 				return all_results
 				
 		inputGrid = optimizeInputGrid(inputGrid, results)
-		# print(f"Iteration {i+1}/{n_iters}")
+		print(f"Iteration {i+1}/{n_iters}")
 
+	print(f"Search over. Found {len(ship_found)} spaceships.")
 	return all_results
 
 if __name__ == "__main__":
-	search()
+	found_structures = search()

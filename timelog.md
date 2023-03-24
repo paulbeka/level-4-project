@@ -288,7 +288,7 @@ s said
 ### 13 Dec 2022
 * *0 hours*
 
-WINTER BREAK- BARELY ANYTHING DONE
+WINTER BREAK- ALMOST NO WORK DONE
 
 ## Week 0 - AFTER BREAK
 
@@ -461,20 +461,34 @@ WINTER BREAK- BARELY ANYTHING DONE
 * *1 hour* made presentation for JW and email
 
 ### 17 Feb 2023
+* *3 hours* Dissertation work
 
 ### 18 Feb 2023
+* *2 hours* Improved the algorithm
 
 ### 19 Feb 2023
+* *2 hours* Bug fixes - no progress
 
 
 ## Week 7 - AFTER BREAK
 
 ### 20 Feb 2023
+* *0 hours* no work
+
 ### 21 Feb 2023
+* *0 hours* no work
+
 ### 22 Feb 2023
+* *0 hours* no work
+
 ### 23 Feb 2023
+* *0 hours* no work
+
 ### 24 Feb 2023
+* *2 hours* met JW and fixed some bugs in code
+
 ### 25 Feb 2023
+* *3 hours* wrote some tests for search and scoring functions
 
 ## 26 Feb 2023
 * *2 hours* Worked on testing the search algorithms
@@ -511,9 +525,78 @@ WINTER BREAK- BARELY ANYTHING DONE
 * *5 hours* Kept bug fixing, writing dissertation, making diagrams
 
 ### 7 Mar 2022
+* *3 hours* adding threshold parametrization
 
 ### 8 Mar 2022
+* *2 hours* adding and fixing threshold parametrization
 
 ### 9 Mar 2022
+* *2 hours* finding lower and upper bounds for thresholds
 
 ### 10 Mar 2022
+* *4 hours* bug fixing and dissertation writing
+
+## Week 10 - AFTER BREAK
+
+### 6 Mar 2022
+* *5 hours* Writing dissertation
+
+### 7 Mar 2022
+* *6 hours* fixed bugs, ran tests, made some diagrams for dissertation
+
+### 8 Mar 2022
+* *6 hours* found critical error in the threshold code and fixed it
+
+### 9 Mar 2022
+* *0 hours* break day :D
+
+### 10 Mar 2022
+* *1 hour* met JW and got some feedback on work
+
+### 11 Mar 2022
+* *5 hours* Bug fixing, writing dissertation, making diagrams
+
+### 12 Mar 2022
+* *6 hours* dissertation writing
+
+
+## Week 11 - AFTER BREAK
+
+### 13 Mar 2022
+* *5 hours* Running the analytics program, fixing bugs
+
+### 14 Mar 2022
+* *7 hours* Implementing the max_depth incrementer, fixing bugs, writing. Finalized code
+
+### 15 Mar 2022
+* *7 hours* Writing implementation
+
+### 16 Mar 2022
+* *7 hours* Writing implementation
+
+### 17 Mar 2022
+* *7 hours* Writing, met JW to find flaws in project, fixing them
+
+### 18 Mar 2022
+* *9 hours* fixing problems with dissertation
+
+### 19 Mar 2022
+* *8 hours* writing and fixing dissertation issues, getting feeback
+
+
+## Week 12 - AFTER BREAK
+
+### 20 Mar 2022
+* *8 hours* Re writing the conclusion, fixing issues with dissertation, summaries of the implementation
+
+### 21 Mar 2022
+* *8 hours* Finishing the implementation of JW's comments made on Friday (re-writing, etc)
+
+### 22 Mar 2022
+* *8 hours* met with JW to review, worked on comments made, re-writing conclusiomn
+
+### 23 Mar 2022
+* *8 hours* Working on the dissertation, created a presentation, recorded presentation
+
+### 24 Mar 2022
+* *7 hours* Finished the dissertation, finalising touches, re-recording the presentation. Submitted :D
